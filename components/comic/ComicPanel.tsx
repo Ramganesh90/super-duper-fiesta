@@ -29,7 +29,7 @@ export default function ComicPanel({ panel, index, accent }: ComicPanelProps) {
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
-      <div className={`pointer-events-none absolute inset-0 opacity-40 ${style.halftone}`} aria-hidden="true" />
+      <div className={`pointer-events-none absolute inset-0 ${style.halftone}`} aria-hidden="true" />
       <figcaption className="relative flex items-center gap-2">
         <span className={`font-comic text-sm tracking-widest sm:text-base ${style.label}`}>
           {String(index + 1).padStart(2, "0")} · {panel.label}
@@ -45,7 +45,9 @@ export default function ComicPanel({ panel, index, accent }: ComicPanelProps) {
           {panel.emoji}
         </span>
       </div>
-      <p className="relative text-base leading-relaxed sm:text-lg">{panel.caption}</p>
+      <p className="comic-border-sm relative bg-paper px-3 py-2 text-base leading-relaxed sm:text-lg">
+        {panel.caption}
+      </p>
       {panel.speaker && panel.dialogue && (
         <div className="relative mt-2">
           <SpeechBubble speaker={panel.speaker} message={panel.dialogue} accent={accent} />

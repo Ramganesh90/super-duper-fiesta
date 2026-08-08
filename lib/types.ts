@@ -1,4 +1,10 @@
-export type PatternCategory = "creational" | "structural" | "behavioral";
+export type PatternCategory =
+  | "creational"
+  | "structural"
+  | "behavioral"
+  | "concurrency"
+  | "architectural"
+  | "enterprise";
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 export type PanelType = "problem" | "hero" | "power" | "result";
 
@@ -94,10 +100,16 @@ export const CATEGORY_LABELS: Record<PatternCategory, string> = {
   creational: "Creational",
   structural: "Structural",
   behavioral: "Behavioral",
+  concurrency: "Concurrency",
+  architectural: "Architectural",
+  enterprise: "Enterprise",
 };
 
 export const CATEGORY_ICONS: Record<PatternCategory, string> = {
   creational: "🛠",
   structural: "🧩",
   behavioral: "🧠",
+  concurrency: "⏱",
+  architectural: "🏛",
+  enterprise: "🏢",
 };
