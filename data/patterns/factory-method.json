@@ -1,0 +1,186 @@
+{
+  "id": "factory-method",
+  "title": "Factory Method Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Lets a class defer object construction to subclasses, so calling code never has to know a concrete type to create it.",
+  "hero": {
+    "name": "Forge Master",
+    "codename": "Factory Method",
+    "catchphrase": "Why are you constructing everything yourself? Give me the blueprint. I'll handle creation.",
+    "power": "Summons the right object for the job from a blueprint, without the caller ever naming the concrete class.",
+    "weakness": "Every new product type needs a new creator subclass — Forge Master can multiply the class count if wielded carelessly.",
+    "origin": "Born in a payment service riddled with 'if (provider === \"stripe\")' branches, Forge Master appeared to hand construction over to specialists instead.",
+    "enemies": [
+      "Rigid Constructors",
+      "Switch Statement Sprawl",
+      "Tight Coupling"
+    ],
+    "emoji": "🔨",
+    "colorFrom": "#ea580c",
+    "colorTo": "#f59e0b"
+  },
+  "story": {
+    "problem": "PaymentService constructs a `new StripeGateway()` directly. Adding Razorpay means editing PaymentService's internals again, and again for every provider after that.",
+    "solution": "Forge Master gives each payment provider its own creator. PaymentService just asks for 'a gateway' — it never touches 'new StripeGateway()' again.",
+    "result": "Adding a new payment provider means adding a new creator class. The core service never changes."
+  },
+  "beforeAfter": {
+    "before": [
+      "PaymentService edited for every new provider",
+      "Tight coupling to every concrete gateway class",
+      "Risk of regressions in unrelated providers"
+    ],
+    "after": [
+      "New providers ship as new files, zero edits to PaymentService",
+      "PaymentService depends only on the PaymentGateway interface",
+      "Existing providers stay untouched and untested-safe"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "PaymentService is riddled with construction logic for every provider it knows about.",
+      "speaker": "Developer",
+      "dialogue": "Every time we add a payment provider, I have to reopen PaymentService and add another if-branch. This file is 400 lines of constructors now.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Forge Master steps out of the blueprint vault, hammer raised.",
+      "speaker": "Forge Master",
+      "dialogue": "Stop building gateways with your bare hands. Define the blueprint — I'll forge the right one at the right time.",
+      "emoji": "🔨"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "An abstract createGateway() method appears. Each provider gets its own creator subclass that overrides it.",
+      "speaker": "Forge Master",
+      "dialogue": "PaymentService only calls createGateway(). It has no idea — and no need to know — which concrete class comes back.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Razorpay support ships as a brand-new file. PaymentService.ts isn't touched at all.",
+      "speaker": "Developer",
+      "dialogue": "We added Razorpay without editing a single line of the existing payment code. New file, zero regressions.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class PaymentService {\n  processPayment(provider: string, amount: number) {\n    let gateway;\n    if (provider === \"stripe\") {\n      gateway = new StripeGateway();\n    } else if (provider === \"razorpay\") {\n      gateway = new RazorpayGateway();\n    } else {\n      throw new Error(\"Unknown provider\");\n    }\n    return gateway.charge(amount);\n  }\n}\n// Adding PayPal means editing PaymentService again",
+    "after": "interface PaymentGateway {\n  charge(amount: number): Promise<void>;\n}\n\nabstract class PaymentCreator {\n  // The Factory Method — subclasses decide what gets built\n  abstract createGateway(): PaymentGateway;\n\n  processPayment(amount: number) {\n    const gateway = this.createGateway();\n    return gateway.charge(amount);\n  }\n}\n\nclass StripeCreator extends PaymentCreator {\n  createGateway(): PaymentGateway {\n    return new StripeGateway();\n  }\n}\n\nclass RazorpayCreator extends PaymentCreator {\n  createGateway(): PaymentGateway {\n    return new RazorpayGateway();\n  }\n}\n\n// Adding PayPal = one new file, PaymentCreator never changes\nclass PayPalCreator extends PaymentCreator {\n  createGateway(): PaymentGateway {\n    return new PayPalGateway();\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "A class can't anticipate which concrete type of object it needs to create ahead of time.",
+      "You want to let subclasses (or plugins) specify the objects they create, without touching shared code.",
+      "Construction logic is complex enough that it deserves its own dedicated method or class."
+    ],
+    "avoidWhen": [
+      "There's only ever going to be one concrete product — a plain constructor call is simpler and clearer.",
+      "The extra creator-class hierarchy adds more ceremony than the variation in construction actually warrants.",
+      "A simple factory function or a lookup object (map of type -> constructor) already solves the problem without subclassing."
+    ],
+    "commonMistakes": [
+      "Reaching for full Factory Method (with abstract creator subclasses) when a simple factory function would do — not every 'thing that creates objects' needs the formal pattern.",
+      "Letting the factory method leak concrete implementation details back up to the caller, defeating the whole point.",
+      "Creating a new creator subclass per product without ever consolidating shared construction logic in the base class.",
+      "Confusing Factory Method (subclasses override one creation method) with Abstract Factory (a family of related creation methods)."
+    ],
+    "realWorldExample": "Document editors that support multiple file formats (e.g. `createDocument()` overridden per format), UI toolkits that create platform-specific buttons, and ORMs that create the right query builder per database driver, all lean on Factory Method."
+  },
+  "conversation": [
+    {
+      "speaker": "Mentor",
+      "message": "So Forge Master doesn't create the object himself?"
+    },
+    {
+      "speaker": "Forge Master",
+      "message": "Correct. I define the blueprint — the createGateway() method — and let each specialist creator fill it in for their own provider."
+    },
+    {
+      "speaker": "Mentor",
+      "message": "Isn't that just a fancy if-statement in disguise?"
+    },
+    {
+      "speaker": "Forge Master",
+      "message": "The difference is where the branching lives. With an if-statement, PaymentService has to know every provider. With me, PaymentService knows none of them — it just asks, and trusts the creator it was given."
+    }
+  ],
+  "codeBattle": {
+    "scenario": "Your image-processing app needs to instantiate a different Exporter class depending on output format (PNG, JPEG, WebP), and new formats keep getting requested by the product team.",
+    "question": "Which hero should you call?",
+    "options": [
+      {
+        "id": "factory",
+        "label": "Factory Method"
+      },
+      {
+        "id": "singleton",
+        "label": "Singleton"
+      },
+      {
+        "id": "decorator",
+        "label": "Decorator"
+      },
+      {
+        "id": "observer",
+        "label": "Observer"
+      }
+    ],
+    "correct": "factory",
+    "explanation": "Forge Master lets you add a new Exporter subclass per format without ever touching the code that decides which exporter to construct."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Factory Method primarily solve?",
+      "options": [
+        "Code that has to construct different concrete classes gets tightly coupled to every one of them",
+        "Two objects need to stay in sync with each other automatically",
+        "An object needs to change its behavior at runtime",
+        "A complex subsystem needs a simpler interface"
+      ],
+      "answer": "Code that has to construct different concrete classes gets tightly coupled to every one of them",
+      "explanation": "Factory Method removes that coupling by pushing the 'which concrete class' decision into a dedicated creation method."
+    },
+    {
+      "question": "In Factory Method, who decides which concrete product gets created?",
+      "options": [
+        "A subclass (or override) of the creator, via the factory method",
+        "The calling code, by passing a class reference directly",
+        "A global configuration file read at startup",
+        "The product classes themselves, via static methods"
+      ],
+      "answer": "A subclass (or override) of the creator, via the factory method",
+      "explanation": "The creator defines the factory method as abstract (or with a default); subclasses override it to return the specific product."
+    },
+    {
+      "question": "You only ever need to construct one kind of Logger, with no variation now or planned. What's the better call?",
+      "options": [
+        "Skip Factory Method — a plain constructor is simpler and equally correct",
+        "Always use Factory Method for every class that gets instantiated",
+        "Use Factory Method plus Singleton together no matter what",
+        "Refactor Logger into an interface with ten creator subclasses just in case"
+      ],
+      "answer": "Skip Factory Method — a plain constructor is simpler and equally correct",
+      "explanation": "Factory Method earns its complexity when construction actually varies. With no variation, a direct constructor is clearer."
+    },
+    {
+      "question": "What's a common mistake when applying Factory Method?",
+      "options": [
+        "Reaching for the full pattern (creator subclass hierarchy) when a simple factory function would solve the same problem",
+        "Using 'new' inside the factory method itself",
+        "Returning an interface type from the factory method",
+        "Naming the method 'create' instead of 'make'"
+      ],
+      "answer": "Reaching for the full pattern (creator subclass hierarchy) when a simple factory function would solve the same problem",
+      "explanation": "Not every creation problem needs formal subclassing — over-applying the pattern adds unnecessary class hierarchy."
+    }
+  ]
+}

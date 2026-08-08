@@ -1,0 +1,186 @@
+{
+  "id": "observer",
+  "title": "Observer Pattern",
+  "category": "behavioral",
+  "difficulty": "beginner",
+  "oneLiner": "Lets an object broadcast state changes to any number of subscribers, without knowing who they are.",
+  "hero": {
+    "name": "Signal-Man",
+    "codename": "Observer",
+    "catchphrase": "Subscribe once. I'll handle the rest!",
+    "power": "Broadcasts a single event to every subscriber instantly, without the sender knowing who's listening.",
+    "weakness": "Too many silent subscribers and nobody can trace who reacts to what — Signal-Man's signals can become impossible to follow.",
+    "origin": "Signal-Man emerged from a dashboard where the OrderService had to manually call sendEmail(), updateInventory(), and logAnalytics() by name every time an order shipped — and forgetting one caused real bugs.",
+    "enemies": [
+      "Manual Polling",
+      "Tangled Callbacks",
+      "Missed Updates"
+    ],
+    "emoji": "📡",
+    "colorFrom": "#059669",
+    "colorTo": "#14b8a6"
+  },
+  "story": {
+    "problem": "OrderService directly calls EmailService, InventoryService, and AnalyticsService every time an order ships. Add a new subscriber, and OrderService's code has to change too.",
+    "solution": "Signal-Man lets OrderService just broadcast 'order shipped' — every subscriber that cares can listen in, and OrderService never needs to know they exist.",
+    "result": "New subscribers plug in independently. OrderService stays focused on orders, not on notifying every downstream system by name."
+  },
+  "beforeAfter": {
+    "before": [
+      "OrderService calls every listener by name",
+      "New integrations require editing OrderService",
+      "OrderService knows too much about unrelated systems"
+    ],
+    "after": [
+      "OrderService only knows about a generic listener list",
+      "New subscribers register themselves independently",
+      "OrderService stays focused purely on shipping orders"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "OrderService calls three unrelated services directly, by name, every time an order ships.",
+      "speaker": "Developer",
+      "dialogue": "Marketing wants a Slack notification on every shipment now. That means editing OrderService again — the fourth time this quarter.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Signal-Man appears in a burst of static, antenna crackling.",
+      "speaker": "Signal-Man",
+      "dialogue": "Stop calling every listener by name. Just broadcast the event — subscribe once, and I'll handle the rest.",
+      "emoji": "📡"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "OrderService becomes a Subject. Email, Inventory, Analytics, and now Slack all register as Observers.",
+      "speaker": "Signal-Man",
+      "dialogue": "You publish 'orderShipped'. Every subscriber picks it up on their own. You don't even know their names anymore — and you don't need to.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The Slack notifier subscribes on its own. OrderService.ts doesn't change at all.",
+      "speaker": "Developer",
+      "dialogue": "I added the Slack notifier as a subscriber and didn't touch OrderService once. Marketing's happy, I'm relieved.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class OrderService {\n  shipOrder(order: Order) {\n    // ...ship the order...\n\n    // Every subscriber called by name — tightly coupled\n    EmailService.sendShippingEmail(order);\n    InventoryService.decrementStock(order);\n    AnalyticsService.trackShipment(order);\n    // Adding Slack notifications means editing this method again\n  }\n}",
+    "after": "type Listener = (order: Order) => void;\n\nclass OrderService {\n  private listeners: Listener[] = [];\n\n  subscribe(listener: Listener) {\n    this.listeners.push(listener);\n  }\n\n  shipOrder(order: Order) {\n    // ...ship the order...\n\n    // Broadcast — OrderService doesn't know who's listening\n    this.listeners.forEach((listener) => listener(order));\n  }\n}\n\nconst orderService = new OrderService();\norderService.subscribe(EmailService.sendShippingEmail);\norderService.subscribe(InventoryService.decrementStock);\norderService.subscribe(AnalyticsService.trackShipment);\n\n// New requirement — just subscribe, OrderService is untouched\norderService.subscribe(SlackNotifier.notifyShipment);"
+  },
+  "explanation": {
+    "useWhen": [
+      "One object's state change needs to trigger reactions in an open-ended, growing set of other objects.",
+      "You want to decouple the source of an event from the code that reacts to it.",
+      "The set of subscribers should be able to change at runtime without modifying the publisher."
+    ],
+    "avoidWhen": [
+      "There's exactly one fixed listener — a direct method call is simpler and easier to trace.",
+      "Update ordering between subscribers matters a lot and needs to be strict; implicit broadcast order can be fragile.",
+      "The chain of notifications could cascade unpredictably (an observer's reaction triggers another notification, and so on) without any way to reason about the depth."
+    ],
+    "commonMistakes": [
+      "Forgetting to unsubscribe, causing memory leaks and 'zombie' listeners that fire on stale objects.",
+      "Letting observers throw exceptions that break the publisher's loop, so one broken subscriber silently blocks the rest.",
+      "Overusing pub/sub for simple, direct call flows — it can obscure control flow if applied where a plain function call would be clearer.",
+      "Not documenting what event payloads look like, leaving subscribers guessing about shape and forcing brittle assumptions."
+    ],
+    "realWorldExample": "DOM event listeners (`addEventListener`), React's state subscriptions, RxJS observables, and pub/sub message queues (like Redis Pub/Sub or Kafka topics) are all real-world Observer implementations."
+  },
+  "conversation": [
+    {
+      "speaker": "Mentor",
+      "message": "So OrderService has no idea who's subscribed?"
+    },
+    {
+      "speaker": "Signal-Man",
+      "message": "None. It just broadcasts. Every observer decides for itself whether to react — I'm just the signal in between."
+    },
+    {
+      "speaker": "Mentor",
+      "message": "What happens if fifty things subscribe and nobody remembers why?"
+    },
+    {
+      "speaker": "Signal-Man",
+      "message": "That's my weakness — untracked subscribers make the system hard to trace. Keep your event names and payloads well documented, or my signals turn into noise."
+    }
+  ],
+  "codeBattle": {
+    "scenario": "Your stock-trading dashboard needs to update five different UI widgets the instant a price ticks, and new widgets get added by other teams every sprint.",
+    "question": "Which hero should you call?",
+    "options": [
+      {
+        "id": "observer",
+        "label": "Observer"
+      },
+      {
+        "id": "singleton",
+        "label": "Singleton"
+      },
+      {
+        "id": "factory",
+        "label": "Factory Method"
+      },
+      {
+        "id": "proxy",
+        "label": "Proxy"
+      }
+    ],
+    "correct": "observer",
+    "explanation": "Signal-Man lets the price feed broadcast 'price changed' once, and any widget — current or future — can subscribe without the feed knowing they exist."
+  },
+  "quiz": [
+    {
+      "question": "What relationship does the Observer pattern formalize?",
+      "options": [
+        "A one-to-many dependency where one subject notifies many observers of state changes",
+        "A one-to-one relationship between two tightly coupled classes",
+        "A hierarchy where a base class is extended by many subclasses",
+        "A pooling mechanism that reuses expensive objects"
+      ],
+      "answer": "A one-to-many dependency where one subject notifies many observers of state changes",
+      "explanation": "One subject, many observers — that fan-out notification is the defining shape of the pattern."
+    },
+    {
+      "question": "Why does Observer reduce coupling compared to calling each listener by name?",
+      "options": [
+        "The subject only depends on a generic subscription interface, not on the concrete listener classes",
+        "It removes the need for any function calls at all",
+        "It guarantees listeners run in a fixed, documented order",
+        "It merges the subject and all its listeners into a single class"
+      ],
+      "answer": "The subject only depends on a generic subscription interface, not on the concrete listener classes",
+      "explanation": "The subject just calls 'notify' on whatever is subscribed — it never imports or names the concrete listener classes."
+    },
+    {
+      "question": "What's a classic bug caused by misusing Observer?",
+      "options": [
+        "Forgetting to unsubscribe a listener, causing a memory leak or updates to a stale/removed object",
+        "The subject running out of memory because it stores too many method names",
+        "Observers being unable to read the subject's public properties",
+        "TypeScript refusing to compile classes with subscribe() methods"
+      ],
+      "answer": "Forgetting to unsubscribe a listener, causing a memory leak or updates to a stale/removed object",
+      "explanation": "Dangling subscriptions are one of the most common real-world Observer bugs, especially in long-lived UI components."
+    },
+    {
+      "question": "When might Observer be the wrong choice?",
+      "options": [
+        "When there's exactly one fixed listener and a direct call would be simpler and easier to trace",
+        "When more than one object needs to react to an event",
+        "When the set of listeners might grow over time",
+        "When you want to decouple a publisher from its subscribers"
+      ],
+      "answer": "When there's exactly one fixed listener and a direct call would be simpler and easier to trace",
+      "explanation": "Observer's value comes from decoupling a growing, dynamic set of listeners — with just one fixed listener, the indirection isn't worth it."
+    }
+  ]
+}

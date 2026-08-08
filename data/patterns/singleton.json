@@ -1,0 +1,186 @@
+{
+  "id": "singleton",
+  "title": "Singleton Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Guarantees a class has exactly one instance and gives the whole app a single point of access to it.",
+  "hero": {
+    "name": "The One",
+    "codename": "Singleton",
+    "catchphrase": "There can only be one of me. Ask, and I shall appear — always the same.",
+    "power": "Guarantees a single, shared instance exists no matter how many times it's requested.",
+    "weakness": "Overused, The One becomes a hidden dependency that's hard to test and secretly couples every part of the app together.",
+    "origin": "Forged in a codebase where five different database connections were opened for the same database, The One swore that never again would duplicate state cause chaos.",
+    "enemies": [
+      "Duplicate State",
+      "Race Conditions",
+      "Global Mutable Chaos"
+    ],
+    "emoji": "🧿",
+    "colorFrom": "#4f46e5",
+    "colorTo": "#3b82f6"
+  },
+  "story": {
+    "problem": "A configuration object gets created every time it's needed. Three different parts of the app each construct their own copy, read stale settings, and silently drift out of sync.",
+    "solution": "The One steps in: the class controls its own construction, hands out the same instance every time, and refuses to ever be built twice.",
+    "result": "Every corner of the app now shares one consistent source of truth, with no duplicate state and no drift."
+  },
+  "beforeAfter": {
+    "before": [
+      "Multiple copies of config drift out of sync",
+      "Wasted memory and setup cost on every construction",
+      "No single source of truth to debug against"
+    ],
+    "after": [
+      "One shared instance, always consistent",
+      "Construction cost paid exactly once",
+      "A single, well-known place to inspect state"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Config is being constructed in three different places. Nobody agrees on the settings anymore.",
+      "speaker": "Developer",
+      "dialogue": "Wait — why does the logger think debug mode is off, but the API client thinks it's on?!",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "A glowing seal appears around the Config class. The One has arrived.",
+      "speaker": "The One",
+      "dialogue": "You don't need a new instance. You need THE instance. Let me handle that.",
+      "emoji": "🧿"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "The constructor is sealed. A private static instance is born, and a public gateway hands it out on request.",
+      "speaker": "The One",
+      "dialogue": "Call getInstance() as many times as you like. You will always receive me — the same me.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "One config. One truth. Every module reads the exact same settings, instantly in sync.",
+      "speaker": "Developer",
+      "dialogue": "Debug mode finally agrees with itself. I could cry.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class AppConfig {\n  debugMode: boolean;\n  apiUrl: string;\n\n  constructor() {\n    // Expensive: reads env, parses files, hits disk\n    this.debugMode = process.env.DEBUG === \"true\";\n    this.apiUrl = process.env.API_URL ?? \"https://api.example.com\";\n  }\n}\n\n// Every file that needs config makes its own copy\nconst loggerConfig = new AppConfig();\nconst apiConfig = new AppConfig();\n\n// If env changes between constructions, these can disagree\nconsole.log(loggerConfig.debugMode, apiConfig.debugMode);",
+    "after": "class AppConfig {\n  private static instance: AppConfig;\n  debugMode: boolean;\n  apiUrl: string;\n\n  // Construction is sealed off from the outside world\n  private constructor() {\n    this.debugMode = process.env.DEBUG === \"true\";\n    this.apiUrl = process.env.API_URL ?? \"https://api.example.com\";\n  }\n\n  static getInstance(): AppConfig {\n    if (!AppConfig.instance) {\n      AppConfig.instance = new AppConfig();\n    }\n    return AppConfig.instance;\n  }\n}\n\n// Every caller gets the exact same object\nconst loggerConfig = AppConfig.getInstance();\nconst apiConfig = AppConfig.getInstance();\n\nconsole.log(loggerConfig === apiConfig); // true, always"
+  },
+  "explanation": {
+    "useWhen": [
+      "Exactly one instance must coordinate actions across the whole app (e.g. a connection pool, a config store, a logging pipeline).",
+      "Creating the object is expensive and reuse clearly saves work.",
+      "You need a well-known access point that many unrelated modules can reach without passing it through every layer."
+    ],
+    "avoidWhen": [
+      "You're using it as a shortcut to avoid passing dependencies explicitly — that just hides coupling instead of removing it.",
+      "The 'single instance' assumption might not hold in the future (multi-tenant apps, multiple config profiles, parallel test runs).",
+      "It would need to hold mutable state read and written from many places — that's a recipe for hidden bugs."
+    ],
+    "commonMistakes": [
+      "Turning ordinary shared services into Singletons just because they're used 'everywhere' — most of the time a single instance passed via dependency injection is enough, and stays testable.",
+      "Forgetting that global state makes unit tests order-dependent, since one test's mutation leaks into the next.",
+      "Not handling concurrent initialization correctly in multi-threaded environments, causing two instances to be created briefly.",
+      "Using a Singleton to fake global variables instead of solving the actual architectural problem."
+    ],
+    "realWorldExample": "Database connection pools, application-wide loggers, and the browser's `window` object are all effectively Singletons — one shared instance the whole runtime talks to."
+  },
+  "conversation": [
+    {
+      "speaker": "Mentor",
+      "message": "So The One just... stops you from making more than one instance?"
+    },
+    {
+      "speaker": "The One",
+      "message": "Exactly. The constructor is private. The only door in is getInstance() — and I already know who's home."
+    },
+    {
+      "speaker": "Mentor",
+      "message": "Isn't that just a fancy global variable?"
+    },
+    {
+      "speaker": "The One",
+      "message": "If you overuse me, yes — and that's my weakness. Used sparingly, for things that truly must be singular, I keep your app consistent instead of tangled."
+    }
+  ],
+  "codeBattle": {
+    "scenario": "Your app opens a new database connection pool every time a request handler runs, exhausting the database's max-connections limit within minutes of going live.",
+    "question": "Which hero should you call?",
+    "options": [
+      {
+        "id": "singleton",
+        "label": "Singleton"
+      },
+      {
+        "id": "observer",
+        "label": "Observer"
+      },
+      {
+        "id": "factory",
+        "label": "Factory Method"
+      },
+      {
+        "id": "adapter",
+        "label": "Adapter"
+      }
+    ],
+    "correct": "singleton",
+    "explanation": "The One guarantees the connection pool is created exactly once and reused everywhere, so you never exceed the database's connection limit."
+  },
+  "quiz": [
+    {
+      "question": "What is the core guarantee a Singleton provides?",
+      "options": [
+        "Only one instance of the class ever exists, and everyone shares it",
+        "The class can be instantiated only from a factory",
+        "Every property on the class is read-only",
+        "The class automatically saves itself to a database"
+      ],
+      "answer": "Only one instance of the class ever exists, and everyone shares it",
+      "explanation": "That single shared instance, reachable from anywhere, is the entire point of the pattern."
+    },
+    {
+      "question": "How does a typical Singleton implementation prevent extra instances from being created?",
+      "options": [
+        "By making the constructor private and exposing a static getInstance() method",
+        "By throwing an error every time 'new' is used anywhere in the file",
+        "By deleting the class after first use",
+        "By storing the instance in a global array and picking one at random"
+      ],
+      "answer": "By making the constructor private and exposing a static getInstance() method",
+      "explanation": "Sealing the constructor forces all callers through the single controlled access point."
+    },
+    {
+      "question": "What's the biggest risk of overusing the Singleton pattern?",
+      "options": [
+        "It creates hidden global state that couples unrelated parts of the app and complicates testing",
+        "It makes the application slower on every single method call",
+        "It prevents the app from ever being deployed to more than one server",
+        "It requires a database to function"
+      ],
+      "answer": "It creates hidden global state that couples unrelated parts of the app and complicates testing",
+      "explanation": "Because a Singleton is reachable from anywhere, it's easy for it to become an untracked dependency, making code harder to reason about and to test in isolation."
+    },
+    {
+      "question": "You need a class that will eventually support multiple named configuration profiles (e.g. per-tenant settings). Is Singleton the right call?",
+      "options": [
+        "No — Singleton assumes exactly one instance forever, which conflicts with needing several distinct instances",
+        "Yes — Singleton can easily be reconfigured later to support multiple instances",
+        "Yes — Singleton is required whenever configuration is involved",
+        "No — Singleton can only be used for logging"
+      ],
+      "answer": "No — Singleton assumes exactly one instance forever, which conflicts with needing several distinct instances",
+      "explanation": "If you anticipate needing more than one instance, avoid locking yourself into 'exactly one' — use a registry or dependency injection instead."
+    }
+  ]
+}
