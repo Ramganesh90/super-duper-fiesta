@@ -15,9 +15,10 @@ const DIFFICULTY_STARS: Record<Pattern["difficulty"], string> = {
 
 interface HeroCardProps {
   pattern: Pattern;
+  showCategory?: boolean;
 }
 
-export default function HeroCard({ pattern }: HeroCardProps) {
+export default function HeroCard({ pattern, showCategory = false }: HeroCardProps) {
   const mastered = useSyncExternalStore(
     subscribeToProgress,
     () => isPatternMastered(pattern.id),
@@ -56,9 +57,13 @@ export default function HeroCard({ pattern }: HeroCardProps) {
       </blockquote>
 
       <div className="mt-auto flex items-center justify-between pt-2 text-sm">
-        <span className="inline-flex items-center gap-1 font-semibold">
-          {CATEGORY_ICONS[pattern.category]} {CATEGORY_LABELS[pattern.category]}
-        </span>
+        {showCategory ? (
+          <span className="inline-flex items-center gap-1 font-semibold">
+            {CATEGORY_ICONS[pattern.category]} {CATEGORY_LABELS[pattern.category]}
+          </span>
+        ) : (
+          <span />
+        )}
         <span aria-label={`Difficulty: ${pattern.difficulty}`}>{DIFFICULTY_STARS[pattern.difficulty]}</span>
       </div>
 

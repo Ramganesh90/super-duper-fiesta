@@ -35,7 +35,7 @@ export default function Home() {
   const patterns = getAllPatterns();
 
   return (
-    <div className="flex flex-col gap-16 pb-20 sm:gap-24">
+    <div id="top" className="flex flex-col gap-16 pb-20 sm:gap-24">
       <section className="bg-halftone relative overflow-hidden border-b-4 border-ink bg-paper-dim px-4 py-16 text-center sm:px-6 sm:py-24">
         <h1 className="font-comic text-5xl leading-none tracking-wide text-ink sm:text-7xl lg:text-8xl">
           PATTERN<span className="text-action-red">-VERSE</span>

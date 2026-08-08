@@ -11,7 +11,16 @@ import CodeBattle from "@/components/learning/CodeBattle";
 import Quiz from "@/components/learning/Quiz";
 import ProgressIndicator from "@/components/learning/ProgressIndicator";
 import { getAllPatternIds, getAllPatterns, getPatternById } from "@/lib/patterns";
-import { CATEGORY_ICONS, CATEGORY_LABELS } from "@/lib/types";
+import { CATEGORY_ICONS, CATEGORY_LABELS, type PatternCategory } from "@/lib/types";
+
+const CATEGORY_ORDER: PatternCategory[] = [
+  "creational",
+  "structural",
+  "behavioral",
+  "concurrency",
+  "architectural",
+  "enterprise",
+];
 
 interface PatternPageProps {
   params: Promise<{ id: string }>;
@@ -64,7 +73,7 @@ export default async function PatternPage({ params }: PatternPageProps) {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <Link href="/#roster" className="underline-offset-2 hover:underline">
+            <Link href={`/#category-${pattern.category}`} className="underline-offset-2 hover:underline">
               {CATEGORY_ICONS[pattern.category]} {CATEGORY_LABELS[pattern.category]}
             </Link>
           </li>
@@ -179,6 +188,22 @@ export default async function PatternPage({ params }: PatternPageProps) {
                 </Link>
               </li>
             ))}
+        </ul>
+      </nav>
+
+      <nav aria-label="Browse other categories" className="pt-2">
+        <h2 className="font-comic text-xl tracking-wide">BROWSE OTHER CATEGORIES</h2>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {CATEGORY_ORDER.filter((category) => category !== pattern.category).map((category) => (
+            <li key={category}>
+              <Link
+                href={`/#category-${category}`}
+                className="comic-border-sm inline-flex items-center gap-1.5 bg-paper px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5"
+              >
+                {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
     </article>
