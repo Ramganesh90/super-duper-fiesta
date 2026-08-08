@@ -1,0 +1,158 @@
+{
+  "id": "mediator",
+  "title": "Mediator Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Centralizes communication between objects so they talk to one hub instead of wiring directly to each other.",
+  "hero": {
+    "name": "Switchboard",
+    "codename": "Mediator",
+    "catchphrase": "Don't talk to each other. Talk to me — I'll route it.",
+    "power": "Routes all communication between a group of objects through one central hub, removing their direct references to each other.",
+    "weakness": "All that routing logic has to live somewhere — Switchboard itself can bloat into a god-object if it absorbs too much responsibility.",
+    "origin": "Switchboard was summoned from a flight-booking UI where the date picker, seat selector, price display, and payment button all held direct references to each other — 12 wires between 4 widgets.",
+    "enemies": ["Tangled Many-to-Many Wiring", "Widget Spaghetti", "Ripple-Effect Bugs"],
+    "emoji": "☎️",
+    "colorFrom": "#1e1b4b",
+    "colorTo": "#a5b4fc"
+  },
+  "story": {
+    "problem": "A booking form's DatePicker calls SeatSelector directly, which calls PriceDisplay directly, which calls PaymentButton directly. Four widgets, twelve tangled direct references between them.",
+    "solution": "Switchboard becomes the single hub. Every widget only talks to the Mediator — 'date changed', 'seat changed' — and the Mediator decides what happens next.",
+    "result": "Widgets no longer know about each other at all. Adding a fifth widget means teaching the Mediator about it, not rewiring four existing ones."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every widget holds direct references to several others",
+      "N widgets need up to N² wires between them",
+      "One widget's change can ripple unpredictably through the rest"
+    ],
+    "after": [
+      "Every widget only knows about the mediator",
+      "N widgets need only N connections, all to the hub",
+      "Changes are routed predictably through one central place"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A diagram shows twelve crossing wires directly connecting four form widgets to each other.",
+      "speaker": "Developer",
+      "dialogue": "I changed the date picker and the payment button broke. They're not even related! But somehow they're wired together.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Switchboard appears at the center, and every wire redirects to plug into it instead.",
+      "speaker": "Switchboard",
+      "dialogue": "Stop wiring widgets directly to each other. Wire every one of them to ME. I'll route what needs to happen next.",
+      "emoji": "☎️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Each widget calls mediator.notify('dateChanged') instead of calling other widgets by name.",
+      "speaker": "Switchboard",
+      "dialogue": "You don't need to know who reacts to your change. Just tell me what happened — I know who needs to hear it.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Twelve tangled wires collapse into four clean spokes, all connecting to Switchboard.",
+      "speaker": "Developer",
+      "dialogue": "Changing the date picker only touches the mediator's routing logic now. The payment button is safe.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class DatePicker {\n  constructor(private seatSelector: SeatSelector, private priceDisplay: PriceDisplay) {}\n  onDateChange(date: Date) {\n    this.seatSelector.refreshAvailability(date); // direct reference\n    this.priceDisplay.updatePrice(date); // direct reference\n  }\n}\n// Every widget ends up holding references to several others",
+    "after": "interface Mediator {\n  notify(sender: string, event: string, payload: unknown): void;\n}\n\nclass BookingFormMediator implements Mediator {\n  constructor(\n    private datePicker: DatePicker,\n    private seatSelector: SeatSelector,\n    private priceDisplay: PriceDisplay\n  ) {}\n\n  notify(sender: string, event: string, payload: unknown) {\n    if (sender === \"datePicker\" && event === \"dateChanged\") {\n      this.seatSelector.refreshAvailability(payload as Date);\n      this.priceDisplay.updatePrice(payload as Date);\n    }\n  }\n}\n\nclass DatePicker {\n  constructor(private mediator: Mediator) {}\n  onDateChange(date: Date) {\n    this.mediator.notify(\"datePicker\", \"dateChanged\", date); // no direct references\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "A group of objects communicate in a tangled, many-to-many way that's hard to trace or change safely.",
+      "You want to add or remove participants without rewiring every existing one.",
+      "The coordination logic between components deserves to live in one place instead of scattered across all of them."
+    ],
+    "avoidWhen": [
+      "Only two objects are involved — a direct reference is simpler than routing through a hub.",
+      "The 'communication' is really just a simple, one-directional data flow that doesn't need central coordination.",
+      "The mediator would just become a dumping ground for unrelated logic instead of focused coordination."
+    ],
+    "commonMistakes": [
+      "Letting the mediator absorb business logic that belongs in the components themselves, turning it into a god-object.",
+      "Building a Mediator for a simple two-object relationship that never needed centralizing.",
+      "Not documenting which events the mediator handles, making its routing logic a black box to new contributors.",
+      "Confusing Mediator (centralizes communication between peers) with Observer (one subject broadcasts to many independent subscribers)."
+    ],
+    "realWorldExample": "Air traffic control coordinating planes that never talk to each other directly, chat room servers routing messages between clients, and UI form-orchestration logic (like a wizard coordinating multiple steps) are all Mediator."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This sounds like Observer — a central point some objects talk through." },
+    { "speaker": "Switchboard", "message": "Related, but Observer is one-directional: a Subject broadcasts, Observers just listen. I coordinate a genuine back-and-forth conversation between multiple peers who'd otherwise be tangled together." },
+    { "speaker": "Mentor", "message": "How do I stop you from becoming a god-object?" },
+    { "speaker": "Switchboard", "message": "Keep my job strictly to ROUTING — deciding who hears what. The actual business logic should stay inside each widget, not migrate into me." }
+  ],
+  "codeBattle": {
+    "scenario": "Your flight-booking form has a date picker, seat map, price display, and payment button — and changing any one of them currently requires updating direct references in two or three others.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "mediator", "label": "Mediator" },
+      { "id": "observer", "label": "Observer" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "command", "label": "Command" }
+    ],
+    "correct": "mediator",
+    "explanation": "Switchboard replaces the tangled many-to-many wiring between widgets with a single hub each widget talks to, so adding or changing a widget no longer ripples through the others."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Mediator solve?",
+      "options": [
+        "A group of objects reference each other directly in a tangled, hard-to-change way",
+        "An object needs to guarantee exactly one instance",
+        "A complex object needs to be assembled step by step",
+        "An algorithm needs to be swapped at runtime"
+      ],
+      "answer": "A group of objects reference each other directly in a tangled, hard-to-change way",
+      "explanation": "Mediator exists to replace many-to-many direct coupling with one-to-many coupling through a hub."
+    },
+    {
+      "question": "After introducing a Mediator, how do the participating objects communicate?",
+      "options": [
+        "They notify the mediator, which decides how to route the event to others",
+        "They still call each other directly, just with an extra logging step",
+        "They communicate through a shared global variable",
+        "They no longer communicate at all"
+      ],
+      "answer": "They notify the mediator, which decides how to route the event to others",
+      "explanation": "The mediator becomes the single point that knows how each event should propagate."
+    },
+    {
+      "question": "What's the main risk of the Mediator pattern?",
+      "options": [
+        "The mediator can absorb too much logic and become a god-object",
+        "It always makes communication slower than direct references",
+        "It requires every participant to be a Singleton",
+        "It prevents adding new participants entirely"
+      ],
+      "answer": "The mediator can absorb too much logic and become a god-object",
+      "explanation": "Centralizing coordination is powerful, but the mediator can become bloated if it absorbs logic that belongs elsewhere."
+    },
+    {
+      "question": "How does Mediator differ from Observer?",
+      "options": [
+        "Mediator coordinates two-way communication among peers; Observer is one subject broadcasting to independent listeners",
+        "They are identical patterns with different names",
+        "Observer requires a central hub; Mediator does not",
+        "Mediator can only have one participant"
+      ],
+      "answer": "Mediator coordinates two-way communication among peers; Observer is one subject broadcasting to independent listeners",
+      "explanation": "The direction and symmetry of communication is the key difference between the two patterns."
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "id": "memento",
+  "title": "Memento Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Captures an object's internal state so it can be restored later, without exposing that state to the outside world.",
+  "hero": {
+    "name": "The Historian",
+    "codename": "Memento",
+    "catchphrase": "I remember exactly who you were. Just ask, and I'll bring it back.",
+    "power": "Snapshots an object's private internal state and can restore it later, without ever exposing that state publicly.",
+    "weakness": "Every snapshot costs memory — keep an unlimited undo history and The Historian will quietly eat all your RAM.",
+    "origin": "The Historian appeared after a text editor's undo feature was implemented by making every private field public, just so the undo code outside the class could read and restore them.",
+    "enemies": ["Broken Encapsulation", "Unbounded History", "Public-Just-For-Undo Fields"],
+    "emoji": "📸",
+    "colorFrom": "#334155",
+    "colorTo": "#cbd5e1"
+  },
+  "story": {
+    "problem": "To implement undo, a text editor's `content` and `cursorPosition` fields were made public just so external undo code could read and restore them — breaking encapsulation for every other caller too.",
+    "solution": "The Historian lets the editor create a private, opaque `Memento` snapshot of its own state. The undo manager stores mementos but can't read or modify their contents — only the editor that created one can restore from it.",
+    "result": "Undo works perfectly, and the editor's internal fields go back to being genuinely private. Nothing outside the editor can peek at or tamper with a snapshot."
+  },
+  "beforeAfter": {
+    "before": [
+      "Internal fields made public just to support undo",
+      "Any code can read or corrupt editor internals",
+      "Undo logic is entangled with the editor's implementation"
+    ],
+    "after": [
+      "Internal fields stay genuinely private",
+      "Snapshots are opaque — only the editor can read its own memento",
+      "Undo logic only touches an opaque history of snapshots"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "The Editor class has every field marked public, with a comment: '// public for undo, sorry'.",
+      "speaker": "Developer",
+      "dialogue": "Now anything in the codebase can directly mutate the editor's cursor position. We broke encapsulation just to support undo.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Historian appears holding a sealed, labeled envelope — a snapshot nobody but the editor can open.",
+      "speaker": "The Historian",
+      "dialogue": "You don't need to expose your fields. Let me hold a snapshot instead — sealed, private, restorable only by you.",
+      "emoji": "📸"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Editor.save() returns an opaque Memento. Editor.restore(memento) reads it back — nobody else can.",
+      "speaker": "The Historian",
+      "dialogue": "The undo manager just stores my sealed envelopes in order. It never opens them. Only you can.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Every editor field goes back to private. Undo still works flawlessly.",
+      "speaker": "Developer",
+      "dialogue": "Encapsulation restored, undo still works perfectly. The undo manager has no idea what's actually inside a memento.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class Editor {\n  // public for undo, sorry\n  public content: string = \"\";\n  public cursorPosition: number = 0;\n}\n\n// Undo code reads/writes internals directly — anything else could too\nconst snapshot = { content: editor.content, cursorPosition: editor.cursorPosition };\neditor.content = snapshot.content; // fragile, and not actually private",
+    "after": "class Memento {\n  // Only Editor can construct or read this — fields are effectively opaque outside it\n  constructor(private readonly content: string, private readonly cursorPosition: number) {}\n  private getState() { return { content: this.content, cursorPosition: this.cursorPosition }; }\n  static restore(editor: Editor, memento: Memento) {\n    editor.setState(memento.getState());\n  }\n}\n\nclass Editor {\n  private content = \"\";\n  private cursorPosition = 0;\n\n  save(): Memento { return new Memento(this.content, this.cursorPosition); }\n  setState(state: { content: string; cursorPosition: number }) {\n    this.content = state.content;\n    this.cursorPosition = state.cursorPosition;\n  }\n}\n\nclass History {\n  private snapshots: Memento[] = [];\n  push(memento: Memento) { this.snapshots.push(memento); }\n  pop(): Memento | undefined { return this.snapshots.pop(); } // opaque — never inspected\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need undo/rollback functionality that captures an object's internal state at a point in time.",
+      "You want to snapshot state without breaking encapsulation by exposing private fields.",
+      "You need to restore an object to a known-good state after a failed operation."
+    ],
+    "avoidWhen": [
+      "The object's state is trivial (one or two primitive fields) — a plain copy is simpler than a formal Memento.",
+      "You need unlimited history depth with large objects — memory cost can become a real problem.",
+      "The 'state' includes external resources (open connections, file handles) that can't be meaningfully snapshotted and restored."
+    ],
+    "commonMistakes": [
+      "Making memento fields public 'just this once', undoing the entire point of the pattern.",
+      "Keeping an unbounded undo history for large objects, silently consuming huge amounts of memory over a long session.",
+      "Snapshotting mutable objects by reference instead of by value, so 'restoring' a memento doesn't actually revert anything.",
+      "Confusing Memento (snapshot + restore an object's own state) with Command's undo (reverses an action's side effects) — they're often combined, but solve different problems."
+    ],
+    "realWorldExample": "Undo/redo history in editors, database transaction rollback/savepoints, and game save states (a snapshot of the entire game world you can reload) are all Memento in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from just deep-cloning the object?" },
+    { "speaker": "The Historian", "message": "A clone is a full, usable copy — anyone can read and use it. A memento is deliberately opaque. Whoever HOLDS it (like an undo manager) can't peek inside; only the original object can read its own snapshot back." },
+    { "speaker": "Mentor", "message": "What's your real weakness?" },
+    { "speaker": "The Historian", "message": "Memory. Every snapshot is a real copy of state. Keep infinite undo history for large objects, and I'll happily eat all your RAM without complaint." }
+  ],
+  "codeBattle": {
+    "scenario": "Your game needs a 'save point' system that captures the entire world state and can restore it exactly later, without exposing the game engine's internal data structures to the save/load UI code.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "memento", "label": "Memento" },
+      { "id": "prototype", "label": "Prototype" },
+      { "id": "command", "label": "Command" },
+      { "id": "state", "label": "State" }
+    ],
+    "correct": "memento",
+    "explanation": "The Historian lets the game engine create opaque save-state snapshots that the save/load UI can store and pass back, without ever reading or tampering with the engine's internals."
+  },
+  "quiz": [
+    {
+      "question": "What does Memento capture, and who can read it?",
+      "options": [
+        "An object's internal state, readable only by the object that created it",
+        "An object's public methods, readable by anyone",
+        "A log of every method call ever made",
+        "A copy of the entire application's memory"
+      ],
+      "answer": "An object's internal state, readable only by the object that created it",
+      "explanation": "Opacity to outside code is exactly what preserves encapsulation while still enabling snapshot/restore."
+    },
+    {
+      "question": "What problem does Memento solve that a plain public state copy doesn't?",
+      "options": [
+        "It preserves encapsulation — the snapshot is opaque to everything except the originating object",
+        "It makes objects immutable permanently",
+        "It removes the need for the object to have any state at all",
+        "It guarantees only one snapshot can ever exist"
+      ],
+      "answer": "It preserves encapsulation — the snapshot is opaque to everything except the originating object",
+      "explanation": "A public copy exposes internals to any caller; a proper memento keeps that state private outside the originator."
+    },
+    {
+      "question": "What's the main cost/risk of using Memento?",
+      "options": [
+        "Each snapshot consumes memory, and unbounded history can grow very large",
+        "It always breaks encapsulation",
+        "It requires the object to have exactly one field",
+        "It can only be used with immutable objects"
+      ],
+      "answer": "Each snapshot consumes memory, and unbounded history can grow very large",
+      "explanation": "Snapshots are real copies of state — keeping too many of them, especially for large objects, adds up fast."
+    },
+    {
+      "question": "How does Memento relate to Command's undo functionality?",
+      "options": [
+        "They're often combined — Command triggers the action, Memento captures state to restore if it needs to be reversed",
+        "They are the exact same pattern",
+        "Memento can only be used without Command",
+        "Command replaces the need for Memento entirely"
+      ],
+      "answer": "They're often combined — Command triggers the action, Memento captures state to restore if it needs to be reversed",
+      "explanation": "Many undo systems use Command to represent the action and Memento to represent the state to roll back to."
+    }
+  ]
+}

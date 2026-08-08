@@ -1,0 +1,158 @@
+{
+  "id": "iterator",
+  "title": "Iterator Pattern",
+  "category": "behavioral",
+  "difficulty": "beginner",
+  "oneLiner": "Walks through a collection one item at a time, without the caller ever needing to know how that collection is actually stored.",
+  "hero": {
+    "name": "Wayfinder",
+    "codename": "Iterator",
+    "catchphrase": "One step at a time — you don't need to know the map.",
+    "power": "Traverses any collection uniformly, hiding whether it's an array, tree, or linked list underneath.",
+    "weakness": "If the underlying collection changes shape mid-traversal, Wayfinder can lose its place — classic 'concurrent modification' bugs.",
+    "origin": "Wayfinder appeared after a reporting tool had one loop for arrays, another for linked lists, and a third for trees — three copies of the exact same reporting logic.",
+    "enemies": ["Exposed Internals", "Duplicate Traversal Logic", "Concurrent Modification"],
+    "emoji": "🧭",
+    "colorFrom": "#0f766e",
+    "colorTo": "#5eead4"
+  },
+  "story": {
+    "problem": "A reporting function has one code path for arrays (`for (let i = 0; ...)`), another for a custom linked list (`while (node) { node = node.next }`), and a third for a tree. Every report duplicates all three.",
+    "solution": "Wayfinder gives every collection the same `Iterator` interface — `hasNext()` and `next()`. The reporting function loops over any of them identically.",
+    "result": "One reporting loop works across arrays, linked lists, and trees. Each collection knows how to traverse itself; the caller never needs to."
+  },
+  "beforeAfter": {
+    "before": [
+      "One traversal implementation per collection type",
+      "Report logic duplicated three times",
+      "Callers need to know each collection's internal structure"
+    ],
+    "after": [
+      "One uniform hasNext()/next() interface for every collection",
+      "Report logic written exactly once",
+      "Callers never touch a collection's internal structure"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Three nearly-identical report functions sit side by side: one for arrays, one for linked lists, one for trees.",
+      "speaker": "Developer",
+      "dialogue": "I just fixed a bug in the array report and now I have to remember to fix the exact same bug in two other copies.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Wayfinder appears holding a compass that works identically no matter the terrain.",
+      "speaker": "Wayfinder",
+      "dialogue": "You don't need three maps. Give every collection the same way to walk through it — hasNext(), next(). I'll handle the terrain.",
+      "emoji": "🧭"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Array, LinkedList, and Tree each implement the same Iterator interface, hiding their internal structure.",
+      "speaker": "Wayfinder",
+      "dialogue": "Write your report loop once, against the interface. It works identically whether it's walking an array or a tree.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The three duplicate report functions collapse into one, working across every collection type.",
+      "speaker": "Developer",
+      "dialogue": "One report function now. One bug fix location. And it works on any collection we add in the future too.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Three near-duplicate traversal implementations\nfunction reportArray(arr: number[]) {\n  for (let i = 0; i < arr.length; i++) { print(arr[i]); }\n}\nfunction reportLinkedList(list: LinkedList) {\n  let node = list.head;\n  while (node) { print(node.value); node = node.next; }\n}\n// ...and a third, nearly identical, for trees",
+    "after": "interface Iterator<T> {\n  hasNext(): boolean;\n  next(): T;\n}\n\nclass ArrayIterator<T> implements Iterator<T> {\n  private index = 0;\n  constructor(private items: T[]) {}\n  hasNext() { return this.index < this.items.length; }\n  next() { return this.items[this.index++]; }\n}\n\nclass LinkedListIterator<T> implements Iterator<T> {\n  constructor(private node: LinkedListNode<T> | null) {}\n  hasNext() { return this.node !== null; }\n  next() {\n    const value = this.node!.value;\n    this.node = this.node!.next;\n    return value;\n  }\n}\n\n// One report function, works with ANY iterator\nfunction report<T>(it: Iterator<T>) {\n  while (it.hasNext()) { print(it.next()); }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to traverse different kinds of collections through one uniform interface.",
+      "You want to hide a collection's internal structure (array, tree, linked list) from the code that processes its elements.",
+      "You need multiple independent traversals over the same collection at once."
+    ],
+    "avoidWhen": [
+      "Your language already provides a built-in, idiomatic iteration protocol (like JS's `for...of` / `Symbol.iterator`) — reinventing it adds nothing.",
+      "There's only ever one collection type and no real duplication to eliminate.",
+      "The collection is small and simple enough that direct indexing is clearer than a custom iterator."
+    ],
+    "commonMistakes": [
+      "Building a custom Iterator interface when the language's native iteration protocol already solves the problem.",
+      "Not handling concurrent modification — mutating a collection while an iterator is mid-traversal, causing skipped or duplicated elements.",
+      "Exposing internal collection details through the iterator anyway, defeating the point of the abstraction.",
+      "Forgetting that some traversal orders (in-order vs. pre-order for a tree) need their own dedicated iterator implementation."
+    ],
+    "realWorldExample": "JavaScript's own iteration protocol (`Symbol.iterator`, `for...of`), Java's `Iterator`/`Iterable` interfaces, and database cursors that stream rows one at a time without loading the whole result set into memory are all Iterator."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Doesn't every modern language already have iteration built in?" },
+    { "speaker": "Wayfinder", "message": "Usually, yes — and you should use that first. I matter most for custom or unusual data structures the language's built-in loops don't already understand, like a tree or a paginated remote dataset." },
+    { "speaker": "Mentor", "message": "What's your real weakness?" },
+    { "speaker": "Wayfinder", "message": "If the collection changes shape while I'm mid-walk through it — an item removed, a node added — I can lose my place or skip elements entirely." }
+  ],
+  "codeBattle": {
+    "scenario": "Your app has a custom Tree data structure and needs to support both depth-first and breadth-first traversal for different reporting features, without those reports knowing the tree's internal shape.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "iterator", "label": "Iterator" },
+      { "id": "composite", "label": "Composite" },
+      { "id": "visitor", "label": "Visitor" },
+      { "id": "strategy", "label": "Strategy" }
+    ],
+    "correct": "iterator",
+    "explanation": "Wayfinder lets you build two different traversal-order iterators (depth-first, breadth-first) behind the same hasNext()/next() interface, so reports never touch the tree's internal structure."
+  },
+  "quiz": [
+    {
+      "question": "What does Iterator hide from the code that processes a collection's elements?",
+      "options": [
+        "The collection's internal structure (array, tree, linked list, etc.)",
+        "The values of the elements themselves",
+        "Whether the collection is empty or not",
+        "The programming language being used"
+      ],
+      "answer": "The collection's internal structure (array, tree, linked list, etc.)",
+      "explanation": "Iterator's whole value is letting callers traverse without caring how the data is actually stored."
+    },
+    {
+      "question": "What two methods typically define a basic Iterator interface?",
+      "options": [
+        "hasNext() and next()",
+        "start() and stop()",
+        "get() and set()",
+        "push() and pop()"
+      ],
+      "answer": "hasNext() and next()",
+      "explanation": "These two methods are enough to walk through any sequence, one element at a time, regardless of underlying structure."
+    },
+    {
+      "question": "When should you avoid building a custom Iterator?",
+      "options": [
+        "When your language's built-in iteration protocol already solves the same problem",
+        "When you have a custom tree structure with no native traversal support",
+        "When you need multiple independent traversals of the same collection",
+        "When you want to hide a complex data structure's internals"
+      ],
+      "answer": "When your language's built-in iteration protocol already solves the same problem",
+      "explanation": "Reimplementing what `for...of` or `Iterable` already does adds needless complexity."
+    },
+    {
+      "question": "What bug class is Iterator particularly vulnerable to?",
+      "options": [
+        "Concurrent modification — the collection changing shape while iteration is in progress",
+        "SQL injection",
+        "Memory leaks from unclosed file handles",
+        "Race conditions between two separate threads reading immutable data"
+      ],
+      "answer": "Concurrent modification — the collection changing shape while iteration is in progress",
+      "explanation": "If the underlying collection is mutated mid-traversal, the iterator's position can become invalid or skip/duplicate elements."
+    }
+  ]
+}

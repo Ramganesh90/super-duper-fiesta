@@ -1,0 +1,158 @@
+{
+  "id": "interpreter",
+  "title": "Interpreter Pattern",
+  "category": "behavioral",
+  "difficulty": "advanced",
+  "oneLiner": "Represents a small grammar as a tree of classes, one per rule, so sentences in that grammar can be evaluated directly.",
+  "hero": {
+    "name": "The Linguist",
+    "codename": "Interpreter",
+    "catchphrase": "Every sentence in this grammar, I can read and act on.",
+    "power": "Turns a small custom language's grammar rules into classes, so any valid sentence in that language can be parsed and evaluated directly.",
+    "weakness": "For anything beyond a genuinely tiny grammar, hand-rolled Interpreter classes get unwieldy fast — a real parser or parser generator scales far better.",
+    "origin": "The Linguist appeared after a permissions system needed to evaluate rules like `role:admin OR (dept:eng AND level>3)` from a config file, and string-matching hacks kept breaking on new rule shapes.",
+    "enemies": ["Fragile String Parsing", "Ad-Hoc Rule Evaluation", "Unmaintainable Regex Chains"],
+    "emoji": "📖",
+    "colorFrom": "#3b0764",
+    "colorTo": "#d8b4fe"
+  },
+  "story": {
+    "problem": "A permissions system evaluates rules like `role:admin OR (dept:eng AND level>3)` using ad-hoc string splitting and regex. Every new rule shape breaks the parser in a new way.",
+    "solution": "The Linguist models the grammar properly: `AndExpression`, `OrExpression`, and `ComparisonExpression` each implement `interpret(context)`. A rule string is parsed once into a tree of these, then evaluated by walking the tree.",
+    "result": "New logical combinations just compose existing expression classes — no parser rewrite needed. The grammar is explicit, testable, and no longer held together by regex."
+  },
+  "beforeAfter": {
+    "before": [
+      "Rules evaluated with fragile string splitting and regex",
+      "Every new rule shape risks breaking the ad-hoc parser",
+      "No clear model of the grammar's actual rules"
+    ],
+    "after": [
+      "Each grammar rule is its own class implementing interpret()",
+      "New rule combinations compose existing expression classes",
+      "The grammar is explicit, structured, and testable"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A permissions rule with nested parentheses breaks the regex-based parser in a new, confusing way.",
+      "speaker": "Developer",
+      "dialogue": "Someone wrote a rule with THREE levels of nested parentheses and our regex parser just... gave up silently.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Linguist appears holding an open grammar book, each rule labeled and understood.",
+      "speaker": "The Linguist",
+      "dialogue": "Stop parsing with regex hacks. Give every grammar rule its own class — then nesting just becomes nesting those classes.",
+      "emoji": "📖"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "AndExpression, OrExpression, and ComparisonExpression each implement interpret(context). They nest naturally, just like the grammar does.",
+      "speaker": "The Linguist",
+      "dialogue": "Parse once into a tree of these expressions. However deep the nesting goes, interpret() just recurses down through it correctly.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The triple-nested rule evaluates correctly, no regex in sight.",
+      "speaker": "Developer",
+      "dialogue": "Nested parentheses just work now, because the grammar is actually modeled instead of pattern-matched with regex.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Fragile: breaks on unexpected nesting or spacing\nfunction evaluateRule(rule: string, context: Context): boolean {\n  const parts = rule.split(\" OR \"); // doesn't handle parentheses at all\n  return parts.some((part) => evaluateAnd(part, context));\n}",
+    "after": "interface Expression {\n  interpret(context: Context): boolean;\n}\n\nclass ComparisonExpression implements Expression {\n  constructor(private field: string, private op: string, private value: string) {}\n  interpret(context: Context) {\n    return compare(context[this.field], this.op, this.value);\n  }\n}\n\nclass AndExpression implements Expression {\n  constructor(private left: Expression, private right: Expression) {}\n  interpret(context: Context) { return this.left.interpret(context) && this.right.interpret(context); }\n}\nclass OrExpression implements Expression {\n  constructor(private left: Expression, private right: Expression) {}\n  interpret(context: Context) { return this.left.interpret(context) || this.right.interpret(context); }\n}\n\n// role:admin OR (dept:eng AND level>3), parsed once into a tree:\nconst rule = new OrExpression(\n  new ComparisonExpression(\"role\", \"=\", \"admin\"),\n  new AndExpression(\n    new ComparisonExpression(\"dept\", \"=\", \"eng\"),\n    new ComparisonExpression(\"level\", \">\", \"3\")\n  )\n);\nrule.interpret(userContext);"
+  },
+  "explanation": {
+    "useWhen": [
+      "You have a genuinely small, well-defined grammar (rule expressions, search queries, simple formulas) to evaluate repeatedly.",
+      "The grammar's rules are naturally recursive/nestable, matching a tree of expression objects well.",
+      "You want the grammar's structure to be explicit and testable, not buried in string-parsing logic."
+    ],
+    "avoidWhen": [
+      "The grammar is large or evolving fast — hand-rolled Interpreter classes don't scale; use a real parser or parser generator instead.",
+      "You just need to evaluate one fixed, simple condition — a plain function is simpler than modeling a grammar.",
+      "Performance is critical and tree-walking interpretation is too slow — compiling to a faster representation may be needed."
+    ],
+    "commonMistakes": [
+      "Reaching for hand-rolled Interpreter classes for a grammar that's actually large or growing — that's a job for a real parser generator (ANTLR, PEG.js) instead.",
+      "Not separating parsing (turning a string into the expression tree) from interpreting (walking the tree) — conflating the two gets messy fast.",
+      "Building a grammar with confusing or undocumented rule classes, making it hard for others to extend safely.",
+      "Underestimating how quickly 'just a few grammar rules' grows into a genuinely large language that outgrows this pattern."
+    ],
+    "realWorldExample": "Regular expression engines, SQL query builders that model WHERE clauses as composable expression trees, and simple rule engines (feature flags, permissions, pricing rules) that parse a small DSL into an evaluable tree are all Interpreter."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This sounds like I'm just... building a mini programming language?" },
+    { "speaker": "The Linguist", "message": "Exactly that, at a small scale. Each grammar rule becomes a class; a sentence in that grammar becomes a tree of those classes; interpreting it means walking the tree." },
+    { "speaker": "Mentor", "message": "When do I stop hand-rolling this and reach for a real parser?" },
+    { "speaker": "The Linguist", "message": "The moment your grammar grows past a handful of rule types, or needs real error recovery. That's exactly when a parser generator earns its keep over hand-written expression classes." }
+  ],
+  "codeBattle": {
+    "scenario": "Your analytics dashboard lets users type filter expressions like `country=US AND (plan=pro OR trials>2)`, and you need to parse and evaluate these safely and correctly, including nested parentheses.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "interpreter", "label": "Interpreter" },
+      { "id": "visitor", "label": "Visitor" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "command", "label": "Command" }
+    ],
+    "correct": "interpreter",
+    "explanation": "The Linguist models AND/OR/comparison as expression classes that nest naturally, correctly handling arbitrarily nested filter expressions without fragile string parsing."
+  },
+  "quiz": [
+    {
+      "question": "What does the Interpreter pattern represent as classes?",
+      "options": [
+        "The individual rules of a grammar, each as its own expression class",
+        "Every possible user input string",
+        "A database schema",
+        "A single global configuration object"
+      ],
+      "answer": "The individual rules of a grammar, each as its own expression class",
+      "explanation": "Each grammar rule (AND, OR, comparison, etc.) becomes its own class implementing a shared `interpret()` method."
+    },
+    {
+      "question": "How does a parsed sentence in the grammar typically get represented?",
+      "options": [
+        "As a tree of expression objects that mirrors the grammar's nesting",
+        "As a single flat string",
+        "As a database row",
+        "As a compiled binary"
+      ],
+      "answer": "As a tree of expression objects that mirrors the grammar's nesting",
+      "explanation": "Nested grammar rules naturally become a nested tree of expression objects, which interpret() walks recursively."
+    },
+    {
+      "question": "When should you avoid hand-rolling the Interpreter pattern?",
+      "options": [
+        "When the grammar is large or growing — a real parser or parser generator scales better",
+        "When you have a small, fixed, well-defined grammar",
+        "When the grammar's rules are naturally recursive",
+        "When you want the grammar's structure to be explicit and testable"
+      ],
+      "answer": "When the grammar is large or growing — a real parser or parser generator scales better",
+      "explanation": "Interpreter's hand-rolled class-per-rule approach works well for small grammars but doesn't scale to large or evolving languages."
+    },
+    {
+      "question": "What's a real-world example of the Interpreter pattern?",
+      "options": [
+        "A rule engine that parses filter expressions like 'country=US AND plan=pro' into an evaluable expression tree",
+        "A single Singleton logging service",
+        "A payment gateway adapter",
+        "An undo/redo history stack"
+      ],
+      "answer": "A rule engine that parses filter expressions like 'country=US AND plan=pro' into an evaluable expression tree",
+      "explanation": "Small rule/query languages evaluated via a tree of expression classes are the classic real-world use of Interpreter."
+    }
+  ]
+}

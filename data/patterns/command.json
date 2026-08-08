@@ -1,0 +1,158 @@
+{
+  "id": "command",
+  "title": "Command Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Turns a request into a standalone object, so it can be queued, logged, retried, or undone instead of executed immediately.",
+  "hero": {
+    "name": "Invoker",
+    "codename": "Command",
+    "catchphrase": "Don't just do it — wrap it, queue it, undo it.",
+    "power": "Wraps an action and its arguments into an object, so the action can be delayed, queued, logged, or reversed.",
+    "weakness": "Wrapping a single, immediate, one-off action in a full command object is pure ceremony — sometimes a direct method call is exactly right.",
+    "origin": "Invoker was summoned when a design tool's 'undo' button had nothing to undo — every action had already executed and vanished the instant the user clicked.",
+    "enemies": ["No-Undo Actions", "Untraceable Side Effects", "Immediate-Only Execution"],
+    "emoji": "🕹️",
+    "colorFrom": "#1e3a8a",
+    "colorTo": "#93c5fd"
+  },
+  "story": {
+    "problem": "A drawing app calls `canvas.drawShape(shape)` directly from the button handler. Once drawn, there's no record of what happened — 'undo' has nothing to work with.",
+    "solution": "Invoker wraps each action in a `DrawCommand` object with both `execute()` and `undo()`. The app pushes every executed command onto a history stack.",
+    "result": "Undo just pops the last command and calls `.undo()`. Redo, macros, and action logging all become trivial once actions are objects instead of side effects."
+  },
+  "beforeAfter": {
+    "before": [
+      "Actions execute immediately with no record",
+      "No way to undo, redo, or replay anything",
+      "Button handlers are tightly coupled to canvas internals"
+    ],
+    "after": [
+      "Every action is an object with execute() and undo()",
+      "Undo/redo is just popping a history stack",
+      "Button handlers only know about commands, not canvas internals"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A user clicks Undo. Nothing happens — the app has no idea what the last action even was.",
+      "speaker": "Developer",
+      "dialogue": "Every button just calls canvas.drawShape() directly. There's no record of anything. How do we even build Undo?",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Invoker appears holding a small, labeled box — an action, wrapped and ready to replay.",
+      "speaker": "Invoker",
+      "dialogue": "Stop executing actions and forgetting them. Wrap every action in an object. Then I can queue it, log it, or reverse it.",
+      "emoji": "🕹️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "DrawCommand holds execute() and undo(). Every executed command is pushed onto a history stack.",
+      "speaker": "Invoker",
+      "dialogue": "Execute a command, push it to history. Undo just pops the last one and calls its own undo(). It already knows how to reverse itself.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Undo, redo, and an action log all work correctly, built entirely on the same command objects.",
+      "speaker": "Developer",
+      "dialogue": "Undo, redo, even a full action replay log — all came nearly for free once actions became objects.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Button handler calls canvas directly — no record, no undo possible\nundoButton.onclick = () => {\n  canvas.drawShape(new Circle(10, 10, 5));\n  // ...no way to know what to undo later\n};",
+    "after": "interface Command {\n  execute(): void;\n  undo(): void;\n}\n\nclass DrawShapeCommand implements Command {\n  constructor(private canvas: Canvas, private shape: Shape) {}\n  execute() { this.canvas.drawShape(this.shape); }\n  undo() { this.canvas.removeShape(this.shape); }\n}\n\nclass CommandHistory {\n  private history: Command[] = [];\n  execute(command: Command) {\n    command.execute();\n    this.history.push(command);\n  }\n  undo() {\n    this.history.pop()?.undo();\n  }\n}\n\nconst history = new CommandHistory();\ndrawButton.onclick = () => history.execute(new DrawShapeCommand(canvas, new Circle(10, 10, 5)));\nundoButton.onclick = () => history.undo();"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need undo/redo, and actions must be reversible objects rather than fire-and-forget calls.",
+      "You want to queue, schedule, or log requests instead of executing them immediately.",
+      "You're building macros or batch operations composed of many smaller actions."
+    ],
+    "avoidWhen": [
+      "The action is simple, immediate, and never needs to be undone, queued, or logged — a direct call is simpler.",
+      "You'd need to wrap dozens of trivial one-off actions just to satisfy the pattern, with no real payoff.",
+      "The overhead of designing a clean `undo()` for every command outweighs the benefit for your use case."
+    ],
+    "commonMistakes": [
+      "Implementing `execute()` without a matching, correct `undo()` — half an undo system is worse than none, since it misleads users.",
+      "Letting commands hold onto stale references (a deleted shape, a closed connection), causing `undo()` to fail silently.",
+      "Wrapping trivial actions in commands 'for consistency' when a plain function call was clearly sufficient.",
+      "Letting the command history grow unbounded in memory without ever trimming it."
+    ],
+    "realWorldExample": "Undo/redo stacks in editors (text, image, code), task queues where jobs are serialized command objects, and GUI menu items/buttons that wrap the same underlying action (so a Ctrl+Z and a menu click trigger identical behavior) are all Command."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just calling a function later instead of now?" },
+    { "speaker": "Invoker", "message": "It's more than delay — it's that the ACTION ITSELF becomes an object with state. I can inspect it, log it, queue it behind other commands, or ask it to reverse itself. A bare function call can't do any of that." },
+    { "speaker": "Mentor", "message": "When don't I need you?" },
+    { "speaker": "Invoker", "message": "When the action is a one-shot, unreversible, immediate thing — like reading a value. Wrapping that in a command object is just extra ceremony." }
+  ],
+  "codeBattle": {
+    "scenario": "Your job-processing system needs to accept tasks from users, queue them, retry failed ones, and log exactly what was requested and when.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "command", "label": "Command" },
+      { "id": "observer", "label": "Observer" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "mediator", "label": "Mediator" }
+    ],
+    "correct": "command",
+    "explanation": "Invoker turns each job request into a queueable, retryable, loggable object instead of an immediate function call that vanishes once executed."
+  },
+  "quiz": [
+    {
+      "question": "What does the Command pattern turn a request into?",
+      "options": [
+        "A standalone object with its own execute (and often undo) behavior",
+        "A single global function that can never be reused",
+        "A database row",
+        "A subclass of the object it acts on"
+      ],
+      "answer": "A standalone object with its own execute (and often undo) behavior",
+      "explanation": "Making the request itself an object is exactly what enables queuing, logging, and undo."
+    },
+    {
+      "question": "How does Command typically enable undo functionality?",
+      "options": [
+        "Each command implements its own undo() logic, and a history stack tracks executed commands to reverse",
+        "It automatically reverses any change made to any variable in the program",
+        "It relies on the operating system's built-in undo feature",
+        "Undo is unrelated to the Command pattern"
+      ],
+      "answer": "Each command implements its own undo() logic, and a history stack tracks executed commands to reverse",
+      "explanation": "The command knows how to reverse itself; the history stack just decides which one to reverse next."
+    },
+    {
+      "question": "When is Command overkill?",
+      "options": [
+        "When the action is simple, immediate, and will never need to be queued, logged, or undone",
+        "When you're building an undo/redo system",
+        "When you need to queue tasks for later execution",
+        "When you're logging every user action for auditing"
+      ],
+      "answer": "When the action is simple, immediate, and will never need to be queued, logged, or undone",
+      "explanation": "Wrapping a trivial, one-off action in a command object adds ceremony without a matching benefit."
+    },
+    {
+      "question": "What's a common mistake when implementing Command?",
+      "options": [
+        "Implementing execute() without a correct, matching undo(), producing a broken or misleading undo system",
+        "Giving every command an execute() method",
+        "Storing executed commands in a history stack",
+        "Using commands for queued background jobs"
+      ],
+      "answer": "Implementing execute() without a correct, matching undo(), producing a broken or misleading undo system",
+      "explanation": "A command that can't reliably reverse itself defeats the purpose of offering undo at all."
+    }
+  ]
+}

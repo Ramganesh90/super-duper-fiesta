@@ -1,0 +1,158 @@
+{
+  "id": "chain-of-responsibility",
+  "title": "Chain of Responsibility Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Passes a request along a chain of handlers, each deciding to handle it or hand it off, until someone actually does.",
+  "hero": {
+    "name": "The Relay",
+    "codename": "Chain of Responsibility",
+    "catchphrase": "Not my job? Pass it on. Someone in this chain will catch it.",
+    "power": "Passes a request down a chain of handlers, each free to handle it, transform it, or hand it to the next link.",
+    "weakness": "If nobody in the chain claims the request, it can silently vanish at the end with no error — a chain needs a fallback handler or it can fail quietly.",
+    "origin": "The Relay appeared inside a support-ticket router with a single 200-line function deciding whether a ticket should go to tier 1, tier 2, billing, or engineering, all in one giant if/else.",
+    "enemies": ["Monolithic Routing Logic", "Silent Drops", "Rigid Handling Order"],
+    "emoji": "🏃",
+    "colorFrom": "#7c2d12",
+    "colorTo": "#fdba74"
+  },
+  "story": {
+    "problem": "`routeTicket()` is one 200-line function full of nested if/else, deciding whether a support ticket goes to tier 1, tier 2, billing, or engineering. Every new routing rule means editing this one fragile function.",
+    "solution": "The Relay turns each routing rule into its own `Handler` in a chain. Each handler checks if it can handle the ticket; if not, it passes it to the next handler in line.",
+    "result": "Tickets flow through the chain until a handler claims them. Adding a new routing rule means inserting one new handler — the rest of the chain doesn't change."
+  },
+  "beforeAfter": {
+    "before": [
+      "One giant function decides every routing rule",
+      "Adding a rule means editing shared, fragile logic",
+      "Routing order is buried inside nested conditionals"
+    ],
+    "after": [
+      "Each routing rule is an independent handler in a chain",
+      "Adding a rule means inserting one new handler",
+      "Routing order is explicit — the order handlers are chained in"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "routeTicket() is a 200-line wall of nested if/else, checking every routing rule in one place.",
+      "speaker": "Developer",
+      "dialogue": "We need a new rule for VIP customers. That means adding another branch to this already-unreadable function.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Relay lines up four handlers, each ready to catch the ticket or pass it down the line.",
+      "speaker": "The Relay",
+      "dialogue": "Stop cramming every rule into one function. Line up your handlers instead — each one decides for itself: handle it, or pass it on.",
+      "emoji": "🏃"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Tier1Handler checks the ticket first. If it can't handle it, it calls next.handle(ticket) — passing to BillingHandler, then EngineeringHandler.",
+      "speaker": "The Relay",
+      "dialogue": "Each handler only knows its own rule. If it's not the right one, it passes the ticket along — no handler needs to know about the others.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "VipHandler ships as one new link at the front of the chain. The other handlers are untouched.",
+      "speaker": "Developer",
+      "dialogue": "One new handler, inserted at the front of the chain. Nothing else in the routing logic had to change.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "function routeTicket(ticket: Ticket) {\n  if (ticket.category === \"billing\") {\n    return billingTeam.handle(ticket);\n  } else if (ticket.priority === \"low\" && ticket.category === \"general\") {\n    return tier1Team.handle(ticket);\n  } else if (ticket.category === \"technical\") {\n    return engineeringTeam.handle(ticket);\n  }\n  // ...every new rule means another branch here\n}",
+    "after": "abstract class TicketHandler {\n  private next: TicketHandler | null = null;\n  setNext(handler: TicketHandler) { this.next = handler; return handler; }\n\n  handle(ticket: Ticket) {\n    if (this.canHandle(ticket)) {\n      return this.process(ticket);\n    }\n    return this.next?.handle(ticket) ?? \"unhandled\";\n  }\n\n  protected abstract canHandle(ticket: Ticket): boolean;\n  protected abstract process(ticket: Ticket): string;\n}\n\nclass BillingHandler extends TicketHandler {\n  protected canHandle(t: Ticket) { return t.category === \"billing\"; }\n  protected process(t: Ticket) { return billingTeam.handle(t); }\n}\nclass EngineeringHandler extends TicketHandler {\n  protected canHandle(t: Ticket) { return t.category === \"technical\"; }\n  protected process(t: Ticket) { return engineeringTeam.handle(t); }\n}\n\nconst billing = new BillingHandler();\nbilling.setNext(new EngineeringHandler());\nbilling.handle(ticket);"
+  },
+  "explanation": {
+    "useWhen": [
+      "A request needs to be handled by one of several possible handlers, but which one isn't known until runtime.",
+      "You want to add or reorder handling rules without touching a monolithic routing function.",
+      "Each handler's decision logic is independent and shouldn't need to know about the other handlers."
+    ],
+    "avoidWhen": [
+      "There's a small, fixed number of routing rules that never change — a simple if/else is easier to read at a glance.",
+      "Every request must be handled by ALL handlers in sequence (that's closer to a pipeline/middleware pattern, not chain-of-responsibility's 'stop at first match').",
+      "You need a guarantee that a request is always handled — chains without a fallback can silently drop requests."
+    ],
+    "commonMistakes": [
+      "Building a chain with no fallback/default handler, so an unmatched request silently disappears at the end.",
+      "Letting handlers depend on each other's internals instead of just deciding independently whether to handle or pass along.",
+      "Making the chain order implicit or hard to discover, so nobody can predict which handler will actually catch a given request.",
+      "Confusing Chain of Responsibility (one handler claims the request) with a middleware pipeline (every layer runs, in sequence)."
+    ],
+    "realWorldExample": "HTTP middleware pipelines (each middleware can handle, modify, or pass the request along), event bubbling in the DOM (a click event travels up through ancestor handlers), and support-ticket or approval-request routing systems are all Chain of Responsibility (or close cousins of it)."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just a fancy if/else chain?" },
+    { "speaker": "The Relay", "message": "The outcome looks similar, but the shape is different. Each handler doesn't know about the others — it just decides 'can I handle this?' and passes along if not. You can reorder or insert handlers without touching the others' code at all." },
+    { "speaker": "Mentor", "message": "What happens if nothing in the chain handles the request?" },
+    { "speaker": "The Relay", "message": "That's my real weakness — silence. Always end your chain with a fallback handler, or you'll have requests vanishing with no error and no trace." }
+  ],
+  "codeBattle": {
+    "scenario": "Your expense-approval system routes requests: managers approve under $500, directors approve under $5,000, and the CFO approves anything above that — and finance keeps adding new approval tiers.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "chain-of-responsibility", "label": "Chain of Responsibility" },
+      { "id": "state", "label": "State" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "mediator", "label": "Mediator" }
+    ],
+    "correct": "chain-of-responsibility",
+    "explanation": "The Relay lets each approval tier be its own handler that either approves the request or passes it up the chain, so adding a new tier means inserting one new link."
+  },
+  "quiz": [
+    {
+      "question": "What is the core behavior of Chain of Responsibility?",
+      "options": [
+        "A request passes through a chain of handlers until one of them handles it",
+        "Every handler in the chain always processes the request in sequence",
+        "A single handler processes all possible request types",
+        "Requests are queued and processed in a random order"
+      ],
+      "answer": "A request passes through a chain of handlers until one of them handles it",
+      "explanation": "The chain stops (typically) once a handler claims the request — that's the defining shape of the pattern."
+    },
+    {
+      "question": "What is a common bug risk with Chain of Responsibility?",
+      "options": [
+        "A request reaches the end of the chain unhandled and silently disappears",
+        "Every handler always processes every request, causing duplication",
+        "Handlers must know about every other handler in the chain",
+        "The chain can only ever have one handler"
+      ],
+      "answer": "A request reaches the end of the chain unhandled and silently disappears",
+      "explanation": "Without a fallback handler, an unmatched request can vanish with no error, making bugs hard to trace."
+    },
+    {
+      "question": "What benefit does Chain of Responsibility provide over one large if/else function?",
+      "options": [
+        "New handling rules can be added or reordered without touching existing handlers' code",
+        "It runs strictly faster in every case",
+        "It removes the need for any conditional logic",
+        "It requires fewer classes overall"
+      ],
+      "answer": "New handling rules can be added or reordered without touching existing handlers' code",
+      "explanation": "Each handler is independent, so extending or reordering the chain doesn't require editing existing logic."
+    },
+    {
+      "question": "How does Chain of Responsibility differ from a middleware pipeline where every layer always runs?",
+      "options": [
+        "Chain of Responsibility typically stops at the first handler that claims the request; a pipeline runs every layer regardless",
+        "They are exactly the same pattern",
+        "Middleware pipelines can only have one layer",
+        "Chain of Responsibility requires a database"
+      ],
+      "answer": "Chain of Responsibility typically stops at the first handler that claims the request; a pipeline runs every layer regardless",
+      "explanation": "The 'stop at first match' behavior is what distinguishes classic Chain of Responsibility from a full middleware pipeline."
+    }
+  ]
+}

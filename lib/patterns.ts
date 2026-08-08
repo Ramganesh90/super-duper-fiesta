@@ -12,6 +12,16 @@ import decorator from "@/data/patterns/decorator.json";
 import facade from "@/data/patterns/facade.json";
 import flyweight from "@/data/patterns/flyweight.json";
 import proxy from "@/data/patterns/proxy.json";
+import strategy from "@/data/patterns/strategy.json";
+import command from "@/data/patterns/command.json";
+import iterator from "@/data/patterns/iterator.json";
+import mediator from "@/data/patterns/mediator.json";
+import memento from "@/data/patterns/memento.json";
+import state from "@/data/patterns/state.json";
+import templateMethod from "@/data/patterns/template-method.json";
+import visitor from "@/data/patterns/visitor.json";
+import chainOfResponsibility from "@/data/patterns/chain-of-responsibility.json";
+import interpreter from "@/data/patterns/interpreter.json";
 
 const patterns = [
   singleton,
@@ -26,7 +36,17 @@ const patterns = [
   facade,
   flyweight,
   proxy,
+  chainOfResponsibility,
+  command,
+  interpreter,
+  iterator,
+  mediator,
+  memento,
   observer,
+  state,
+  strategy,
+  templateMethod,
+  visitor,
 ] as unknown as Pattern[];
 
 export function getAllPatterns(): Pattern[] {

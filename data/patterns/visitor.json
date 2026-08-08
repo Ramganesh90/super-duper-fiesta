@@ -1,0 +1,158 @@
+{
+  "id": "visitor",
+  "title": "Visitor Pattern",
+  "category": "behavioral",
+  "difficulty": "advanced",
+  "oneLiner": "Adds new operations across a whole class hierarchy without modifying any of those classes — by having the operation visit each one.",
+  "hero": {
+    "name": "The Emissary",
+    "codename": "Visitor",
+    "catchphrase": "I bring the operation to you — you don't carry it yourself.",
+    "power": "Adds an entirely new operation across a class hierarchy (pricing, exporting, validating) without editing a single one of those classes.",
+    "weakness": "The trade-off flips: adding a brand-new shape to the hierarchy now means updating every existing visitor — easy to add operations, hard to add types.",
+    "origin": "The Emissary appeared after a shape library needed a new `exportToSvg()` operation, and adding it meant touching Circle, Square, Triangle, and eleven other shape classes just to add one method each.",
+    "enemies": ["Scattered Cross-Cutting Operations", "Bloated Base Classes", "Type-Checking Chains"],
+    "emoji": "🕵️",
+    "colorFrom": "#164e63",
+    "colorTo": "#67e8f9"
+  },
+  "story": {
+    "problem": "Adding an `exportToSvg()` method means editing Circle, Square, Triangle, and eleven other shape classes — one method added per class, just for this one operation. The next operation means doing it all over again.",
+    "solution": "The Emissary introduces a `ShapeVisitor` interface with one method per shape type. Each shape gets a single `accept(visitor)` method that calls back into the visitor. New operations become new visitor classes — no shape class changes.",
+    "result": "Adding `exportToSvg()` now means writing one new `SvgExportVisitor` class. None of the fourteen shape classes are touched."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every new operation means editing every shape class",
+      "Shape classes accumulate unrelated operation-specific methods",
+      "Operations and data are tightly tangled together"
+    ],
+    "after": [
+      "Every new operation is one new visitor class",
+      "Shape classes stay focused purely on their own data",
+      "Operations and data are cleanly separated"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A pull request touches fourteen different shape files, adding one exportToSvg() method to each.",
+      "speaker": "Developer",
+      "dialogue": "Fourteen files changed, for ONE new feature. And we'll do this again for exportToPdf() next sprint.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Emissary appears holding a single letter addressed to every shape, ready to visit each one in turn.",
+      "speaker": "The Emissary",
+      "dialogue": "Stop carrying the operation into every shape class. Let ME visit each shape instead — the shapes barely have to change at all.",
+      "emoji": "🕵️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Each shape gets one accept(visitor) method. SvgExportVisitor implements visitCircle(), visitSquare(), visitTriangle().",
+      "speaker": "The Emissary",
+      "dialogue": "shape.accept(visitor) calls back to visitor.visitCircle(shape) automatically. The operation lives entirely inside me — the visitor — not inside the shape.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "exportToPdf ships as one new visitor class. Zero shape files are touched.",
+      "speaker": "Developer",
+      "dialogue": "One new visitor class, zero changes to any shape. That's the entire PR now.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Every new operation means editing every shape class\nclass Circle {\n  area() { /* ... */ }\n  exportToSvg() { /* new method, added here */ }\n  exportToPdf() { /* another new method, added later */ }\n}\nclass Square {\n  area() { /* ... */ }\n  exportToSvg() { /* duplicated across every shape */ }\n}",
+    "after": "interface ShapeVisitor {\n  visitCircle(c: Circle): string;\n  visitSquare(s: Square): string;\n}\n\ninterface Shape {\n  accept(visitor: ShapeVisitor): string;\n}\n\nclass Circle implements Shape {\n  constructor(public radius: number) {}\n  accept(visitor: ShapeVisitor) { return visitor.visitCircle(this); }\n}\nclass Square implements Shape {\n  constructor(public side: number) {}\n  accept(visitor: ShapeVisitor) { return visitor.visitSquare(this); }\n}\n\n// A brand-new operation, with zero changes to Circle or Square\nclass SvgExportVisitor implements ShapeVisitor {\n  visitCircle(c: Circle) { return `<circle r=\"${c.radius}\"/>`; }\n  visitSquare(s: Square) { return `<rect width=\"${s.side}\"/>`; }\n}\n\nshapes.map((shape) => shape.accept(new SvgExportVisitor()));"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to add new, unrelated operations (export, pricing, validation) across a stable class hierarchy repeatedly.",
+      "The class hierarchy itself rarely changes, but the operations performed on it change or grow often.",
+      "You want to keep operation-specific logic out of the domain classes entirely, for a cleaner separation of concerns."
+    ],
+    "avoidWhen": [
+      "The class hierarchy changes frequently — every new class means updating every existing visitor, which gets expensive fast.",
+      "You only need one operation, once — Visitor's ceremony isn't worth it for a single use case.",
+      "The language doesn't support double dispatch cleanly, making the boilerplate heavier than the benefit."
+    ],
+    "commonMistakes": [
+      "Applying Visitor to a hierarchy that changes often — every new subclass forces updates to every existing visitor, which is exactly backwards from what you want.",
+      "Forgetting to implement a new shape type's `accept()` method, silently breaking every visitor that should have handled it.",
+      "Overusing Visitor for a single operation that would've been simpler as one ordinary method on the base class.",
+      "Letting visitors reach into shape internals instead of working through the shape's public interface, tightly coupling them anyway."
+    ],
+    "realWorldExample": "AST (Abstract Syntax Tree) traversal in compilers and linters — one Visitor per operation (type-checking, code generation, formatting) walking a stable tree of node types — is the textbook real-world use of Visitor."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Why not just add exportToSvg() directly to each shape class?" },
+    { "speaker": "The Emissary", "message": "You could — until the fifth unrelated operation shows up and every shape class is bloated with export/price/validate methods that have nothing to do with being a shape. I keep operations OUT of the data classes entirely." },
+    { "speaker": "Mentor", "message": "What's the catch?" },
+    { "speaker": "The Emissary", "message": "Add a new shape — say, Hexagon — and every existing visitor needs a new visitHexagon() method. I trade 'easy to add operations' for 'hard to add types'. Know which one your codebase changes more often." }
+  ],
+  "codeBattle": {
+    "scenario": "Your compiler's AST has 20 stable node types (numbers, strings, function calls, ...) and needs type-checking, code generation, and pretty-printing — three operations, likely more to come, over a hierarchy that rarely changes.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "visitor", "label": "Visitor" },
+      { "id": "iterator", "label": "Iterator" },
+      { "id": "composite", "label": "Composite" },
+      { "id": "template-method", "label": "Template Method" }
+    ],
+    "correct": "visitor",
+    "explanation": "The Emissary lets each new operation (type-checking, codegen, printing) become its own visitor class, without touching any of the 20 stable node classes."
+  },
+  "quiz": [
+    {
+      "question": "What trade-off does Visitor make?",
+      "options": [
+        "Adding new operations becomes easy; adding new classes to the hierarchy becomes hard",
+        "Adding new classes becomes easy; adding new operations becomes hard",
+        "Both adding operations and adding classes become equally easy",
+        "Visitor removes the need for any class hierarchy at all"
+      ],
+      "answer": "Adding new operations becomes easy; adding new classes to the hierarchy becomes hard",
+      "explanation": "This is Visitor's defining trade-off — it inverts the usual difficulty of extending a hierarchy versus extending its operations."
+    },
+    {
+      "question": "What method does each element in the hierarchy typically implement to support Visitor?",
+      "options": [
+        "accept(visitor), which calls back into the visitor's type-specific method",
+        "visit(), which performs the operation directly",
+        "clone(), to create a copy for the visitor to inspect",
+        "toString(), to convert itself into a visitor"
+      ],
+      "answer": "accept(visitor), which calls back into the visitor's type-specific method",
+      "explanation": "The `accept()` call is what routes execution to the correct `visitX()` method on the visitor — the double dispatch mechanism."
+    },
+    {
+      "question": "When is Visitor a poor fit?",
+      "options": [
+        "When the class hierarchy changes frequently, since every new type requires updating every existing visitor",
+        "When you need to add many new operations to a stable hierarchy",
+        "When operations should be kept separate from the data classes",
+        "When you're building a compiler or linter"
+      ],
+      "answer": "When the class hierarchy changes frequently, since every new type requires updating every existing visitor",
+      "explanation": "A frequently-changing hierarchy makes Visitor's core trade-off work against you instead of for you."
+    },
+    {
+      "question": "What's a textbook real-world use of Visitor?",
+      "options": [
+        "Walking a compiler's abstract syntax tree with different visitors for type-checking, code generation, and formatting",
+        "Implementing a Singleton logger",
+        "Building a payment gateway adapter",
+        "Managing undo/redo history in a text editor"
+      ],
+      "answer": "Walking a compiler's abstract syntax tree with different visitors for type-checking, code generation, and formatting",
+      "explanation": "AST traversal is the classic case: a stable set of node types, with many operations performed on them over time."
+    }
+  ]
+}

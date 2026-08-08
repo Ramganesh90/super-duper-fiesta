@@ -1,0 +1,158 @@
+{
+  "id": "strategy",
+  "title": "Strategy Pattern",
+  "category": "behavioral",
+  "difficulty": "beginner",
+  "oneLiner": "Makes an algorithm swappable at runtime by putting each variant behind the same interface.",
+  "hero": {
+    "name": "Shape-Shifter",
+    "codename": "Strategy",
+    "catchphrase": "Same job, different move — pick your algorithm.",
+    "power": "Swaps an entire algorithm in or out at runtime, without the code that uses it ever changing.",
+    "weakness": "A handful of nearly-identical strategies with one-line differences is its own kind of clutter — sometimes a parameter would've done the job.",
+    "origin": "Shape-Shifter appeared inside a shipping calculator's 400-line if/else chain, one branch per carrier's pricing algorithm, that grew every quarter.",
+    "enemies": ["If/Else Sprawl", "Hardcoded Algorithms", "Copy-Pasted Variants"],
+    "emoji": "🦎",
+    "colorFrom": "#c2410c",
+    "colorTo": "#fb923c"
+  },
+  "story": {
+    "problem": "`calculateShipping()` has a giant if/else chain: one branch per carrier's pricing algorithm. Every new carrier means editing this one increasingly fragile function.",
+    "solution": "Shape-Shifter gives each carrier its own `ShippingStrategy` implementation. `calculateShipping()` just calls `strategy.calculate(cart)` — it doesn't know or care which carrier it is.",
+    "result": "Adding a carrier means adding one new strategy class. The core shipping code never changes again."
+  },
+  "beforeAfter": {
+    "before": [
+      "One giant if/else chain, one branch per algorithm",
+      "Adding an algorithm means editing shared code",
+      "Hard to test one pricing algorithm in isolation"
+    ],
+    "after": [
+      "Each algorithm is its own swappable class",
+      "Adding an algorithm means adding one new file",
+      "Each strategy is trivially testable on its own"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "calculateShipping() has grown to a 400-line if/else chain, one branch per carrier.",
+      "speaker": "Developer",
+      "dialogue": "We're adding a fifth carrier and I have to touch this massive function again. One typo breaks all four existing carriers.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Shape-Shifter appears, morphing between four different forms.",
+      "speaker": "Shape-Shifter",
+      "dialogue": "Stop branching on carrier inside one function. Give each carrier its own algorithm — and let the caller just swap which one it uses.",
+      "emoji": "🦎"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Each carrier implements the same ShippingStrategy interface. calculateShipping() just calls strategy.calculate().",
+      "speaker": "Shape-Shifter",
+      "dialogue": "The caller doesn't know or care which strategy it's holding. Swap it out entirely, and nothing else changes.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The fifth carrier ships as a new 15-line file. The 400-line function is gone entirely.",
+      "speaker": "Developer",
+      "dialogue": "One new file, fully tested in isolation, zero risk to the other four carriers.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "function calculateShipping(cart: Cart, carrier: string): number {\n  if (carrier === \"fedex\") {\n    return cart.weight * 1.5 + 5;\n  } else if (carrier === \"ups\") {\n    return cart.weight * 1.2 + 7;\n  } else if (carrier === \"usps\") {\n    return cart.weight * 2.0;\n  }\n  throw new Error(\"Unknown carrier\");\n}",
+    "after": "interface ShippingStrategy {\n  calculate(cart: Cart): number;\n}\n\nclass FedExStrategy implements ShippingStrategy {\n  calculate(cart: Cart) { return cart.weight * 1.5 + 5; }\n}\nclass UPSStrategy implements ShippingStrategy {\n  calculate(cart: Cart) { return cart.weight * 1.2 + 7; }\n}\n\nclass ShippingCalculator {\n  constructor(private strategy: ShippingStrategy) {}\n  calculate(cart: Cart) { return this.strategy.calculate(cart); }\n}\n\n// Swap the algorithm entirely by swapping the strategy\nconst calculator = new ShippingCalculator(new FedExStrategy());\ncalculator.calculate(cart);"
+  },
+  "explanation": {
+    "useWhen": [
+      "You have several interchangeable algorithms for the same task and need to pick one at runtime.",
+      "A function's conditional logic branches heavily on 'which algorithm' — that's a strong Strategy smell.",
+      "You want each algorithm to be independently testable without dragging in the others."
+    ],
+    "avoidWhen": [
+      "There's only one algorithm and no realistic need for a second — the interface is pure overhead.",
+      "The 'algorithms' differ by a single parameter — a config value is simpler than a whole class.",
+      "The number of near-identical strategies grows large enough that the class count becomes its own maintenance burden."
+    ],
+    "commonMistakes": [
+      "Reaching for Strategy when a single parameterized function would solve the same problem more simply.",
+      "Leaking algorithm-specific details back into the caller, defeating the point of swappability.",
+      "Not giving the caller an easy way to choose a strategy (hardcoding one strategy negates the pattern's benefit).",
+      "Confusing Strategy with State — Strategy is chosen by the client; State transitions are driven by the object itself."
+    ],
+    "realWorldExample": "Sorting functions that accept a custom comparator, payment processing that swaps between providers, and compression libraries that let you pick gzip vs. brotli vs. zstd are all Strategy in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Couldn't I just pass a function instead of a whole Strategy class?" },
+    { "speaker": "Shape-Shifter", "message": "In many languages, absolutely — a function IS a lightweight Strategy. I matter most when the algorithm needs its own state or several related methods, not just one function signature." },
+    { "speaker": "Mentor", "message": "When am I overusing you?" },
+    { "speaker": "Shape-Shifter", "message": "When your 'strategies' are one line each and differ only by a number. That's a parameter, not a pattern." }
+  ],
+  "codeBattle": {
+    "scenario": "Your image export feature needs to support PNG, JPEG, and WebP compression, each with a completely different algorithm, chosen by the user at export time.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "state", "label": "State" },
+      { "id": "template-method", "label": "Template Method" },
+      { "id": "command", "label": "Command" }
+    ],
+    "correct": "strategy",
+    "explanation": "Shape-Shifter lets the export feature swap between fully independent compression algorithms at runtime, chosen by the caller, with no shared conditional logic."
+  },
+  "quiz": [
+    {
+      "question": "What is the core problem Strategy solves?",
+      "options": [
+        "Conditional logic that branches heavily on 'which algorithm to use' becomes hard to maintain and extend",
+        "An object needs to notify many listeners of a change",
+        "A complex object needs to be constructed step by step",
+        "Two incompatible interfaces need to work together"
+      ],
+      "answer": "Conditional logic that branches heavily on 'which algorithm to use' becomes hard to maintain and extend",
+      "explanation": "Strategy's entire purpose is replacing that branching with swappable, independently testable algorithm objects."
+    },
+    {
+      "question": "Who decides which Strategy is used?",
+      "options": [
+        "The client code, which selects and supplies the strategy",
+        "The strategy interface itself, automatically",
+        "It's determined randomly at runtime",
+        "It's fixed permanently at compile time with no way to change it"
+      ],
+      "answer": "The client code, which selects and supplies the strategy",
+      "explanation": "Strategy selection is external — the client picks which algorithm to plug in."
+    },
+    {
+      "question": "When is a plain function parameter a better choice than a full Strategy class?",
+      "options": [
+        "When the algorithm is simple, stateless, and fits naturally as a single function",
+        "When the algorithm needs several related methods and internal state",
+        "When you have ten different complex algorithms to choose from",
+        "Never — Strategy classes are always preferable"
+      ],
+      "answer": "When the algorithm is simple, stateless, and fits naturally as a single function",
+      "explanation": "A function is often a lighter-weight Strategy for simple, single-operation algorithms."
+    },
+    {
+      "question": "How does Strategy differ from State?",
+      "options": [
+        "In Strategy, the client chooses the algorithm; in State, the object itself drives transitions between behaviors",
+        "They are the same pattern with different names",
+        "State can only have one implementation, Strategy can have many",
+        "Strategy requires a database, State does not"
+      ],
+      "answer": "In Strategy, the client chooses the algorithm; in State, the object itself drives transitions between behaviors",
+      "explanation": "The structural shape is similar, but who controls the swap — and why — is the key distinguishing factor."
+    }
+  ]
+}

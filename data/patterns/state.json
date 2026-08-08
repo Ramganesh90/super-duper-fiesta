@@ -1,0 +1,158 @@
+{
+  "id": "state",
+  "title": "State Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Lets an object change its behavior automatically when its internal state changes, by delegating to a state-specific object instead of one giant switch statement.",
+  "hero": {
+    "name": "Morph",
+    "codename": "State",
+    "catchphrase": "I don't check what state I'm in — I simply become it.",
+    "power": "Delegates behavior entirely to the current state object, so switching states automatically switches behavior.",
+    "weakness": "Every discrete state becomes its own small class — for a simple two-state toggle, that's more ceremony than a boolean flag needs.",
+    "origin": "Morph appeared inside a vending machine's `dispense()` method, which had grown a 15-branch switch statement checking `state === \"idle\" | \"hasCoin\" | \"dispensing\" | \"sold out\"` at every single method.",
+    "enemies": ["Switch Statement Sprawl", "Invalid State Transitions", "Scattered State Checks"],
+    "emoji": "🚦",
+    "colorFrom": "#a21caf",
+    "colorTo": "#e879f9"
+  },
+  "story": {
+    "problem": "VendingMachine's `insertCoin()`, `selectItem()`, and `dispense()` methods each start with a switch on `this.state`. Every new state means editing every single method to add a new branch.",
+    "solution": "Morph gives each state (Idle, HasCoin, Dispensing, SoldOut) its own class implementing the same `VendingMachineState` interface. The machine just delegates to `this.state.insertCoin()`.",
+    "result": "Adding a new state means adding one new class implementing the interface. No existing method needs to grow another switch branch."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every method starts with a switch on the current state",
+      "Adding a state means editing every existing method",
+      "Invalid transitions are easy to allow by accident"
+    ],
+    "after": [
+      "Each state is a self-contained class implementing one interface",
+      "Adding a state means adding one new class",
+      "Invalid transitions are simply not implemented in that state's class"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Three methods each start with the same 15-branch switch statement on the machine's state.",
+      "speaker": "Developer",
+      "dialogue": "We're adding a 'maintenance mode' state. That means editing this switch statement in FIVE different methods, again.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Morph appears, shifting fluidly between four distinct forms — Idle, HasCoin, Dispensing, SoldOut.",
+      "speaker": "Morph",
+      "dialogue": "Stop checking what state you're in everywhere. Let the state itself decide how to behave — delegate, don't branch.",
+      "emoji": "🚦"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Each state implements insertCoin(), selectItem(), dispense(). The machine just calls this.state.insertCoin().",
+      "speaker": "Morph",
+      "dialogue": "The machine doesn't check what state it's in anymore. It just asks the current state to handle the call — and the state knows exactly what to do, or refuse to do.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "MaintenanceState ships as one new file. Every existing state class is untouched.",
+      "speaker": "Developer",
+      "dialogue": "One new class, zero edits to the four existing states. The switch statements are just gone.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class VendingMachine {\n  state: \"idle\" | \"hasCoin\" | \"dispensing\" | \"soldOut\" = \"idle\";\n\n  insertCoin() {\n    if (this.state === \"idle\") { this.state = \"hasCoin\"; }\n    else if (this.state === \"soldOut\") { throw new Error(\"Sold out\"); }\n    // ...every method repeats this same branching\n  }\n}",
+    "after": "interface VendingMachineState {\n  insertCoin(machine: VendingMachine): void;\n  dispense(machine: VendingMachine): void;\n}\n\nclass IdleState implements VendingMachineState {\n  insertCoin(machine: VendingMachine) { machine.setState(new HasCoinState()); }\n  dispense() { throw new Error(\"Insert a coin first\"); }\n}\nclass HasCoinState implements VendingMachineState {\n  insertCoin() { throw new Error(\"Coin already inserted\"); }\n  dispense(machine: VendingMachine) { machine.setState(new DispensingState()); }\n}\n\nclass VendingMachine {\n  private state: VendingMachineState = new IdleState();\n  setState(state: VendingMachineState) { this.state = state; }\n  insertCoin() { this.state.insertCoin(this); }\n  dispense() { this.state.dispense(this); }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "An object's behavior changes significantly based on an internal state, and that logic is scattered across many switch/if statements.",
+      "You have well-defined states with clear transition rules between them.",
+      "You want invalid state transitions to be structurally impossible rather than checked at runtime everywhere."
+    ],
+    "avoidWhen": [
+      "There are only two states (a simple boolean flag) — a full State pattern is unnecessary ceremony.",
+      "State transitions are rare or trivial, and a switch statement is genuinely easier to read in one place.",
+      "The states don't actually have distinct behavior, just distinct data — that's not really a State problem."
+    ],
+    "commonMistakes": [
+      "Applying State to a simple two-value toggle where a boolean and an if-statement would be clearer.",
+      "Letting state classes directly reference and mutate each other in tangled ways instead of going through the context object.",
+      "Forgetting to make invalid transitions explicit (e.g. `dispense()` called while `Idle`) — silently ignoring them hides bugs.",
+      "Confusing State with Strategy — State transitions are driven by the object itself; Strategy is chosen by the client."
+    ],
+    "realWorldExample": "TCP connection state machines (Listen, SynSent, Established, Closed), traffic light controllers, order-processing pipelines (Pending, Shipped, Delivered, Cancelled), and UI component state (Loading, Loaded, Error) are all classic State pattern use cases."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This looks identical to Strategy — swap in an object, behavior changes." },
+    { "speaker": "Morph", "message": "Structurally close cousins, but who's driving matters. With Strategy, the CLIENT picks an algorithm. With me, the OBJECT ITSELF transitions between states as things happen — insertCoin() moves me from Idle to HasCoin automatically." },
+    { "speaker": "Mentor", "message": "When shouldn't I use you?" },
+    { "speaker": "Morph", "message": "When there are really just two states — on and off. A boolean handles that fine. I earn my keep once there are three or more states with real behavioral differences and transition rules." }
+  ],
+  "codeBattle": {
+    "scenario": "Your order-processing system has Pending, Paid, Shipped, Delivered, and Cancelled states, each allowing only specific transitions, and the transition-checking logic is duplicated across six different methods.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "state", "label": "State" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "command", "label": "Command" },
+      { "id": "mediator", "label": "Mediator" }
+    ],
+    "correct": "state",
+    "explanation": "Morph gives each order status its own class that knows exactly which transitions are valid from it, eliminating the duplicated switch logic across every method."
+  },
+  "quiz": [
+    {
+      "question": "What triggers a state transition in the State pattern?",
+      "options": [
+        "The object itself, in response to something that happens to it",
+        "The client code, choosing which state to use ahead of time",
+        "A random timer",
+        "A database migration"
+      ],
+      "answer": "The object itself, in response to something that happens to it",
+      "explanation": "The defining trait of State is that the object drives its own transitions as events occur."
+    },
+    {
+      "question": "How does State typically eliminate switch-statement sprawl?",
+      "options": [
+        "Each state becomes its own class implementing a shared interface, and the object delegates to whichever state it currently holds",
+        "By deleting all conditional logic from the codebase entirely",
+        "By storing all states in a single database table",
+        "By making every method asynchronous"
+      ],
+      "answer": "Each state becomes its own class implementing a shared interface, and the object delegates to whichever state it currently holds",
+      "explanation": "Delegation to a state object replaces repeated 'if state is X' checks scattered across methods."
+    },
+    {
+      "question": "When is State overkill?",
+      "options": [
+        "When there are only two states, well-modeled by a simple boolean flag",
+        "When there are five or more states with distinct behavior",
+        "When transition rules between states are complex",
+        "When state-specific behavior is scattered across many methods"
+      ],
+      "answer": "When there are only two states, well-modeled by a simple boolean flag",
+      "explanation": "A boolean and an if-statement is simpler and clearer for a genuine two-value toggle."
+    },
+    {
+      "question": "How does State differ from Strategy?",
+      "options": [
+        "In State, the object transitions itself between states; in Strategy, the client chooses which algorithm to use",
+        "State can only have one implementation; Strategy can have many",
+        "They are identical patterns with different names",
+        "Strategy requires inheritance, State forbids it"
+      ],
+      "answer": "In State, the object transitions itself between states; in Strategy, the client chooses which algorithm to use",
+      "explanation": "The structural shape is similar, but who drives the swap — and why — is what separates the two patterns."
+    }
+  ]
+}

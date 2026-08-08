@@ -1,0 +1,158 @@
+{
+  "id": "template-method",
+  "title": "Template Method Pattern",
+  "category": "behavioral",
+  "difficulty": "beginner",
+  "oneLiner": "Locks the overall steps of an algorithm in a base class, while letting subclasses customize individual steps.",
+  "hero": {
+    "name": "The Blueprint",
+    "codename": "Template Method",
+    "catchphrase": "I set the steps. You fill in the details.",
+    "power": "Fixes an algorithm's overall sequence in one place, while individual steps stay overridable by subclasses.",
+    "weakness": "Leans on inheritance, so a step written for one report can't be reused by an unrelated class that isn't part of the same hierarchy.",
+    "origin": "The Blueprint appeared after three report generators — CSV, PDF, HTML — each duplicated the exact same 'fetch data, validate, sort, then export' sequence, differing only in the export step.",
+    "enemies": ["Copy-Pasted Algorithms", "Inconsistent Step Ordering", "Duplicated Boilerplate"],
+    "emoji": "📋",
+    "colorFrom": "#713f12",
+    "colorTo": "#eab308"
+  },
+  "story": {
+    "problem": "CsvReport, PdfReport, and HtmlReport each implement their own `generate()` method that fetches data, validates it, sorts it, then exports — identical except for the final export step.",
+    "solution": "The Blueprint puts the fixed sequence in an abstract base class's `generate()` method, calling `fetchData()`, `validate()`, `sort()`, then the abstract `export()` — which each subclass only needs to implement once.",
+    "result": "The four-step sequence is defined exactly once. Each report subclass only writes the one step that's actually different: its export format."
+  },
+  "beforeAfter": {
+    "before": [
+      "Three report classes duplicate the same four-step sequence",
+      "A bug in step ordering has to be fixed in three places",
+      "Every new report format re-implements fetch/validate/sort from scratch"
+    ],
+    "after": [
+      "The four-step sequence is defined exactly once, in the base class",
+      "A bug fix in the sequence applies to every report automatically",
+      "A new report format only implements its one unique export step"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Three report classes each contain a near-identical generate() method, differing only in the last step.",
+      "speaker": "Developer",
+      "dialogue": "I just found a sorting bug that exists in all three report classes, because they all copy-pasted the same broken sort call.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Blueprint rolls out a single master plan with four labeled steps, one still blank.",
+      "speaker": "The Blueprint",
+      "dialogue": "Stop copying the whole sequence. Define it ONCE — then let each report fill in only the step that's actually different.",
+      "emoji": "📋"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Report.generate() calls fetchData(), validate(), sort(), then the abstract export(). Subclasses only override export().",
+      "speaker": "The Blueprint",
+      "dialogue": "The sequence is locked here, in one place. You only write the one step that makes your report format unique.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The sorting bug fix happens in one file. All three report formats are fixed instantly.",
+      "speaker": "Developer",
+      "dialogue": "One fix, in one place, and every report format got it automatically. That bug can't come back in just one of them again.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class CsvReport {\n  generate(data: Record[]) {\n    data = fetchData();\n    data = validate(data);\n    data = sort(data);\n    return toCsv(data); // the only genuinely different step\n  }\n}\nclass PdfReport {\n  generate(data: Record[]) {\n    data = fetchData(); // duplicated\n    data = validate(data); // duplicated\n    data = sort(data); // duplicated, and the bug lives here too\n    return toPdf(data);\n  }\n}",
+    "after": "abstract class Report {\n  // The template method — the sequence is fixed here, once\n  generate(): string {\n    let data = this.fetchData();\n    data = this.validate(data);\n    data = this.sort(data);\n    return this.export(data);\n  }\n\n  protected fetchData(): Record[] { return fetchFromDb(); }\n  protected validate(data: Record[]) { return data.filter(isValid); }\n  protected sort(data: Record[]) { return data.sort(byDate); }\n\n  // The only step each subclass must actually implement\n  protected abstract export(data: Record[]): string;\n}\n\nclass CsvReport extends Report {\n  protected export(data: Record[]) { return toCsv(data); }\n}\nclass PdfReport extends Report {\n  protected export(data: Record[]) { return toPdf(data); }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Several classes share the same overall algorithm structure but differ in one or two specific steps.",
+      "You want to enforce a consistent sequence of operations across all subclasses.",
+      "You want to let subclasses hook into specific points of an algorithm without letting them alter the sequence itself."
+    ],
+    "avoidWhen": [
+      "The algorithm's steps need to be reusable outside this specific class hierarchy — Template Method locks you into inheritance.",
+      "There's only one variant of the algorithm — there's nothing to templatize yet.",
+      "The steps need to be reordered or skipped dynamically at runtime — composition-based approaches (like Strategy) are more flexible."
+    ],
+    "commonMistakes": [
+      "Making too many steps overridable, so subclasses can effectively rewrite the whole algorithm anyway — defeating the point of a fixed sequence.",
+      "Using Template Method where a composed Strategy would be more flexible, since inheritance locks the relationship at compile time.",
+      "Forgetting to mark the template method itself `final`/non-overridable (where the language allows it), letting a subclass break the sequence entirely.",
+      "Not documenting which steps are required overrides versus optional hooks, confusing subclass authors."
+    ],
+    "realWorldExample": "Test framework lifecycle methods (`setUp()` → `test()` → `tearDown()`, fixed order, customizable steps), data-import pipelines (fetch → validate → transform → load), and UI framework lifecycle hooks (`componentDidMount`-style sequences) are all Template Method."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from Strategy? Both let you customize behavior." },
+    { "speaker": "The Blueprint", "message": "Strategy swaps a WHOLE algorithm via composition. I fix the overall SEQUENCE in a base class and only let subclasses customize specific STEPS within it — inheritance, not composition." },
+    { "speaker": "Mentor", "message": "When does that inheritance requirement bite me?" },
+    { "speaker": "The Blueprint", "message": "When a step needs to be reused somewhere OUTSIDE this class hierarchy. Inheritance ties that step to me forever. If reuse across hierarchies matters, composition-based patterns serve you better." }
+  ],
+  "codeBattle": {
+    "scenario": "Your data pipeline has three importers (CSV, JSON, XML) that each must fetch, validate, transform, and load data in that exact order — but the fetch/validate/load steps are identical across all three; only transform differs.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "template-method", "label": "Template Method" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "chain-of-responsibility", "label": "Chain of Responsibility" },
+      { "id": "builder", "label": "Builder" }
+    ],
+    "correct": "template-method",
+    "explanation": "The Blueprint locks the fetch/validate/transform/load sequence in one base class, letting each importer override only the transform step that actually differs."
+  },
+  "quiz": [
+    {
+      "question": "What does the 'template method' itself typically do?",
+      "options": [
+        "Defines the fixed sequence of steps, calling both concrete and overridable methods in order",
+        "Implements every step of the algorithm directly, with no overriding allowed",
+        "Is always abstract and left entirely to subclasses",
+        "Runs asynchronously in a separate thread from the rest of the algorithm"
+      ],
+      "answer": "Defines the fixed sequence of steps, calling both concrete and overridable methods in order",
+      "explanation": "The template method is the orchestrator — it owns the sequence while delegating specific steps to (possibly overridden) methods."
+    },
+    {
+      "question": "What's the main risk of making too many steps overridable?",
+      "options": [
+        "Subclasses can effectively rewrite the entire algorithm, defeating the purpose of a fixed sequence",
+        "The code becomes impossible to compile",
+        "The base class stops being reusable at all",
+        "It becomes impossible to write any subclasses"
+      ],
+      "answer": "Subclasses can effectively rewrite the entire algorithm, defeating the purpose of a fixed sequence",
+      "explanation": "Template Method's value comes from guaranteeing a consistent sequence — over-exposing hooks erodes that guarantee."
+    },
+    {
+      "question": "What's a key limitation of Template Method compared to Strategy?",
+      "options": [
+        "It relies on inheritance, so a step can't easily be reused by classes outside that specific hierarchy",
+        "It cannot customize any part of an algorithm",
+        "It requires a database connection",
+        "It can only be used with exactly two subclasses"
+      ],
+      "answer": "It relies on inheritance, so a step can't easily be reused by classes outside that specific hierarchy",
+      "explanation": "Strategy's composition-based approach allows reusing an algorithm variant anywhere; Template Method's inheritance ties it to one hierarchy."
+    },
+    {
+      "question": "What's a classic real-world example of Template Method?",
+      "options": [
+        "A test framework's fixed setUp → test → tearDown lifecycle, with each step customizable per test",
+        "A single global configuration singleton",
+        "A payment gateway adapter",
+        "A quiz question randomizer"
+      ],
+      "answer": "A test framework's fixed setUp → test → tearDown lifecycle, with each step customizable per test",
+      "explanation": "Test lifecycles are a textbook Template Method: fixed order, customizable individual steps."
+    }
+  ]
+}
