@@ -1,0 +1,158 @@
+{
+  "id": "object-pool",
+  "title": "Object Pool Pattern",
+  "category": "creational",
+  "difficulty": "intermediate",
+  "oneLiner": "Reuses a pool of expensive, pre-created objects instead of constructing and destroying them on every use.",
+  "hero": {
+    "name": "The Recycler",
+    "codename": "Object Pool",
+    "catchphrase": "Don't throw it away. Return it, and I'll hand it to the next one who needs it.",
+    "power": "Keeps a pool of ready-to-use, expensive objects, handing them out and reclaiming them instead of constructing and destroying constantly.",
+    "weakness": "A borrowed object must be fully reset before it's returned to the pool, or leftover state silently leaks into whoever borrows it next.",
+    "origin": "The Recycler appeared after a game engine was creating and destroying a new database connection for every single query, tanking throughput under load.",
+    "enemies": ["Constant Allocation Churn", "Leaked Pool State", "Resource Exhaustion"],
+    "emoji": "♻️",
+    "colorFrom": "#15803d",
+    "colorTo": "#86efac"
+  },
+  "story": {
+    "problem": "Every database query opens a brand-new connection and closes it afterward. Under load, connection setup/teardown dominates response time and the database's max-connections limit gets hit constantly.",
+    "solution": "The Recycler pre-creates a fixed pool of connections at startup. Code borrows a connection, uses it, and returns it — the connection itself is never destroyed between uses.",
+    "result": "Query latency drops sharply since connection setup happens once, not per-request, and the database never sees more than the pool's fixed connection count."
+  },
+  "beforeAfter": {
+    "before": [
+      "A new connection is opened and closed for every query",
+      "Connection setup cost is paid on every single request",
+      "Easy to exceed the database's max-connections limit"
+    ],
+    "after": [
+      "A fixed pool of connections is reused across requests",
+      "Connection setup cost is paid once, at pool creation",
+      "Connection count is capped and predictable"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A metrics dashboard shows connection setup eating 80% of every query's response time.",
+      "speaker": "Developer",
+      "dialogue": "We're opening and closing a fresh database connection for every single query. No wonder we're hitting connection limits.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Recycler appears holding a rack of ready-to-use connections, each labeled 'available'.",
+      "speaker": "The Recycler",
+      "dialogue": "Stop destroying connections after one use. Borrow one from the pool, return it when you're done — I'll keep it ready for the next request.",
+      "emoji": "♻️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "pool.acquire() hands out a ready connection. pool.release(conn) resets and returns it to the rack.",
+      "speaker": "The Recycler",
+      "dialogue": "The pool is fixed size, created once. Borrowing and returning are cheap — no setup, no teardown, every time.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The dashboard shows query latency dropping by 70%, with connection count now capped and stable.",
+      "speaker": "Developer",
+      "dialogue": "Latency dropped 70% and we haven't hit a connection limit since. Same database, same queries — just reused connections.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "async function runQuery(sql: string) {\n  const conn = await createConnection(); // expensive: TCP handshake, auth\n  const result = await conn.query(sql);\n  await conn.close(); // thrown away immediately\n  return result;\n}",
+    "after": "class ConnectionPool {\n  private available: Connection[] = [];\n\n  constructor(size: number) {\n    for (let i = 0; i < size; i++) this.available.push(createConnectionSync());\n  }\n\n  acquire(): Connection {\n    if (this.available.length === 0) throw new Error(\"Pool exhausted\");\n    return this.available.pop()!;\n  }\n\n  release(conn: Connection) {\n    conn.reset(); // critical: clear any leftover state before reuse\n    this.available.push(conn);\n  }\n}\n\nconst pool = new ConnectionPool(10);\nasync function runQuery(sql: string) {\n  const conn = pool.acquire();\n  try {\n    return await conn.query(sql);\n  } finally {\n    pool.release(conn); // returned, not destroyed\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Object creation is genuinely expensive (network connections, threads, large buffers) and objects are used repeatedly.",
+      "You need to cap the number of concurrent expensive resources in use at once.",
+      "Objects can be safely reset to a clean state between uses."
+    ],
+    "avoidWhen": [
+      "Object creation is cheap — pooling adds complexity for no measurable benefit.",
+      "Objects can't be reliably reset between uses, risking leaked state between borrowers.",
+      "Usage is bursty and unpredictable in a way that makes a fixed pool size awkward (either starved or wasteful)."
+    ],
+    "commonMistakes": [
+      "Forgetting to fully reset an object's state before returning it to the pool, silently leaking data between users.",
+      "Sizing the pool incorrectly — too small causes starvation under load, too large wastes resources for no benefit.",
+      "Not releasing objects back to the pool on error paths, slowly leaking the pool's capacity over time.",
+      "Confusing Object Pool with Flyweight — Pool reuses whole objects exclusively one-at-a-time; Flyweight shares immutable state across many objects simultaneously."
+    ],
+    "realWorldExample": "Database connection pools, thread pools, and game engines pooling bullets/particles/enemies that are frequently spawned and destroyed are all Object Pool in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from Flyweight? Both are about reuse." },
+    { "speaker": "The Recycler", "message": "Flyweight shares one immutable piece of data across many objects AT THE SAME TIME. I hand out whole, exclusive objects ONE AT A TIME — you borrow it, use it, give it back before anyone else can." },
+    { "speaker": "Mentor", "message": "What's your real danger?" },
+    { "speaker": "The Recycler", "message": "Leftover state. If you don't reset an object before returning it, the next borrower inherits your mess — and that bug is brutal to trace back to the pool." }
+  ],
+  "codeBattle": {
+    "scenario": "Your PDF-generation service creates a new heavyweight rendering engine instance for every request, and engine startup alone takes 300ms under a load of hundreds of requests per second.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "object-pool", "label": "Object Pool" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "flyweight", "label": "Flyweight" },
+      { "id": "prototype", "label": "Prototype" }
+    ],
+    "correct": "object-pool",
+    "explanation": "The Recycler keeps a fixed pool of already-started rendering engines ready to borrow, eliminating the 300ms startup cost from the request path entirely."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Object Pool solve?",
+      "options": [
+        "Repeatedly creating and destroying expensive objects wastes time and resources",
+        "Two incompatible interfaces need to work together",
+        "An object needs to notify many listeners of a change",
+        "A class needs to guarantee exactly one instance"
+      ],
+      "answer": "Repeatedly creating and destroying expensive objects wastes time and resources",
+      "explanation": "Object Pool's entire value is amortizing expensive construction cost across many reuses instead of paying it every time."
+    },
+    {
+      "question": "What must happen before a pooled object is handed to a new borrower?",
+      "options": [
+        "It must be reset to a clean state, or leftover data leaks between users",
+        "It must be destroyed and rebuilt from scratch",
+        "It must be cloned into a new instance",
+        "Nothing — pooled objects don't need any preparation"
+      ],
+      "answer": "It must be reset to a clean state, or leftover data leaks between users",
+      "explanation": "Skipping the reset step is the single most common and dangerous Object Pool bug."
+    },
+    {
+      "question": "How does Object Pool differ from Flyweight?",
+      "options": [
+        "Object Pool hands out whole objects exclusively, one at a time; Flyweight shares immutable state across many objects simultaneously",
+        "They are the exact same pattern with different names",
+        "Flyweight requires a database; Object Pool does not",
+        "Object Pool can only be used with database connections"
+      ],
+      "answer": "Object Pool hands out whole objects exclusively, one at a time; Flyweight shares immutable state across many objects simultaneously",
+      "explanation": "Pool grants exclusive, temporary ownership; Flyweight grants concurrent, shared access to immutable data."
+    },
+    {
+      "question": "When is Object Pool the wrong choice?",
+      "options": [
+        "When object creation is already cheap, making pooling unnecessary complexity",
+        "When object creation involves a network connection or thread setup",
+        "When you need to cap the number of concurrent expensive resources",
+        "When objects can be safely reset between uses"
+      ],
+      "answer": "When object creation is already cheap, making pooling unnecessary complexity",
+      "explanation": "Pooling only pays off when construction cost is real — for cheap objects, it's pure overhead."
+    }
+  ]
+}
