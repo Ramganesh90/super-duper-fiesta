@@ -1,0 +1,158 @@
+{
+  "id": "unit-of-work",
+  "title": "Unit of Work Pattern",
+  "category": "enterprise",
+  "difficulty": "advanced",
+  "oneLiner": "Tracks every change made during a business operation and commits them all together, as one atomic transaction — or none at all.",
+  "hero": {
+    "name": "The Ledger",
+    "codename": "Unit of Work",
+    "catchphrase": "Every change gets tracked. Nothing commits until it ALL commits together.",
+    "power": "Tracks every change made across multiple objects during a business operation, committing them as a single atomic transaction, or rolling all of them back.",
+    "weakness": "Real bookkeeping overhead, and easy to misuse if some changes bypass the tracked unit of work entirely — a stray direct save() silently breaks the all-or-nothing guarantee.",
+    "origin": "The Ledger appeared after a 'transfer funds' operation debited one account, then crashed before crediting the other — leaving the money simply gone, with two separate untracked save() calls, neither aware of the other's fate.",
+    "enemies": ["Partial Writes", "Untracked Side Saves", "Crash-Time Data Corruption"],
+    "emoji": "📒",
+    "colorFrom": "#052e16",
+    "colorTo": "#6ee7b7"
+  },
+  "story": {
+    "problem": "`transferFunds()` saves the debit to Account A, then crashes before saving the credit to Account B. The two `save()` calls are entirely independent — nothing ties them together, so the money is simply gone.",
+    "solution": "The Ledger introduces a `UnitOfWork` that registers both changes, then commits them together in a single transaction. If anything fails before commit, nothing is saved at all — not the debit, not the credit.",
+    "result": "A crash mid-transfer now leaves the database exactly as it was before the operation started. Either both changes land, or neither does — money is never silently lost."
+  },
+  "beforeAfter": {
+    "before": [
+      "Each change is saved independently, as it happens",
+      "A crash mid-operation can leave data partially updated",
+      "No single point tracks everything that changed together"
+    ],
+    "after": [
+      "All changes are registered, then committed together as one unit",
+      "A crash before commit leaves the database completely unchanged",
+      "One clear point tracks and commits every related change"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A production incident report shows $500 debited from one account, with no matching credit anywhere — the transfer crashed halfway.",
+      "speaker": "Developer",
+      "dialogue": "The debit saved, then the app crashed before the credit saved. Five hundred dollars just... vanished from the system.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Ledger appears holding a single open book, tracking every pending change before a single one is finalized.",
+      "speaker": "The Ledger",
+      "dialogue": "Stop saving changes one at a time. Register them all with me first — I'll commit them together, or not at all.",
+      "emoji": "📒"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "unitOfWork.registerDirty(accountA); unitOfWork.registerDirty(accountB); unitOfWork.commit() saves both in one transaction.",
+      "speaker": "The Ledger",
+      "dialogue": "Both changes commit together, in one transaction. If anything fails before commit(), neither change is saved — not one, not the other.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The same crash scenario now leaves both accounts exactly as they were before the transfer started.",
+      "speaker": "Developer",
+      "dialogue": "Same crash, but now neither account changed at all. The money never left in the first place — no partial state, ever.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "async function transferFunds(from: Account, to: Account, amount: number) {\n  from.balance -= amount;\n  await accountRepo.save(from); // saved immediately\n  // If the app crashes right here, the debit is saved but the credit never happens\n  to.balance += amount;\n  await accountRepo.save(to);\n}",
+    "after": "class UnitOfWork {\n  private dirty: Entity[] = [];\n\n  registerDirty(entity: Entity) { this.dirty.push(entity); }\n\n  async commit() {\n    await db.transaction(async (tx) => {\n      for (const entity of this.dirty) {\n        await entity.save(tx); // all saved together, in ONE transaction\n      }\n    });\n    this.dirty = [];\n  }\n}\n\nasync function transferFunds(from: Account, to: Account, amount: number, uow: UnitOfWork) {\n  from.balance -= amount;\n  to.balance += amount;\n  uow.registerDirty(from);\n  uow.registerDirty(to);\n  await uow.commit(); // both save together, or neither does\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "A single business operation touches multiple objects that must be saved together, atomically, or not at all.",
+      "You need to guarantee data consistency even if the operation fails partway through.",
+      "You want to batch several changes into one database round-trip instead of many separate saves."
+    ],
+    "avoidWhen": [
+      "Operations only ever touch a single object — a simple save() with no coordination is enough.",
+      "The underlying data store doesn't support real transactions, making the 'all or nothing' guarantee hard to actually deliver.",
+      "The added bookkeeping (tracking dirty entities, coordinating commit) isn't worth it for genuinely simple, low-risk operations."
+    ],
+    "commonMistakes": [
+      "Letting some code call save() directly, bypassing the Unit of Work entirely and silently breaking the all-or-nothing guarantee.",
+      "Forgetting to roll back cleanly on failure, leaving the tracked entities in an inconsistent in-memory state even if the database itself rolled back correctly.",
+      "Keeping a Unit of Work alive across too large or too long an operation, risking long-held locks or stale tracked state.",
+      "Confusing Unit of Work with a database transaction itself — Unit of Work is the application-level tracking and coordination; the transaction is the underlying mechanism it relies on."
+    ],
+    "realWorldExample": "ORM 'session' or 'change tracking' objects (like Entity Framework's DbContext or Hibernate's Session) that batch and commit changes together are real-world Unit of Work implementations — most modern ORMs implement this pattern under the hood."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... a database transaction?" },
+    { "speaker": "The Ledger", "message": "The database transaction is the underlying mechanism, yes. I'm the APPLICATION-LEVEL bookkeeping on top of it — tracking which objects changed across a whole business operation, so they all get wrapped in that transaction together." },
+    { "speaker": "Mentor", "message": "What's the easiest way to break your guarantee?" },
+    { "speaker": "The Ledger", "message": "One stray direct save() call that bypasses me entirely. The moment any change happens outside my tracking, the all-or-nothing promise is broken — even if everything else does it correctly." }
+  ],
+  "codeBattle": {
+    "scenario": "Your order-processing system needs to deduct inventory, charge the customer, and create a shipment record — and a recent outage during step two left inventory deducted with no charge and no shipment, corrupting the data.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "unit-of-work", "label": "Unit of Work" },
+      { "id": "command", "label": "Command" },
+      { "id": "repository", "label": "Repository" },
+      { "id": "memento", "label": "Memento" }
+    ],
+    "correct": "unit-of-work",
+    "explanation": "The Ledger tracks the inventory deduction, charge, and shipment creation together, committing all three atomically — a crash mid-operation leaves none of them applied."
+  },
+  "quiz": [
+    {
+      "question": "What guarantee does Unit of Work provide?",
+      "options": [
+        "All tracked changes commit together as one atomic operation, or none of them do",
+        "Each change is saved immediately as it happens",
+        "Only the first tracked change is ever saved",
+        "Changes are saved in a random order"
+      ],
+      "answer": "All tracked changes commit together as one atomic operation, or none of them do",
+      "explanation": "This all-or-nothing guarantee is exactly what prevents partial, corrupted writes."
+    },
+    {
+      "question": "What's the easiest way to accidentally break Unit of Work's guarantee?",
+      "options": [
+        "Letting some code save an entity directly, bypassing the tracked unit of work entirely",
+        "Registering too many entities as dirty",
+        "Calling commit() too many times",
+        "Using it with a database that supports transactions"
+      ],
+      "answer": "Letting some code save an entity directly, bypassing the tracked unit of work entirely",
+      "explanation": "Any change made outside the Unit of Work's tracking isn't included in the atomic commit, silently breaking the guarantee."
+    },
+    {
+      "question": "How does Unit of Work relate to a database transaction?",
+      "options": [
+        "Unit of Work is application-level tracking and coordination built on top of an underlying database transaction",
+        "They are completely unrelated concepts",
+        "A database transaction requires Unit of Work to exist",
+        "Unit of Work replaces the need for any database transaction"
+      ],
+      "answer": "Unit of Work is application-level tracking and coordination built on top of an underlying database transaction",
+      "explanation": "The transaction provides the atomicity mechanism; Unit of Work tracks which changes should be included in it."
+    },
+    {
+      "question": "What's a real-world implementation of Unit of Work?",
+      "options": [
+        "An ORM's 'session' or change-tracking object, like Entity Framework's DbContext",
+        "A single raw SQL INSERT statement",
+        "A REST API endpoint",
+        "A CSS stylesheet"
+      ],
+      "answer": "An ORM's 'session' or change-tracking object, like Entity Framework's DbContext",
+      "explanation": "Most modern ORMs implement Unit of Work under the hood to batch and commit tracked changes together."
+    }
+  ]
+}

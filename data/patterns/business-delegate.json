@@ -1,0 +1,158 @@
+{
+  "id": "business-delegate",
+  "title": "Business Delegate Pattern",
+  "category": "enterprise",
+  "difficulty": "intermediate",
+  "oneLiner": "Shields client code from the complexity and volatility of looking up and calling remote business services, behind a simple local stand-in.",
+  "hero": {
+    "name": "The Envoy",
+    "codename": "Business Delegate",
+    "catchphrase": "You don't talk to the business tier directly. Send it through me.",
+    "power": "Shields client code from remote service lookup and networking complexity, presenting a simple, local, stable interface instead.",
+    "weakness": "A very J2EE-era pattern, largely superseded by simpler modern remoting and DI approaches — reaching for it in a modern stack can be unnecessary ceremony.",
+    "origin": "The Envoy appeared after a client-tier UI class had raw JNDI lookup code, remote-exception handling, and retry logic directly inside its button-click handler, just to call one business method.",
+    "enemies": ["Leaked Remoting Details", "Untraceable Lookup Failures", "Tangled Retry Logic"],
+    "emoji": "🎩",
+    "colorFrom": "#450a0a",
+    "colorTo": "#fca5a5"
+  },
+  "story": {
+    "problem": "A UI button handler contains raw JNDI lookup code, remote-exception handling, and retry logic, just to call one method on a remote business service. Every screen that calls the business tier repeats this same plumbing.",
+    "solution": "The Envoy introduces an `OrderServiceDelegate` that hides the JNDI lookup, exception translation, and retries behind one simple method: `placeOrder()`. UI code calls that, and nothing else.",
+    "result": "UI code no longer touches JNDI, remote exceptions, or retry logic at all. Every screen that needs the business tier just calls the delegate's simple methods."
+  },
+  "beforeAfter": {
+    "before": [
+      "Client code directly performs remote service lookups",
+      "Remote exception handling is duplicated across every call site",
+      "A change to the lookup mechanism ripples through client code everywhere"
+    ],
+    "after": [
+      "Client code calls one simple, local delegate method",
+      "Remote exception handling and retries live in one place",
+      "A change to the lookup mechanism only touches the delegate"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A UI button handler has raw JNDI lookup code and retry logic mixed directly into its click event.",
+      "speaker": "Developer",
+      "dialogue": "Every single screen that calls the order service repeats this same JNDI lookup and retry boilerplate. It's everywhere.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Envoy appears, offering to carry every message to the business tier so the client never has to reach it directly.",
+      "speaker": "The Envoy",
+      "dialogue": "Stop reaching into the business tier yourself. Send your requests through me — I'll handle the lookup, the retries, all of it.",
+      "emoji": "🎩"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "OrderServiceDelegate.placeOrder() hides JNDI lookup, exception translation, and retry logic behind one simple call.",
+      "speaker": "The Envoy",
+      "dialogue": "UI code just calls placeOrder(). All the remoting complexity — lookup, retries, exception translation — lives inside me, not in every button handler.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Every screen now calls one simple delegate method, with zero JNDI code in sight.",
+      "speaker": "Developer",
+      "dialogue": "Every screen just calls placeOrder() now. Not one of them touches JNDI or retry logic directly anymore.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Remote lookup and retry logic embedded directly in the UI handler\nbutton.onClick = async () => {\n  let service;\n  try {\n    service = await jndiLookup(\"OrderService\"); // remoting details leak into the UI\n  } catch (err) {\n    service = await retryLookup(\"OrderService\", 3);\n  }\n  await service.placeOrder(cart);\n};",
+    "after": "class OrderServiceDelegate {\n  private cachedService: OrderService | null = null;\n\n  private async lookup(): Promise<OrderService> {\n    if (!this.cachedService) {\n      this.cachedService = await jndiLookupWithRetry(\"OrderService\", 3);\n    }\n    return this.cachedService;\n  }\n\n  async placeOrder(cart: Cart): Promise<void> {\n    const service = await this.lookup();\n    return service.placeOrder(cart);\n  }\n}\n\n// UI code never touches JNDI, retries, or remote exceptions\nconst delegate = new OrderServiceDelegate();\nbutton.onClick = () => delegate.placeOrder(cart);"
+  },
+  "explanation": {
+    "useWhen": [
+      "You're working with a genuinely heavyweight remote service lookup mechanism (classic JNDI/EJB-style systems) that shouldn't leak into client code.",
+      "Multiple client-tier screens or components need to call the same remote business services and shouldn't duplicate lookup/retry logic.",
+      "You want a stable local interface that insulates clients from changes in how the business tier is actually reached."
+    ],
+    "avoidWhen": [
+      "You're on a modern stack where simple HTTP clients, gRPC stubs, or dependency injection already provide this insulation without extra ceremony.",
+      "There's no real remoting complexity to hide — a plain function call or lightweight SDK client is already simple enough.",
+      "The added indirection doesn't map to any actual pain point your team has experienced."
+    ],
+    "commonMistakes": [
+      "Applying Business Delegate to modern, already-simple remoting (a REST client, a typed gRPC stub) where it adds ceremony without solving a real problem — this is a very J2EE-era pattern.",
+      "Letting the delegate leak low-level remoting exceptions back to client code anyway, defeating the point of the abstraction.",
+      "Not caching the expensive lookup when appropriate, repeating costly service discovery on every single call.",
+      "Confusing Business Delegate with Facade — Business Delegate specifically targets remote/business-tier lookup complexity; Facade simplifies access to any complex subsystem, remote or not."
+    ],
+    "realWorldExample": "Classic Java EE applications using Business Delegate to wrap EJB lookups behind a simple client-tier interface are the textbook use case — modern equivalents include typed API client wrappers that hide authentication, retries, and endpoint discovery behind simple method calls."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this the same as a typical typed API client we'd write today?" },
+    { "speaker": "The Envoy", "message": "Spiritually, very close! Modern SDK wrappers hiding auth, retries, and endpoint discovery are doing exactly what I was invented for — just without the specific J2EE/EJB baggage I originally carried." },
+    { "speaker": "Mentor", "message": "So am I outdated?" },
+    { "speaker": "The Envoy", "message": "By that specific name, mostly, yes. But the underlying idea — insulate clients from remote-lookup complexity — is alive and well in every well-designed API client wrapper written today." }
+  ],
+  "codeBattle": {
+    "scenario": "Your legacy enterprise Java application has EJB lookup code, connection retries, and remote exception translation duplicated across fifteen different client-tier screens that all need to call the same business service.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "business-delegate", "label": "Business Delegate" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "proxy", "label": "Proxy" },
+      { "id": "service-locator", "label": "Service Locator" }
+    ],
+    "correct": "business-delegate",
+    "explanation": "The Envoy centralizes the EJB lookup, retry, and exception-translation logic behind one simple delegate interface, so the fifteen screens stop duplicating remoting plumbing."
+  },
+  "quiz": [
+    {
+      "question": "What does Business Delegate shield client code from?",
+      "options": [
+        "The complexity and volatility of looking up and calling remote business services",
+        "All database access entirely",
+        "The need to have any business logic at all",
+        "User input validation"
+      ],
+      "answer": "The complexity and volatility of looking up and calling remote business services",
+      "explanation": "Insulating clients from remote lookup and networking details is exactly what this pattern exists to do."
+    },
+    {
+      "question": "What era/technology is Business Delegate classically associated with?",
+      "options": [
+        "Classic Java EE applications using EJB lookups",
+        "Modern React frontend development",
+        "NoSQL database design",
+        "CSS layout systems"
+      ],
+      "answer": "Classic Java EE applications using EJB lookups",
+      "explanation": "Business Delegate is a well-known J2EE-era pattern, originally designed around hiding EJB lookup complexity."
+    },
+    {
+      "question": "What's the modern equivalent of what Business Delegate provides?",
+      "options": [
+        "A typed API client wrapper hiding authentication, retries, and endpoint discovery behind simple method calls",
+        "A raw HTTP fetch call with no abstraction",
+        "A CSS stylesheet",
+        "A database index"
+      ],
+      "answer": "A typed API client wrapper hiding authentication, retries, and endpoint discovery behind simple method calls",
+      "explanation": "The underlying idea persists in modern SDK/API client wrappers, even without the specific EJB-era name."
+    },
+    {
+      "question": "How does Business Delegate differ from Facade?",
+      "options": [
+        "Business Delegate specifically targets remote/business-tier lookup complexity; Facade simplifies access to any complex subsystem",
+        "They are the exact same pattern with different names",
+        "Facade can only be used for remote services",
+        "Business Delegate requires a NoSQL database"
+      ],
+      "answer": "Business Delegate specifically targets remote/business-tier lookup complexity; Facade simplifies access to any complex subsystem",
+      "explanation": "Business Delegate is a more specific application of simplification, focused on remote service access rather than any subsystem in general."
+    }
+  ]
+}

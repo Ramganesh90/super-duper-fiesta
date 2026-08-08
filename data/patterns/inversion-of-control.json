@@ -1,0 +1,158 @@
+{
+  "id": "inversion-of-control",
+  "title": "Inversion of Control Pattern",
+  "category": "enterprise",
+  "difficulty": "intermediate",
+  "oneLiner": "Hands control of execution to a framework or container, which calls into your code at the right moments, instead of your code driving everything itself.",
+  "hero": {
+    "name": "The Conductor",
+    "codename": "Inversion of Control",
+    "catchphrase": "Don't call the framework. The framework calls you.",
+    "power": "Inverts who's driving — a container or framework manages the overall flow, calling into your code exactly when it's needed.",
+    "weakness": "Makes control flow harder to read top-to-bottom — you have to understand the container's lifecycle to know when, or even whether, your code actually runs.",
+    "origin": "The Conductor appeared after a team's web server hand-rolled its own socket listening, request parsing, and routing loop from scratch for every single project, reinventing the same orchestration every time.",
+    "enemies": ["Reinvented Orchestration", "Manual Lifecycle Management", "Boilerplate Control Loops"],
+    "emoji": "🔄",
+    "colorFrom": "#4a044e",
+    "colorTo": "#e879f9"
+  },
+  "story": {
+    "problem": "Every new project hand-rolls its own socket listening loop, HTTP parsing, and routing logic from scratch — reinventing the same low-level orchestration that has nothing to do with the actual business features.",
+    "solution": "The Conductor introduces a web framework that owns the whole request lifecycle. Developers just register handlers; the framework calls into them at the right moment — 'don't call us, we'll call you'.",
+    "result": "Nobody writes socket-handling code anymore. Teams just plug in route handlers, and the framework drives everything around them."
+  },
+  "beforeAfter": {
+    "before": [
+      "Application code drives its own low-level control flow",
+      "The same orchestration logic is reinvented on every project",
+      "Business logic is tangled with infrastructure plumbing"
+    ],
+    "after": [
+      "A framework/container drives the overall control flow",
+      "Application code only supplies the pieces the framework calls into",
+      "Business logic stays separate from infrastructure plumbing"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A new project's first week is spent hand-rolling socket listening and HTTP parsing from scratch, again.",
+      "speaker": "Developer",
+      "dialogue": "We're writing the same socket-handling and routing code we wrote on the LAST three projects. None of this is our actual product.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Conductor appears on a podium, baton raised, ready to lead the whole orchestra so nobody else has to.",
+      "speaker": "The Conductor",
+      "dialogue": "Stop driving your own control loop. Hand ME the podium — register your handlers, and I'll call into them exactly when needed.",
+      "emoji": "🔄"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "app.get('/orders', handler) registers a callback. The framework owns the request loop and calls the handler at the right moment.",
+      "speaker": "The Conductor",
+      "dialogue": "You write handler logic. I decide WHEN it runs — parsing the request, matching the route, then calling you. Don't call us, we'll call you.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The new project skips a full week of infrastructure plumbing and starts on actual features day one.",
+      "speaker": "Developer",
+      "dialogue": "We started writing actual product features on day one. Zero time spent reinventing request handling this time.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Application code drives everything, low-level, from scratch\nconst server = net.createServer((socket) => {\n  socket.on(\"data\", (chunk) => {\n    const request = parseHttpManually(chunk);\n    if (request.path === \"/orders\") {\n      socket.write(handleOrders(request));\n    }\n    // Every project reinvents this exact plumbing\n  });\n});",
+    "after": "// The framework owns the control flow — you just register handlers\nconst app = createServer();\n\napp.get(\"/orders\", (req, res) => {\n  res.json(handleOrders(req)); // called BY the framework, at the right time\n});\n\napp.listen(3000);\n// You never write socket-handling or HTTP-parsing code — the framework\n// drives the whole lifecycle and calls into your handler when it matters"
+  },
+  "explanation": {
+    "useWhen": [
+      "You're building on top of a framework/container that manages lifecycle, request handling, or dependency wiring for you.",
+      "You want to focus application code purely on business logic, letting infrastructure concerns be handled elsewhere.",
+      "The same orchestration logic would otherwise need to be reinvented across many projects."
+    ],
+    "avoidWhen": [
+      "The application is simple enough that hand-rolled, linear control flow is easier to understand than a framework's inverted lifecycle.",
+      "Debugging an inverted control flow (where does my code actually get called from?) would cost more than the boilerplate it saves.",
+      "You need full, explicit control over exact execution order — IoC's callback-driven model can obscure that."
+    ],
+    "commonMistakes": [
+      "Treating 'Inversion of Control' and 'Dependency Injection' as identical — DI is one common technique for achieving IoC, but IoC is the broader principle (which also covers callbacks, event handlers, and template methods).",
+      "Losing track of control flow in a heavily inverted system, making it hard to trace 'when does my code actually run?' just by reading it top-to-bottom.",
+      "Fighting the framework's IoC container instead of working with it, reintroducing manual control flow the framework was meant to replace.",
+      "Over-relying on framework magic without understanding the underlying lifecycle, making debugging framework-level issues much harder."
+    ],
+    "realWorldExample": "Web frameworks (Express, Spring, Rails) calling your route handlers, game engines calling your `update()` method each frame, and UI frameworks calling your component's render function are all Inversion of Control — the framework, not your code, drives execution."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Is this the same thing as Dependency Injection?" },
+    { "speaker": "The Conductor", "message": "Related, but broader. DI is ONE technique for achieving inversion — the container hands you your dependencies instead of you constructing them. I'm the bigger idea: the FRAMEWORK drives execution, calling your code, not the other way around." },
+    { "speaker": "Mentor", "message": "What's the real cost of working under you?" },
+    { "speaker": "The Conductor", "message": "Traceability. When a framework calls your code instead of your code calling straight through, understanding 'why did this run, and when' means understanding MY lifecycle, not just reading top-to-bottom." }
+  ],
+  "codeBattle": {
+    "scenario": "Your team keeps hand-rolling the same request-parsing, routing, and lifecycle-management code on every new backend project, none of which is actually your product's differentiating logic.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "inversion-of-control", "label": "Inversion of Control" },
+      { "id": "dependency-injection", "label": "Dependency Injection" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "template-method", "label": "Template Method" }
+    ],
+    "correct": "inversion-of-control",
+    "explanation": "The Conductor lets a framework own the request lifecycle entirely, so your team only writes the business-logic handlers it calls into — no more reinvented plumbing per project."
+  },
+  "quiz": [
+    {
+      "question": "What does Inversion of Control fundamentally change?",
+      "options": [
+        "Who drives the overall control flow — a framework/container instead of your own application code",
+        "The programming language used",
+        "The database schema",
+        "The number of classes in the application"
+      ],
+      "answer": "Who drives the overall control flow — a framework/container instead of your own application code",
+      "explanation": "'Don't call us, we'll call you' — that inversion of who's in charge is the defining idea."
+    },
+    {
+      "question": "How does Inversion of Control relate to Dependency Injection?",
+      "options": [
+        "DI is one common technique for achieving IoC; IoC is the broader principle",
+        "They are unrelated concepts",
+        "IoC requires DI to be disabled",
+        "DI is a completely different pattern with no connection to IoC"
+      ],
+      "answer": "DI is one common technique for achieving IoC; IoC is the broader principle",
+      "explanation": "IoC covers callbacks, event handlers, and template methods too — DI is just the most commonly cited example."
+    },
+    {
+      "question": "What's a real trade-off of building on heavily inverted control flow?",
+      "options": [
+        "It can be harder to trace exactly when and why your code gets called, just from reading it top-to-bottom",
+        "It always makes the application slower",
+        "It removes the need for any framework at all",
+        "It requires every class to be a Singleton"
+      ],
+      "answer": "It can be harder to trace exactly when and why your code gets called, just from reading it top-to-bottom",
+      "explanation": "Understanding an inverted system means understanding the container/framework's lifecycle, not just linear code."
+    },
+    {
+      "question": "What's a real-world example of Inversion of Control?",
+      "options": [
+        "A web framework calling your route handler when a matching request arrives",
+        "A function calling another function directly and returning its result",
+        "A single global variable",
+        "A raw SQL query"
+      ],
+      "answer": "A web framework calling your route handler when a matching request arrives",
+      "explanation": "The framework owns the request lifecycle and calls into your code — a textbook example of inverted control."
+    }
+  ]
+}

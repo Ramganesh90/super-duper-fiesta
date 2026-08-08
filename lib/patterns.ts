@@ -44,6 +44,13 @@ import layeredArchitecture from "@/data/patterns/layered-architecture.json";
 import microkernel from "@/data/patterns/microkernel.json";
 import soa from "@/data/patterns/soa.json";
 import cqrs from "@/data/patterns/cqrs.json";
+import dependencyInjection from "@/data/patterns/dependency-injection.json";
+import inversionOfControl from "@/data/patterns/inversion-of-control.json";
+import serviceLocator from "@/data/patterns/service-locator.json";
+import repository from "@/data/patterns/repository.json";
+import unitOfWork from "@/data/patterns/unit-of-work.json";
+import dao from "@/data/patterns/dao.json";
+import businessDelegate from "@/data/patterns/business-delegate.json";
 
 const patterns = [
   singleton,
@@ -91,6 +98,13 @@ const patterns = [
   microkernel,
   soa,
   cqrs,
+  dependencyInjection,
+  inversionOfControl,
+  serviceLocator,
+  repository,
+  unitOfWork,
+  dao,
+  businessDelegate,
 ] as unknown as Pattern[];
 
 export function getAllPatterns(): Pattern[] {

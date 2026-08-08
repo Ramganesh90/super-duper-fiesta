@@ -1,0 +1,158 @@
+{
+  "id": "repository",
+  "title": "Repository Pattern",
+  "category": "enterprise",
+  "difficulty": "intermediate",
+  "oneLiner": "Exposes a collection-like interface over domain objects, hiding whether they actually come from a database, cache, or API.",
+  "hero": {
+    "name": "The Archivist",
+    "codename": "Repository",
+    "catchphrase": "Ask me for what you need, like a list. I'll handle where it actually lives.",
+    "power": "Presents domain objects through a simple, collection-like interface — findById, findAll, save — hiding the real persistence mechanism entirely.",
+    "weakness": "A poorly-designed repository can turn into a dumping ground for every possible query the app ever needs, becoming a bloated, untestable god-object of its own.",
+    "origin": "The Archivist appeared after business logic across the app was scattered with raw SQL queries against the `users` table, making a database migration to a new schema touch dozens of unrelated files.",
+    "enemies": ["Scattered Raw Queries", "Persistence-Leaking Business Logic", "Migration Nightmares"],
+    "emoji": "📚",
+    "colorFrom": "#57534e",
+    "colorTo": "#d6d3d1"
+  },
+  "story": {
+    "problem": "Business logic across a dozen files runs raw SQL directly against the `users` table. A schema migration means hunting down and updating every single query, scattered throughout the codebase.",
+    "solution": "The Archivist introduces a `UserRepository` with a simple, collection-like interface: `findById()`, `findByEmail()`, `save()`. Business logic calls these methods and never writes SQL directly again.",
+    "result": "The schema migration now only touches UserRepository's internals. Every business-logic call site stays exactly the same, because they never depended on the schema in the first place."
+  },
+  "beforeAfter": {
+    "before": [
+      "Raw queries against a table are scattered across many files",
+      "A schema change means hunting down every affected query",
+      "Business logic is tightly coupled to specific database details"
+    ],
+    "after": [
+      "One repository exposes a clean, collection-like interface",
+      "A schema change only touches the repository's internals",
+      "Business logic depends only on the repository's interface, not the schema"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A codebase search for 'SELECT * FROM users' returns 23 matches scattered across unrelated business-logic files.",
+      "speaker": "Developer",
+      "dialogue": "We need to rename a column and I have to hunt down and update 23 different raw SQL queries scattered across files that have nothing to do with each other.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Archivist appears behind a reference desk, ready to fetch exactly what's asked for, however it's actually stored.",
+      "speaker": "The Archivist",
+      "dialogue": "Stop writing raw queries everywhere. Ask ME for what you need — findById, findByEmail — I'll handle where and how it's actually stored.",
+      "emoji": "📚"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "UserRepository.findByEmail(email) hides the actual SQL. Every business-logic call site uses this one interface.",
+      "speaker": "The Archivist",
+      "dialogue": "Business logic just calls findByEmail(). It has no idea — and no need to know — what the underlying query actually looks like.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The column rename now touches exactly one file: UserRepository itself.",
+      "speaker": "Developer",
+      "dialogue": "One file changed for the entire migration. All 23 call sites were completely unaffected.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Raw SQL scattered across business logic, everywhere\nasync function getUserOrders(email: string) {\n  const user = await db.query(\"SELECT * FROM users WHERE email=$1\", [email]);\n  return db.query(\"SELECT * FROM orders WHERE user_id=$1\", [user.id]);\n}\n// Twenty-two more files do the exact same kind of direct query",
+    "after": "class UserRepository {\n  async findByEmail(email: string): Promise<User | null> {\n    const row = await db.query(\"SELECT * FROM users WHERE email=$1\", [email]);\n    return row ? new User(row.id, row.email) : null;\n  }\n  async save(user: User): Promise<void> {\n    await db.query(\"UPDATE users SET email=$1 WHERE id=$2\", [user.email, user.id]);\n  }\n}\n\n// Business logic depends only on the repository's interface\nasync function getUserOrders(email: string, repo: UserRepository, orders: OrderRepository) {\n  const user = await repo.findByEmail(email);\n  return user ? orders.findByUserId(user.id) : [];\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Business logic needs a clean, collection-like way to access domain objects without knowing persistence details.",
+      "You want the option to swap or evolve the underlying data store (schema changes, cache layers) without touching business logic.",
+      "You want data access to be independently mockable/testable, separate from the rest of the application."
+    ],
+    "avoidWhen": [
+      "The application is small enough that direct database access is genuinely simpler and the indirection isn't earning its cost.",
+      "You're already using an ORM's active-record style effectively, and adding a Repository layer on top would just be redundant.",
+      "You'd end up making the repository a dumping ground for every possible specialized query the app needs, rather than a focused collection-like interface."
+    ],
+    "commonMistakes": [
+      "Letting the repository grow into a catch-all with dozens of highly specific query methods instead of staying focused on core, collection-like operations.",
+      "Leaking persistence details (like raw SQL fragments) back out through the repository's public interface, quietly defeating the abstraction.",
+      "Confusing Repository with Data Mapper — Repository provides a friendly, collection-like interface, often built ON TOP of a Data Mapper doing the actual object-to-row translation underneath.",
+      "Adding a Repository layer to a trivial CRUD app where an ORM's built-in active-record methods already do the job."
+    ],
+    "realWorldExample": "Domain-driven design's Repository pattern (e.g. `orderRepository.findById()` in a DDD-structured app), and many backend frameworks' 'repository' or 'DAO' layers sitting between business logic and the ORM, are all Repository in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from Data Mapper?" },
+    { "speaker": "The Archivist", "message": "We're often layered together. Data Mapper does the low-level work of translating between objects and rows. I sit ABOVE that, giving business logic a clean, collection-like interface — findById, findAll, save — that feels natural to work with." },
+    { "speaker": "Mentor", "message": "When do I know I've overloaded a repository?" },
+    { "speaker": "The Archivist", "message": "When it has thirty highly specific methods like findActiveUsersInRegionWithDiscount(). At that point I've stopped being a clean collection abstraction and become a dumping ground for every query the app has ever needed." }
+  ],
+  "codeBattle": {
+    "scenario": "Your e-commerce app has product-lookup SQL queries duplicated across the cart, search, and recommendations features, and a recent database index change required updating query logic in six different files.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "repository", "label": "Repository" },
+      { "id": "data-mapper", "label": "Data Mapper" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "repository",
+    "explanation": "The Archivist gives cart, search, and recommendations one shared, collection-like interface for product lookups, so future changes touch one repository instead of six call sites."
+  },
+  "quiz": [
+    {
+      "question": "What kind of interface does a Repository typically expose?",
+      "options": [
+        "A simple, collection-like interface such as findById(), findAll(), and save()",
+        "A raw SQL query builder with no abstraction",
+        "A UI rendering interface",
+        "A network socket interface"
+      ],
+      "answer": "A simple, collection-like interface such as findById(), findAll(), and save()",
+      "explanation": "Feeling like an in-memory collection, regardless of the real underlying storage, is exactly Repository's goal."
+    },
+    {
+      "question": "What's the main benefit of hiding persistence details behind a Repository?",
+      "options": [
+        "Schema or storage changes only require updating the repository, not every business-logic call site",
+        "It automatically makes queries run faster",
+        "It removes the need for a database entirely",
+        "It prevents any data from ever being read"
+      ],
+      "answer": "Schema or storage changes only require updating the repository, not every business-logic call site",
+      "explanation": "That containment of change is Repository's central practical payoff."
+    },
+    {
+      "question": "How does Repository typically relate to Data Mapper?",
+      "options": [
+        "Repository often provides a friendly interface built on top of a Data Mapper doing the actual object-to-row translation",
+        "They are mutually exclusive and can never be used together",
+        "Data Mapper requires Repository to function at all",
+        "Repository always replaces the need for any database"
+      ],
+      "answer": "Repository often provides a friendly interface built on top of a Data Mapper doing the actual object-to-row translation",
+      "explanation": "The two are frequently layered: Repository as the collection-like facade, Data Mapper handling the low-level translation underneath."
+    },
+    {
+      "question": "What's a sign a Repository has become an anti-pattern?",
+      "options": [
+        "It has accumulated dozens of highly specific query methods instead of staying a focused, collection-like interface",
+        "It has exactly findById(), findAll(), and save() methods",
+        "It's used consistently across the codebase instead of raw queries",
+        "It's independently mockable for tests"
+      ],
+      "answer": "It has accumulated dozens of highly specific query methods instead of staying a focused, collection-like interface",
+      "explanation": "An overloaded repository stops feeling like a clean collection and starts acting as a dumping ground for every query need."
+    }
+  ]
+}

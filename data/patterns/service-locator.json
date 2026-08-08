@@ -1,0 +1,158 @@
+{
+  "id": "service-locator",
+  "title": "Service Locator Pattern",
+  "category": "enterprise",
+  "difficulty": "intermediate",
+  "oneLiner": "Centralizes lookup of shared services through a registry that any code can query by name or type, instead of passing them around explicitly.",
+  "hero": {
+    "name": "The Directory",
+    "codename": "Service Locator",
+    "catchphrase": "Don't know where to find it? Ask me. I'll look it up.",
+    "power": "Centralizes shared service lookup through a single registry that any code can query on demand, wherever it happens to run.",
+    "weakness": "Hides a class's real dependencies inside its method bodies instead of its constructor — they become invisible until runtime, and harder to test than plain injection.",
+    "origin": "The Directory appeared inside a game engine where deeply nested gameplay code needed access to the AudioManager, but threading it through six layers of constructor parameters felt absurd.",
+    "enemies": ["Deep Parameter Threading", "Hidden Runtime Dependencies", "Global Registry Sprawl"],
+    "emoji": "📇",
+    "colorFrom": "#92400e",
+    "colorTo": "#fdba74"
+  },
+  "story": {
+    "problem": "A deeply nested piece of gameplay code needs the AudioManager, six layers down from where the game loop starts. Threading it through every intermediate constructor as a parameter feels absurd for something used so rarely.",
+    "solution": "The Directory introduces a `ServiceLocator` registry. Deep gameplay code just calls `ServiceLocator.get(\"audio\")` when it actually needs sound, without every intermediate layer needing to know or pass it along.",
+    "result": "Only the code that genuinely needs AudioManager touches it — via a lookup, not a six-layer parameter chain that clutters every constructor in between."
+  },
+  "beforeAfter": {
+    "before": [
+      "A rarely-used dependency is threaded through many constructor layers",
+      "Every intermediate layer must know about a dependency it never uses",
+      "Adding a new deep dependency means touching every layer in between"
+    ],
+    "after": [
+      "Deep code looks up rarely-used dependencies on demand",
+      "Intermediate layers stay unaware of dependencies they don't use",
+      "Adding a new deep dependency touches only the code that needs it"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Six constructors in a row each accept an AudioManager parameter just to pass it further down, unused.",
+      "speaker": "Developer",
+      "dialogue": "I'm threading AudioManager through six constructors that never even use it, just so the seventh layer can play one sound effect.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Directory appears holding a single lookup book, ready to hand out any service by name, on demand.",
+      "speaker": "The Directory",
+      "dialogue": "Stop threading it through six layers that don't need it. When you actually need AudioManager, just ask ME.",
+      "emoji": "📇"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "ServiceLocator.get('audio') looks up and returns the registered AudioManager instance, wherever it's called.",
+      "speaker": "The Directory",
+      "dialogue": "Only the deep code that genuinely needs audio calls me. The five layers between game-loop and gameplay-code stay untouched.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Six constructor signatures shrink back down. Only the actual sound-playing code touches AudioManager at all.",
+      "speaker": "Developer",
+      "dialogue": "Six constructors are clean again. Only the one function that actually plays a sound touches AudioManager now.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// AudioManager threaded through layers that never use it\nclass GameLoop {\n  constructor(private audio: AudioManager) { this.level = new Level(audio); }\n}\nclass Level {\n  constructor(private audio: AudioManager) { this.enemy = new Enemy(audio); }\n}\nclass Enemy {\n  constructor(private audio: AudioManager) {} // finally used, six layers down\n  onDeath() { this.audio.play(\"enemy-death\"); }\n}",
+    "after": "class ServiceLocator {\n  private static services = new Map<string, unknown>();\n  static register(name: string, service: unknown) { this.services.set(name, service); }\n  static get<T>(name: string): T { return this.services.get(name) as T; }\n}\n\nServiceLocator.register(\"audio\", new AudioManager());\n\n// Intermediate layers no longer need to know AudioManager exists\nclass GameLoop { constructor() { this.level = new Level(); } }\nclass Level { constructor() { this.enemy = new Enemy(); } }\nclass Enemy {\n  onDeath() {\n    ServiceLocator.get<AudioManager>(\"audio\").play(\"enemy-death\"); // looked up only when needed\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "A dependency is genuinely rarely used, deep in a call chain, and threading it through every intermediate layer via constructor injection is impractical.",
+      "You're working in a framework or engine (like many game engines) where global registries are an established convention.",
+      "You accept the trade-off of hidden dependencies in exchange for avoiding excessive parameter threading."
+    ],
+    "avoidWhen": [
+      "Dependency Injection (passing dependencies explicitly through constructors) is practical — DI keeps dependencies visible and is generally easier to test.",
+      "You want a class's dependencies to be discoverable just by reading its constructor signature.",
+      "You need strong compile-time guarantees that a required service is actually available — Service Locator's lookups typically fail at runtime instead."
+    ],
+    "commonMistakes": [
+      "Reaching for Service Locator as a default instead of Dependency Injection, hiding dependencies that should be visible and explicit.",
+      "Letting the locator's registry grow into a dumping ground for every shared object in the app, becoming an untracked global state store.",
+      "Not handling missing registrations gracefully, letting `get()` fail with a confusing runtime error far from where the actual bug is.",
+      "Making testing harder than it needs to be — since dependencies are hidden inside method bodies, mocking them requires manipulating the global locator instead of a simple constructor argument."
+    ],
+    "realWorldExample": "Game engines' global manager registries (Unity's `FindObjectOfType`, older engine `ServiceLocator` classes), and some legacy Java EE JNDI lookups, are real-world Service Locator implementations — though modern guidance generally favors Dependency Injection where practical."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Why wouldn't I just always use you instead of threading dependencies through constructors?" },
+    { "speaker": "The Directory", "message": "Because I hide what a class actually depends on. Read Enemy's constructor and you'd never know it needs AudioManager — that only shows up buried inside onDeath(). DI keeps dependencies visible; I trade that visibility for convenience." },
+    { "speaker": "Mentor", "message": "So when do you actually win?" },
+    { "speaker": "The Directory", "message": "When threading a genuinely rare dependency through many layers that never use it would be worse than the hidden-dependency trade-off. Use me sparingly, and prefer DI whenever it's practical." }
+  ],
+  "codeBattle": {
+    "scenario": "Your game's deeply nested combat-resolution code occasionally needs to play a sound effect, but it's called from twelve different places across five layers of unrelated game logic that have no other reason to know AudioManager exists.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "service-locator", "label": "Service Locator" },
+      { "id": "dependency-injection", "label": "Dependency Injection" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "facade", "label": "Facade" }
+    ],
+    "correct": "service-locator",
+    "explanation": "The Directory lets the deeply-nested combat code look up AudioManager only when it's actually needed, without forcing five unrelated layers to thread it through as an unused parameter."
+  },
+  "quiz": [
+    {
+      "question": "What does Service Locator provide?",
+      "options": [
+        "A central registry that code can query to look up shared services by name or type",
+        "A guarantee that a class has exactly one instance",
+        "A way to clone objects instead of constructing them",
+        "A translator between two incompatible interfaces"
+      ],
+      "answer": "A central registry that code can query to look up shared services by name or type",
+      "explanation": "Centralized, on-demand lookup — rather than explicit passing — is Service Locator's defining trait."
+    },
+    {
+      "question": "What's the main downside of Service Locator compared to Dependency Injection?",
+      "options": [
+        "It hides a class's real dependencies inside method bodies instead of making them visible in the constructor",
+        "It requires more constructor parameters than DI",
+        "It cannot be used in any modern application",
+        "It always requires a database"
+      ],
+      "answer": "It hides a class's real dependencies inside method bodies instead of making them visible in the constructor",
+      "explanation": "This hidden-dependency trade-off is exactly why most modern guidance favors DI where it's practical."
+    },
+    {
+      "question": "When might Service Locator be a reasonable choice over DI?",
+      "options": [
+        "When a dependency is rarely used deep in a call chain, and threading it through many unrelated layers would be impractical",
+        "When you want dependencies to be fully visible in every constructor",
+        "When testability is the top priority",
+        "When the codebase has no framework or engine conventions around global registries"
+      ],
+      "answer": "When a dependency is rarely used deep in a call chain, and threading it through many unrelated layers would be impractical",
+      "explanation": "This narrow, practical trade-off is where Service Locator's convenience can outweigh DI's visibility benefits."
+    },
+    {
+      "question": "What's a real-world use of Service Locator?",
+      "options": [
+        "Game engines' global manager registries for looking up shared systems like audio or physics",
+        "A payment gateway's charge() method",
+        "A React component's props",
+        "A SQL JOIN clause"
+      ],
+      "answer": "Game engines' global manager registries for looking up shared systems like audio or physics",
+      "explanation": "Game engines are one of the most common real-world contexts where Service Locator-style global lookups are an established convention."
+    }
+  ]
+}

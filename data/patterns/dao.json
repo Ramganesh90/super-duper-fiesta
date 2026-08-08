@@ -1,0 +1,158 @@
+{
+  "id": "dao",
+  "title": "DAO (Data Access Object) Pattern",
+  "category": "enterprise",
+  "difficulty": "beginner",
+  "oneLiner": "Encapsulates all interaction with a specific data source behind a clean API, so the rest of the app never touches raw queries directly.",
+  "hero": {
+    "name": "The Custodian",
+    "codename": "DAO",
+    "catchphrase": "I'm the only one who touches the raw data source. Everyone else asks me.",
+    "power": "Encapsulates every detail of talking to one specific data source (a database, a file, an external API) behind one clean, focused API.",
+    "weakness": "Because it's tied closely to a specific persistence mechanism, swapping that mechanism later usually means rewriting the DAO entirely, not just tweaking its internals.",
+    "origin": "The Custodian appeared after a report-generation module had raw JDBC connection-handling, SQL, and result-set parsing directly inside its business logic, tangled with formatting code.",
+    "enemies": ["Business-Logic-Embedded SQL", "Scattered Connection Handling", "Unencapsulated Result Parsing"],
+    "emoji": "🗄️",
+    "colorFrom": "#292524",
+    "colorTo": "#d6d3d1"
+  },
+  "story": {
+    "problem": "The report-generation module opens its own JDBC connection, writes raw SQL, and manually parses result sets — all directly inside a function that's also responsible for formatting the final report.",
+    "solution": "The Custodian introduces a `ReportDAO` class that owns every detail of the connection, the query, and the result-set parsing. The report-generation code just calls `dao.getMonthlySales()` and gets back clean data.",
+    "result": "Report-generation code no longer touches JDBC, SQL, or result sets at all. All of that lives inside ReportDAO, in one focused, well-tested place."
+  },
+  "beforeAfter": {
+    "before": [
+      "Raw data-source access is embedded directly in business logic",
+      "Connection handling and query logic are duplicated across features",
+      "Business logic is tightly coupled to one specific data-access mechanism"
+    ],
+    "after": [
+      "All data-source access is encapsulated in one DAO class",
+      "Connection handling and query logic exist in exactly one place",
+      "Business logic only depends on the DAO's clean method signatures"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A report-generation function has JDBC connection setup, raw SQL, and formatting logic all tangled in one 150-line method.",
+      "speaker": "Developer",
+      "dialogue": "I need to add a new report, and I have to copy-paste this same JDBC connection and result-set parsing boilerplate again.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Custodian appears at the archive room's only entrance, the sole keeper of the raw data behind it.",
+      "speaker": "The Custodian",
+      "dialogue": "Stop reaching into the data source yourself. I'm the only one who touches raw queries — everyone else just asks me for what they need.",
+      "emoji": "🗄️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "ReportDAO.getMonthlySales() handles the connection, the query, and the parsing. Report-generation code just calls it.",
+      "speaker": "The Custodian",
+      "dialogue": "Report-generation code calls getMonthlySales() and gets clean data back. It never sees a connection, a query, or a result set.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The new report reuses ReportDAO's existing query methods, with zero copy-pasted boilerplate.",
+      "speaker": "Developer",
+      "dialogue": "The new report reused existing DAO methods. Not one line of JDBC boilerplate was copy-pasted this time.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Raw connection handling and SQL tangled directly into business logic\nasync function generateMonthlyReport() {\n  const conn = await createConnection();\n  const result = await conn.query(\"SELECT date, amount FROM sales WHERE date >= $1\", [startOfMonth()]);\n  await conn.close();\n  return result.rows.map((r) => ({ date: r.date, amount: r.amount })); // manual parsing, mixed with formatting below\n}",
+    "after": "class SalesDAO {\n  async getMonthlySales(): Promise<SalesRecord[]> {\n    const conn = await createConnection();\n    try {\n      const result = await conn.query(\"SELECT date, amount FROM sales WHERE date >= $1\", [startOfMonth()]);\n      return result.rows.map((r) => new SalesRecord(r.date, r.amount));\n    } finally {\n      await conn.close();\n    }\n  }\n}\n\n// Business logic never touches JDBC, SQL, or connections directly\nasync function generateMonthlyReport(dao: SalesDAO) {\n  const sales = await dao.getMonthlySales();\n  return formatReport(sales);\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "You want a clear, single place responsible for all interaction with one specific data source.",
+      "Connection handling, query construction, and result parsing are currently duplicated across the codebase.",
+      "You want business logic to work with clean domain objects instead of raw rows, files, or API responses."
+    ],
+    "avoidWhen": [
+      "The app already uses an ORM or Repository layer that provides this same encapsulation — adding a DAO on top would be redundant.",
+      "Data access is trivial enough (a single, simple query used in one place) that a dedicated class adds no real value.",
+      "You need persistence-mechanism independence — DAO is typically tied closely to one specific mechanism, unlike Repository's more abstracted, collection-like interface."
+    ],
+    "commonMistakes": [
+      "Letting SQL, connection management, or result-parsing logic leak back out into business logic 'just this once', quietly defeating the encapsulation.",
+      "Confusing DAO with Repository — DAO is typically framed around one specific data source's raw access; Repository aims to feel like an in-memory collection regardless of source. The line blurs in practice, but the intent differs.",
+      "Not properly closing connections or handling errors inside the DAO, leaking resource-management bugs that were supposed to be contained there.",
+      "Building a DAO per table indiscriminately, even for tables that are always accessed together, instead of designing around actual business access patterns."
+    ],
+    "realWorldExample": "Java EE's classic `UserDAO`/`OrderDAO` classes wrapping JDBC calls, and similar data-access classes wrapping file I/O or external API calls in other stacks, are textbook DAO implementations."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this actually different from Repository?" },
+    { "speaker": "The Custodian", "message": "We overlap a lot in practice. I'm traditionally framed around ONE specific data source's raw access — a database, a file, an API. Repository leans harder into feeling like an in-memory COLLECTION, regardless of what's actually behind it." },
+    { "speaker": "Mentor", "message": "Should I ever use both at once?" },
+    { "speaker": "The Custodian", "message": "Some codebases do — a Repository built on top of one or more DAOs. In smaller apps, picking just one of us and being consistent about it matters far more than which name you use." }
+  ],
+  "codeBattle": {
+    "scenario": "Your analytics module has JDBC connection setup and raw SQL query logic copy-pasted across four different report-generation functions, each handling connections and result parsing slightly differently.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "dao", "label": "DAO" },
+      { "id": "repository", "label": "Repository" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "dao",
+    "explanation": "The Custodian centralizes all the raw connection handling, SQL, and result parsing into one class, so the four report functions call clean methods instead of duplicating JDBC boilerplate."
+  },
+  "quiz": [
+    {
+      "question": "What does DAO encapsulate?",
+      "options": [
+        "All interaction with a specific data source (connections, queries, result parsing) behind a clean API",
+        "The application's entire UI layer",
+        "A single algorithm that can be swapped at runtime",
+        "A notification system for multiple listeners"
+      ],
+      "answer": "All interaction with a specific data source (connections, queries, result parsing) behind a clean API",
+      "explanation": "Encapsulating raw data-source access — and hiding it from the rest of the app — is DAO's core purpose."
+    },
+    {
+      "question": "What does business logic interact with once a DAO is in place?",
+      "options": [
+        "Clean domain objects and method calls, never raw connections, queries, or result sets directly",
+        "Raw SQL strings passed as function arguments",
+        "The database's connection pool directly",
+        "A global variable holding the last query result"
+      ],
+      "answer": "Clean domain objects and method calls, never raw connections, queries, or result sets directly",
+      "explanation": "The whole point is that business logic never sees the underlying data-access mechanism at all."
+    },
+    {
+      "question": "How does DAO typically differ from Repository, in intent?",
+      "options": [
+        "DAO is traditionally framed around one specific data source's raw access; Repository aims to feel like an in-memory collection regardless of source",
+        "They are completely unrelated patterns with no overlap",
+        "Repository can only be used with files, DAO only with databases",
+        "DAO requires a NoSQL database; Repository requires SQL"
+      ],
+      "answer": "DAO is traditionally framed around one specific data source's raw access; Repository aims to feel like an in-memory collection regardless of source",
+      "explanation": "The two patterns overlap heavily in practice, but this is the traditional distinction in intent between them."
+    },
+    {
+      "question": "What's a classic real-world example of DAO?",
+      "options": [
+        "A Java EE `UserDAO` class wrapping JDBC calls behind clean methods",
+        "A React component's render function",
+        "A CSS media query",
+        "An HTTP status code"
+      ],
+      "answer": "A Java EE `UserDAO` class wrapping JDBC calls behind clean methods",
+      "explanation": "This is the textbook, historically named example that gave the pattern its common name."
+    }
+  ]
+}

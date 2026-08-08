@@ -1,0 +1,158 @@
+{
+  "id": "dependency-injection",
+  "title": "Dependency Injection Pattern",
+  "category": "enterprise",
+  "difficulty": "intermediate",
+  "oneLiner": "Supplies a class's dependencies from outside instead of letting it construct them itself, making it swappable and testable.",
+  "hero": {
+    "name": "The Provider",
+    "codename": "Dependency Injection",
+    "catchphrase": "Don't build your own tools. I'll hand you exactly what you need.",
+    "power": "Supplies a class with the dependencies it needs from the outside, instead of the class constructing them itself, making swapping and testing trivial.",
+    "weakness": "Heavy framework magic — auto-wiring via reflection or annotations — can make it genuinely hard to trace where a given dependency actually came from.",
+    "origin": "The Provider appeared after `OrderService`'s constructor directly did `new StripeGateway()`, making it impossible to test order logic without a real (or heavily mocked) Stripe connection.",
+    "enemies": ["Hardcoded Dependencies", "Untestable Constructors", "Tight Coupling to Concrete Classes"],
+    "emoji": "💉",
+    "colorFrom": "#14532d",
+    "colorTo": "#4ade80"
+  },
+  "story": {
+    "problem": "`OrderService`'s constructor calls `new StripeGateway()` directly. Every test that touches OrderService needs a real (or awkwardly mocked) Stripe connection, even for logic that has nothing to do with payments.",
+    "solution": "The Provider changes `OrderService` to accept a `PaymentGateway` through its constructor instead of building one itself. Tests pass in a fake; production code passes in the real Stripe gateway.",
+    "result": "OrderService no longer knows or cares which payment gateway it's using. Tests inject a fake in microseconds; swapping providers means passing a different implementation, with zero changes to OrderService itself."
+  },
+  "beforeAfter": {
+    "before": [
+      "A class constructs its own dependencies internally",
+      "Testing requires the real dependency or complex mocking",
+      "Swapping an implementation means editing the class itself"
+    ],
+    "after": [
+      "Dependencies are supplied from outside, through the constructor",
+      "Testing just injects a lightweight fake",
+      "Swapping an implementation means passing a different argument"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A unit test for order-total calculation fails because it can't reach the real Stripe API in CI.",
+      "speaker": "Developer",
+      "dialogue": "I'm testing tax math and it's failing because OrderService insists on constructing a real Stripe connection internally.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Provider appears holding out a tray of ready-made tools, offering them instead of letting anyone build their own.",
+      "speaker": "The Provider",
+      "dialogue": "Don't construct your dependencies yourself. Accept them from outside — I'll hand you exactly what you need, real or fake.",
+      "emoji": "💉"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "OrderService's constructor now accepts a PaymentGateway parameter instead of constructing one internally.",
+      "speaker": "The Provider",
+      "dialogue": "Production hands you the real Stripe gateway. Tests hand you a fake. OrderService itself never changes either way.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The tax-math test now runs in milliseconds with a fake gateway, no network calls involved.",
+      "speaker": "Developer",
+      "dialogue": "The test runs instantly now with a fake gateway. Zero network calls needed to test tax math.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class OrderService {\n  private gateway = new StripeGateway(); // hardcoded, untestable without real Stripe\n\n  async placeOrder(order: Order) {\n    return this.gateway.charge(order.total);\n  }\n}",
+    "after": "interface PaymentGateway {\n  charge(amount: number): Promise<void>;\n}\n\nclass OrderService {\n  // Dependency supplied from outside — OrderService doesn't know or care which implementation\n  constructor(private gateway: PaymentGateway) {}\n\n  async placeOrder(order: Order) {\n    return this.gateway.charge(order.total);\n  }\n}\n\n// Production\nconst orderService = new OrderService(new StripeGateway());\n\n// Test — a lightweight fake, no real network calls\nconst fakeGateway = { charge: jest.fn() };\nconst testService = new OrderService(fakeGateway);"
+  },
+  "explanation": {
+    "useWhen": [
+      "A class depends on something that's expensive, external, or varies by environment (a payment gateway, a database, an API client).",
+      "You want to unit test a class's logic without needing its real dependencies to be available.",
+      "You want to swap an implementation (a different payment provider, a mock database) without editing the class that uses it."
+    ],
+    "avoidWhen": [
+      "The dependency is a simple, stable value with no need for swapping or mocking (like a math utility function).",
+      "A full DI framework's auto-wiring machinery would add more indirection than the app's size actually justifies.",
+      "The class and its dependency are so tightly coupled by design that injecting alternatives would never make sense."
+    ],
+    "commonMistakes": [
+      "Reaching for a heavy DI framework with reflection-based auto-wiring for a small app where plain constructor injection would be simpler and more traceable.",
+      "Injecting so many dependencies into one constructor that it signals the class is doing too much and should be split up.",
+      "Using a Service Locator instead of real injection, hiding a class's true dependencies inside its method bodies instead of its constructor.",
+      "Forgetting that DI is about WHO supplies the dependency, not a specific framework — you can do genuine dependency injection with zero framework at all, just passing arguments."
+    ],
+    "realWorldExample": "Spring's `@Autowired`, Angular's constructor-based DI, and any codebase that passes dependencies as constructor arguments instead of `new`-ing them internally are Dependency Injection in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Do I need a DI framework to do this?" },
+    { "speaker": "The Provider", "message": "Not at all — the simplest form of me is just passing arguments to a constructor. Frameworks automate wiring for large systems, but the core idea works with zero framework at all." },
+    { "speaker": "Mentor", "message": "When does DI actually hurt readability?" },
+    { "speaker": "The Provider", "message": "When auto-wiring hides WHERE a dependency comes from — annotations resolving things behind the scenes make it hard to trace, at a glance, what's actually being injected and why." }
+  ],
+  "codeBattle": {
+    "scenario": "Your `EmailService` constructs its own SMTP client internally, and every test that touches any code calling EmailService ends up trying to send a real email, slowing down and flaking your test suite.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "dependency-injection", "label": "Dependency Injection" },
+      { "id": "service-locator", "label": "Service Locator" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "factory-method", "label": "Factory Method" }
+    ],
+    "correct": "dependency-injection",
+    "explanation": "The Provider lets EmailService accept its SMTP client from outside, so tests can inject a fake client instead of sending real emails."
+  },
+  "quiz": [
+    {
+      "question": "What does Dependency Injection change about how a class gets its dependencies?",
+      "options": [
+        "Dependencies are supplied from outside instead of being constructed internally by the class",
+        "The class must always use a Singleton for every dependency",
+        "Dependencies are looked up from a global registry by name",
+        "The class can no longer have any dependencies at all"
+      ],
+      "answer": "Dependencies are supplied from outside instead of being constructed internally by the class",
+      "explanation": "Externalizing dependency creation is the entire premise of Dependency Injection."
+    },
+    {
+      "question": "What's the simplest form of Dependency Injection?",
+      "options": [
+        "Passing a dependency as a constructor argument, with no framework required",
+        "Using a heavy reflection-based auto-wiring framework",
+        "Storing the dependency in a global variable",
+        "Hardcoding the dependency directly in the class"
+      ],
+      "answer": "Passing a dependency as a constructor argument, with no framework required",
+      "explanation": "DI's core idea works with plain constructor arguments — frameworks just automate wiring at scale."
+    },
+    {
+      "question": "How does Dependency Injection improve testability?",
+      "options": [
+        "Tests can supply lightweight fake dependencies instead of needing the real ones",
+        "It removes the need for any tests at all",
+        "It makes every test require a real database connection",
+        "It prevents classes from having any dependencies"
+      ],
+      "answer": "Tests can supply lightweight fake dependencies instead of needing the real ones",
+      "explanation": "Injecting a fake in place of a real, expensive dependency is exactly what makes fast, isolated unit tests possible."
+    },
+    {
+      "question": "How does Dependency Injection differ from Service Locator?",
+      "options": [
+        "DI supplies dependencies explicitly (often via constructor); Service Locator hides them inside method bodies via a lookup call",
+        "They are identical patterns with different names",
+        "Service Locator requires a constructor; DI forbids constructors",
+        "DI can only be used with databases"
+      ],
+      "answer": "DI supplies dependencies explicitly (often via constructor); Service Locator hides them inside method bodies via a lookup call",
+      "explanation": "DI makes dependencies visible at construction time; Service Locator hides them until a lookup happens somewhere inside the class."
+    }
+  ]
+}
