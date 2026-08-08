@@ -1,0 +1,158 @@
+{
+  "id": "private-class-data",
+  "title": "Private Class Data Pattern",
+  "category": "structural",
+  "difficulty": "beginner",
+  "oneLiner": "Wraps a class's internal data in a separate, immutable holder, so not even the class's own methods can accidentally mutate it later.",
+  "hero": {
+    "name": "The Vault",
+    "codename": "Private Class Data",
+    "catchphrase": "Your data goes in once. Nobody mutates it after — not even you.",
+    "power": "Encapsulates a class's core state in a separate, immutable data object, protecting it from accidental mutation by the class's own methods.",
+    "weakness": "For a genuinely simple class, wrapping data in a separate holder object is a layer of indirection that doesn't earn its keep.",
+    "origin": "The Vault appeared after a `Circle` class's own `scale()` method accidentally mutated its `radius` field mid-calculation, corrupting an area computation that assumed the radius stayed constant throughout.",
+    "enemies": ["Accidental Self-Mutation", "Shared Mutable Fields", "Inconsistent Mid-Method State"],
+    "emoji": "🔐",
+    "colorFrom": "#172554",
+    "colorTo": "#93c5fd"
+  },
+  "story": {
+    "problem": "`Circle`'s own methods freely read and write `this.radius` throughout the class. A refactor accidentally mutates `radius` mid-way through `area()`, silently producing a wrong result depending on call order.",
+    "solution": "The Vault moves `radius` into a separate, immutable `CircleData` object, set once at construction. `Circle`'s methods can only read from it — none of them, not even `Circle` itself, can mutate it after creation.",
+    "result": "It becomes structurally impossible for any method to accidentally corrupt the circle's core data mid-calculation. The bug class disappears entirely."
+  },
+  "beforeAfter": {
+    "before": [
+      "The class's own methods can freely mutate its core fields",
+      "A refactor can accidentally corrupt state mid-method",
+      "No structural guarantee of consistency between calls"
+    ],
+    "after": [
+      "Core data lives in a separate, immutable holder",
+      "No method — not even the class's own — can mutate it after creation",
+      "Consistency is guaranteed structurally, not by convention"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A refactored scale() method accidentally reassigns this.radius mid-calculation, corrupting area().",
+      "speaker": "Developer",
+      "dialogue": "area() gives a different answer depending on whether scale() ran first. The radius is getting mutated somewhere it shouldn't be.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Vault appears holding a sealed data box, locking the radius away from every method, including the class's own.",
+      "speaker": "The Vault",
+      "dialogue": "Don't let your own methods freely rewrite your core data. Seal it in me at construction — nobody mutates it after, not even you.",
+      "emoji": "🔐"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Circle holds a private, readonly CircleData object. Every method reads from it; none can write to it.",
+      "speaker": "The Vault",
+      "dialogue": "radius is set once, at construction, inside me. Every method in Circle can read it — but not one of them can change it.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "area() now returns the exact same, correct result no matter what other methods ran before it.",
+      "speaker": "Developer",
+      "dialogue": "That entire bug class is gone. The radius simply can't be mutated by accident anymore — the type system won't allow it.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class Circle {\n  radius: number; // freely mutable by any method, including its own\n\n  constructor(radius: number) { this.radius = radius; }\n\n  scale(factor: number) {\n    this.radius = this.radius * factor; // oops, mutated it mid-refactor\n  }\n\n  area() {\n    return Math.PI * this.radius ** 2; // depends on whatever radius currently is\n  }\n}",
+    "after": "class CircleData {\n  constructor(public readonly radius: number) {}\n}\n\nclass Circle {\n  private readonly data: CircleData; // sealed at construction, never reassigned\n\n  constructor(radius: number) {\n    this.data = new CircleData(radius);\n  }\n\n  area(): number {\n    return Math.PI * this.data.radius ** 2; // always the original, correct radius\n  }\n\n  // 'Scaling' now returns a NEW Circle instead of mutating this one\n  scaled(factor: number): Circle {\n    return new Circle(this.data.radius * factor);\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "A class's core data should never change after construction, but ordinary field access makes accidental mutation easy.",
+      "You want a structural (compile-time) guarantee of immutability, not just a coding convention everyone has to remember.",
+      "Bugs from unexpected mid-method state changes have actually happened, or the class is complex enough to risk them."
+    ],
+    "avoidWhen": [
+      "The class's fields genuinely need to change over its lifetime — this pattern is specifically for data that shouldn't mutate.",
+      "The class is trivially simple, and the extra data-holder class adds ceremony without meaningfully reducing risk.",
+      "The language already provides simple, first-class immutability (like `readonly` fields) without needing a separate wrapper object."
+    ],
+    "commonMistakes": [
+      "Applying this to fields that genuinely need to change, forcing awkward 'create a new object for every tiny update' workarounds where simple mutability would be clearer.",
+      "Forgetting that the data holder itself must be truly immutable — a mutable object exposed by reference defeats the whole point.",
+      "Over-engineering trivial classes with this pattern when a couple of `readonly` fields would achieve the same safety more simply.",
+      "Confusing this with Memento — Memento captures state at a point in time for later restoration; Private Class Data protects state from mutation throughout an object's whole life."
+    ],
+    "realWorldExample": "Immutable value objects in functional-leaning codebases, `readonly` record types, and classes that return a modified copy instead of mutating themselves (a common practice in state management libraries like Redux) all embody Private Class Data's core idea."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't `readonly` on a field basically the same thing?" },
+    { "speaker": "The Vault", "message": "For a single field, often yes. I matter more when several related fields need to be protected TOGETHER as one consistent, immutable unit — not just individually locked, but bundled and sealed as one." },
+    { "speaker": "Mentor", "message": "When don't I need you?" },
+    { "speaker": "The Vault", "message": "When your class's data is genuinely meant to change over its lifetime. I'm specifically for state that should be set once and never touched again — forcing that on mutable data just creates awkward workarounds." }
+  ],
+  "codeBattle": {
+    "scenario": "Your `Money` class has had two separate bugs where an internal method accidentally mutated the `amount` field mid-calculation, producing wrong totals depending on which methods ran first.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "private-class-data", "label": "Private Class Data" },
+      { "id": "memento", "label": "Memento" },
+      { "id": "flyweight", "label": "Flyweight" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "private-class-data",
+    "explanation": "The Vault seals Money's core amount in an immutable data holder set once at construction, making accidental mid-method mutation structurally impossible."
+  },
+  "quiz": [
+    {
+      "question": "What does Private Class Data protect against?",
+      "options": [
+        "A class's own methods accidentally mutating its core internal state",
+        "External classes reading public data",
+        "Two incompatible interfaces failing to work together",
+        "A class having too many subclasses"
+      ],
+      "answer": "A class's own methods accidentally mutating its core internal state",
+      "explanation": "The key insight is that even the class's OWN methods are restricted from mutating the sealed data, not just outside callers."
+    },
+    {
+      "question": "How is the protected data typically structured?",
+      "options": [
+        "As a separate, immutable data-holder object set once at construction",
+        "As public fields with no restrictions at all",
+        "As a global variable shared across all instances",
+        "As a database row fetched on every access"
+      ],
+      "answer": "As a separate, immutable data-holder object set once at construction",
+      "explanation": "Isolating the data in its own immutable object is what makes accidental mutation structurally impossible."
+    },
+    {
+      "question": "How does Private Class Data differ from Memento?",
+      "options": [
+        "Private Class Data prevents mutation throughout an object's life; Memento captures a snapshot at a point in time for later restoration",
+        "They are the exact same pattern with different names",
+        "Memento prevents all mutation permanently; Private Class Data allows unlimited mutation",
+        "Private Class Data requires a database; Memento does not"
+      ],
+      "answer": "Private Class Data prevents mutation throughout an object's life; Memento captures a snapshot at a point in time for later restoration",
+      "explanation": "The two solve different problems: one is about ongoing immutability, the other is about point-in-time snapshotting for undo/rollback."
+    },
+    {
+      "question": "When is Private Class Data unnecessary?",
+      "options": [
+        "When the class's fields genuinely need to change over its lifetime",
+        "When bugs from accidental mid-method state mutation have actually occurred",
+        "When a structural immutability guarantee is valuable",
+        "When several related fields need to be protected together as one unit"
+      ],
+      "answer": "When the class's fields genuinely need to change over its lifetime",
+      "explanation": "This pattern is specifically for data meant to stay fixed after construction — forcing it onto genuinely mutable data creates awkward workarounds."
+    }
+  ]
+}

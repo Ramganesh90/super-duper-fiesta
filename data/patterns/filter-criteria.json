@@ -1,0 +1,158 @@
+{
+  "id": "filter-criteria",
+  "title": "Filter / Criteria Pattern",
+  "category": "behavioral",
+  "difficulty": "intermediate",
+  "oneLiner": "Builds selection logic out of small, combinable criteria objects (AND, OR, NOT) instead of one hardcoded filter function per combination.",
+  "hero": {
+    "name": "The Sieve",
+    "codename": "Filter / Criteria",
+    "catchphrase": "Combine your criteria. I'll sift out exactly who matches.",
+    "power": "Composes reusable, combinable filter conditions to select objects matching complex, changing criteria.",
+    "weakness": "Break every tiny condition into its own class and a simple query can end up harder to read than the plain if-statement it replaced.",
+    "origin": "The Sieve appeared after a product search page grew a new hardcoded filter function for every combination requested: `filterActiveInStock()`, `filterActiveOnSaleInStock()`, `filterDiscontinuedOnSale()` — a combinatorial mess.",
+    "enemies": ["Combinatorial Filter Functions", "Hardcoded Query Logic", "Copy-Pasted Conditions"],
+    "emoji": "🔍",
+    "colorFrom": "#155e75",
+    "colorTo": "#a5f3fc"
+  },
+  "story": {
+    "problem": "The product search page has a hardcoded function for every filter combination a user might want: `filterActiveInStock()`, `filterActiveOnSaleInStock()`, and a dozen more. Every new combination means a new function.",
+    "solution": "The Sieve introduces small, composable `Criteria` objects — `InStock`, `OnSale`, `Active` — combinable with `.and()`/`.or()`. Any combination the user picks builds itself from these reusable pieces.",
+    "result": "New filter combinations require zero new code. Any combination of `InStock`, `OnSale`, and `Active` composes automatically from the criteria that already exist."
+  },
+  "beforeAfter": {
+    "before": [
+      "One hardcoded function per filter combination",
+      "New combinations require new functions",
+      "Filter logic is duplicated across near-identical functions"
+    ],
+    "after": [
+      "Filter conditions are small, reusable, combinable objects",
+      "New combinations compose existing criteria — no new code",
+      "Each condition's logic is written exactly once"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A file lists a dozen near-identical filter functions, each hardcoding one specific combination of conditions.",
+      "speaker": "Developer",
+      "dialogue": "Marketing wants 'on sale AND in stock AND not discontinued' now. That's a thirteenth hardcoded function to write.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Sieve appears holding several small mesh screens, each one a separate condition, ready to stack.",
+      "speaker": "The Sieve",
+      "dialogue": "Stop hardcoding combinations. Build small, reusable criteria instead — then combine them however you need, on demand.",
+      "emoji": "🔍"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "InStock, OnSale, and NotDiscontinued each implement isSatisfiedBy(product). They combine with .and().",
+      "speaker": "The Sieve",
+      "dialogue": "new InStock().and(new OnSale()).and(new NotDiscontinued()) — that thirteenth combination just composed itself from three existing pieces.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The new combination ships with zero new functions written.",
+      "speaker": "Developer",
+      "dialogue": "Marketing's new combination composed itself from criteria that already existed. Zero new code.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// One hardcoded function per combination\nfunction filterActiveInStock(products: Product[]) {\n  return products.filter((p) => p.active && p.stock > 0);\n}\nfunction filterActiveOnSaleInStock(products: Product[]) {\n  return products.filter((p) => p.active && p.onSale && p.stock > 0);\n}\n// Every new combination needs another near-duplicate function",
+    "after": "interface Criteria {\n  isSatisfiedBy(product: Product): boolean;\n  and(other: Criteria): Criteria;\n}\n\nabstract class BaseCriteria implements Criteria {\n  abstract isSatisfiedBy(product: Product): boolean;\n  and(other: Criteria): Criteria {\n    return { isSatisfiedBy: (p) => this.isSatisfiedBy(p) && other.isSatisfiedBy(p), and: this.and };\n  }\n}\n\nclass InStock extends BaseCriteria {\n  isSatisfiedBy(p: Product) { return p.stock > 0; }\n}\nclass OnSale extends BaseCriteria {\n  isSatisfiedBy(p: Product) { return p.onSale; }\n}\n\nfunction filter(products: Product[], criteria: Criteria) {\n  return products.filter((p) => criteria.isSatisfiedBy(p));\n}\n\n// Any combination composes from existing pieces — no new function needed\nfilter(products, new InStock().and(new OnSale()));"
+  },
+  "explanation": {
+    "useWhen": [
+      "Users can combine multiple independent conditions (filters, search criteria) in ways you can't fully predict upfront.",
+      "You're accumulating a hardcoded function per filter combination, and the count keeps growing.",
+      "Conditions are naturally composable with AND/OR/NOT logic."
+    ],
+    "avoidWhen": [
+      "There's only ever one or two fixed filter combinations — plain conditionals are simpler and more direct.",
+      "Breaking every condition into its own class would fragment a genuinely simple query into unnecessary ceremony.",
+      "Performance-critical filtering needs to be expressed as a single optimized database query, not composed in application code."
+    ],
+    "commonMistakes": [
+      "Over-fragmenting trivial conditions into criteria classes when a single readable boolean expression would do.",
+      "Reimplementing this pattern when the underlying data store (SQL, a search engine) already provides expressive, composable query building.",
+      "Not giving criteria descriptive names, so a composed chain like `a.and(b).or(c)` becomes unreadable without knowing what each piece means.",
+      "Forgetting that composed criteria need to be evaluated efficiently — naive re-evaluation of overlapping conditions can be wasteful at scale."
+    ],
+    "realWorldExample": "ORM query builders (`.where().and().or()`), search UI 'advanced filters' that let users freely combine conditions, and specification-pattern-based business rule engines are all Filter/Criteria in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just a bunch of if-statements dressed up as classes?" },
+    { "speaker": "The Sieve", "message": "The individual conditions are simple, yes — the power is in COMPOSABILITY. You can combine them in ways nobody anticipated, without writing new code for every new combination." },
+    { "speaker": "Mentor", "message": "When am I overusing you?" },
+    { "speaker": "The Sieve", "message": "When you're wrapping a single, permanent, never-combined condition in a whole class. If it's just `products.filter(p => p.active)` and that's all it will ever be, skip me entirely." }
+  ],
+  "codeBattle": {
+    "scenario": "Your job-search platform lets users freely combine filters — remote-only, salary above X, posted in the last week, specific tags — in any combination, and new filter types get requested regularly.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "filter-criteria", "label": "Filter / Criteria" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "chain-of-responsibility", "label": "Chain of Responsibility" },
+      { "id": "visitor", "label": "Visitor" }
+    ],
+    "correct": "filter-criteria",
+    "explanation": "The Sieve lets each filter type be its own composable criteria object, so users can combine any subset freely without a hardcoded function for every combination."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Filter/Criteria solve?",
+      "options": [
+        "A hardcoded function is needed for every possible combination of selection conditions",
+        "An object needs to notify listeners of changes",
+        "Two incompatible interfaces need to work together",
+        "A complex object needs to be built step by step"
+      ],
+      "answer": "A hardcoded function is needed for every possible combination of selection conditions",
+      "explanation": "Filter/Criteria's whole purpose is letting combinations compose from small, reusable pieces instead of duplicating a function per combination."
+    },
+    {
+      "question": "How do individual criteria typically combine in this pattern?",
+      "options": [
+        "Through composable and()/or()/not() operations that build a new combined criteria",
+        "By copy-pasting their logic into a new function",
+        "They cannot be combined at all",
+        "Only through database stored procedures"
+      ],
+      "answer": "Through composable and()/or()/not() operations that build a new combined criteria",
+      "explanation": "Composability via logical operations is what lets new filter combinations form without new hardcoded functions."
+    },
+    {
+      "question": "When is Filter/Criteria overkill?",
+      "options": [
+        "When there's only one or two fixed conditions that will never be combined",
+        "When users can freely combine many independent filter conditions",
+        "When new filter types are added regularly",
+        "When conditions are naturally composable with AND/OR logic"
+      ],
+      "answer": "When there's only one or two fixed conditions that will never be combined",
+      "explanation": "For simple, unchanging conditions, a plain conditional is clearer than wrapping logic in composable criteria objects."
+    },
+    {
+      "question": "What's a real-world example of this pattern?",
+      "options": [
+        "ORM query builders that let you chain .where().and().or() to build complex queries",
+        "A Singleton logger",
+        "A payment gateway adapter",
+        "An undo/redo history stack"
+      ],
+      "answer": "ORM query builders that let you chain .where().and().or() to build complex queries",
+      "explanation": "Composable query builders are a widely used real-world implementation of the Filter/Criteria idea."
+    }
+  ]
+}

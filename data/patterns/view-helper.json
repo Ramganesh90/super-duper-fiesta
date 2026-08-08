@@ -1,0 +1,158 @@
+{
+  "id": "view-helper",
+  "title": "View Helper Pattern",
+  "category": "enterprise",
+  "difficulty": "beginner",
+  "oneLiner": "Moves formatting and display logic out of a view/template into a dedicated helper, so the view stays focused purely on layout.",
+  "hero": {
+    "name": "The Stagehand",
+    "codename": "View Helper",
+    "catchphrase": "The view just displays. I do the formatting work backstage.",
+    "power": "Handles all the formatting and display-logic legwork behind the scenes, so templates only ever describe layout, never computation.",
+    "weakness": "Scatter formatting logic across too many uncoordinated helpers and it fragments the same way tangled inline template logic did.",
+    "origin": "The Stagehand appeared after a product page template was riddled with inline date-formatting, currency-formatting, and truncation logic, making the markup unreadable and impossible to test.",
+    "enemies": ["Logic-Stuffed Templates", "Untestable Inline Formatting", "Duplicated Display Rules"],
+    "emoji": "🧰",
+    "colorFrom": "#451a03",
+    "colorTo": "#fbbf24"
+  },
+  "story": {
+    "problem": "A product page template is full of inline logic: date formatting, currency formatting, text truncation — all mixed directly into the markup, making it unreadable and impossible to unit test.",
+    "solution": "The Stagehand moves that logic into a `ProductViewHelper` class with methods like `formatPrice()` and `truncateDescription()`. The template just calls these methods — no computation happens in the markup itself.",
+    "result": "The template becomes purely declarative layout. All the formatting logic lives in one testable class, reusable across every template that needs it."
+  },
+  "beforeAfter": {
+    "before": [
+      "Formatting logic is inlined directly into template markup",
+      "The same formatting logic is duplicated across templates",
+      "Formatting rules can't be unit tested independently"
+    ],
+    "after": [
+      "Templates only describe layout, calling helper methods",
+      "Formatting logic lives in one reusable, shared class",
+      "Formatting rules are independently unit testable"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A product page template has fifteen lines of inline date and currency formatting mixed directly into the markup.",
+      "speaker": "Developer",
+      "dialogue": "This template is unreadable. I can't tell where the layout ends and the currency-formatting logic begins.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Stagehand appears backstage, quietly preparing everything the view will need.",
+      "speaker": "The Stagehand",
+      "dialogue": "The view shouldn't compute anything. Let me handle the formatting backstage — your template just displays the result.",
+      "emoji": "🧰"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "ProductViewHelper.formatPrice(product) and .truncateDescription(product) do all the computation. The template just calls them.",
+      "speaker": "The Stagehand",
+      "dialogue": "Call helper.formatPrice(product) in your markup. All the currency logic lives in one tested class — the template never sees it.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The template shrinks to pure layout markup, with formatting logic now unit tested separately.",
+      "speaker": "Developer",
+      "dialogue": "The template is readable again, and the formatting logic finally has real unit tests.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Inline formatting logic buried in the template itself\nfunction renderProduct(product: Product) {\n  const price = `$${(product.priceCents / 100).toFixed(2)}`;\n  const desc = product.description.length > 100\n    ? product.description.slice(0, 100) + \"...\"\n    : product.description;\n  return `<div>${price} — ${desc}</div>`; // logic and layout tangled together\n}",
+    "after": "class ProductViewHelper {\n  formatPrice(product: Product): string {\n    return `$${(product.priceCents / 100).toFixed(2)}`;\n  }\n  truncateDescription(product: Product, maxLength = 100): string {\n    return product.description.length > maxLength\n      ? product.description.slice(0, maxLength) + \"...\"\n      : product.description;\n  }\n}\n\nconst helper = new ProductViewHelper();\n\n// Template only describes layout, never computes anything itself\nfunction renderProduct(product: Product) {\n  return `<div>${helper.formatPrice(product)} — ${helper.truncateDescription(product)}</div>`;\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Templates or views are accumulating inline formatting/computation logic that makes them hard to read.",
+      "The same formatting rules (currency, dates, truncation) are duplicated across multiple templates.",
+      "You want formatting logic to be independently unit testable, separate from rendering."
+    ],
+    "avoidWhen": [
+      "The view only ever displays raw, pre-formatted data with no computation needed.",
+      "Your templating framework already provides clean, built-in formatting primitives that make a separate helper redundant.",
+      "The formatting is truly one-off and used in exactly one place — a dedicated helper class is unnecessary ceremony."
+    ],
+    "commonMistakes": [
+      "Letting view helpers grow into a dumping ground for unrelated business logic instead of staying focused on presentation formatting.",
+      "Creating one helper per template instead of sharing helpers for genuinely common formatting logic (currency, dates) across the app.",
+      "Not testing helper methods independently, missing the exact benefit that separating them from the template was supposed to provide.",
+      "Confusing View Helper with Facade — View Helper specifically targets presentation formatting; Facade simplifies access to a broader subsystem."
+    ],
+    "realWorldExample": "Rails view helpers, template engine 'filters' (Jinja2, Handlebars helpers), and React custom hooks like `useFormattedDate()` that keep formatting logic out of JSX are all View Helper in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... a utility function?" },
+    { "speaker": "The Stagehand", "message": "At small scale, sure. I matter once a template accumulates ENOUGH formatting logic that it starts obscuring the actual layout — that's my cue to pull it all out into one coherent, testable place." },
+    { "speaker": "Mentor", "message": "When do I stop adding helpers?" },
+    { "speaker": "The Stagehand", "message": "When a helper starts doing business logic instead of formatting — validating orders, calculating discounts. That's not presentation anymore. Keep me strictly backstage, handling only how things LOOK." }
+  ],
+  "codeBattle": {
+    "scenario": "Your dashboard has twelve different templates, each independently reimplementing the same date-formatting and number-formatting logic inline, and a recent locale bug had to be fixed in all twelve places separately.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "view-helper", "label": "View Helper" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "template-method", "label": "Template Method" },
+      { "id": "decorator", "label": "Decorator" }
+    ],
+    "correct": "view-helper",
+    "explanation": "The Stagehand centralizes the date/number formatting logic in one shared helper class, so the locale bug fix happens once instead of twelve times."
+  },
+  "quiz": [
+    {
+      "question": "What does View Helper move out of templates?",
+      "options": [
+        "Formatting and display-computation logic",
+        "The HTML structure itself",
+        "Database connection strings",
+        "CSS styling rules"
+      ],
+      "answer": "Formatting and display-computation logic",
+      "explanation": "View Helper's whole purpose is separating 'how to compute the display value' from 'how to lay it out'."
+    },
+    {
+      "question": "What's a key benefit of moving formatting logic into a View Helper class?",
+      "options": [
+        "The logic becomes independently unit testable, separate from rendering",
+        "It makes the template file larger",
+        "It removes the need for any templates at all",
+        "It automatically translates text into other languages"
+      ],
+      "answer": "The logic becomes independently unit testable, separate from rendering",
+      "explanation": "Extracting formatting logic into its own class/methods makes it trivially testable without needing to render a view at all."
+    },
+    {
+      "question": "What's a common mistake when using View Helper?",
+      "options": [
+        "Letting the helper accumulate business logic instead of staying focused on presentation formatting",
+        "Sharing a helper's formatting methods across multiple templates",
+        "Unit testing the helper's methods independently",
+        "Extracting date formatting out of a template"
+      ],
+      "answer": "Letting the helper accumulate business logic instead of staying focused on presentation formatting",
+      "explanation": "A helper should stay about 'how things look', not become a dumping ground for logic that belongs elsewhere."
+    },
+    {
+      "question": "What's a real-world example of View Helper?",
+      "options": [
+        "Rails view helpers or template engine formatting filters",
+        "A Singleton database connection",
+        "A payment gateway adapter",
+        "An undo/redo command history"
+      ],
+      "answer": "Rails view helpers or template engine formatting filters",
+      "explanation": "These are widely-used, real-world implementations of exactly this idea: keeping formatting logic out of raw templates."
+    }
+  ]
+}

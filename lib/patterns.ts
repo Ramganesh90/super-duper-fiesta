@@ -33,6 +33,10 @@ import reactor from "@/data/patterns/reactor.json";
 import proactor from "@/data/patterns/proactor.json";
 import monitorObject from "@/data/patterns/monitor-object.json";
 import threadPool from "@/data/patterns/thread-pool.json";
+import filterCriteria from "@/data/patterns/filter-criteria.json";
+import privateClassData from "@/data/patterns/private-class-data.json";
+import viewHelper from "@/data/patterns/view-helper.json";
+import dataMapper from "@/data/patterns/data-mapper.json";
 
 const patterns = [
   singleton,
@@ -53,6 +57,7 @@ const patterns = [
   facade,
   flyweight,
   proxy,
+  privateClassData,
   chainOfResponsibility,
   command,
   interpreter,
@@ -64,11 +69,14 @@ const patterns = [
   strategy,
   templateMethod,
   visitor,
+  filterCriteria,
   activeObject,
   reactor,
   proactor,
   monitorObject,
   threadPool,
+  viewHelper,
+  dataMapper,
 ] as unknown as Pattern[];
 
 export function getAllPatterns(): Pattern[] {

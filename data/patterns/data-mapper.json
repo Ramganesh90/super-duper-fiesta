@@ -1,0 +1,158 @@
+{
+  "id": "data-mapper",
+  "title": "Data Mapper Pattern",
+  "category": "enterprise",
+  "difficulty": "advanced",
+  "oneLiner": "Moves data between in-memory domain objects and a database while keeping the domain model completely unaware persistence exists.",
+  "hero": {
+    "name": "The Courier",
+    "codename": "Data Mapper",
+    "catchphrase": "Your objects never touch the database. I carry data between them.",
+    "power": "Transfers data between domain objects and the database, keeping the domain model entirely ignorant of SQL, tables, or persistence details.",
+    "weakness": "Adds a real layer of mapping code — overkill for simple CRUD apps that would be perfectly fine with an ORM's simpler active-record style.",
+    "origin": "The Courier appeared after a `User` domain class had `save()`, `find()`, and raw SQL strings baked directly into it, making it impossible to unit test business logic without spinning up a real database.",
+    "enemies": ["SQL-Polluted Domain Models", "Untestable Business Logic", "Persistence-Coupled Objects"],
+    "emoji": "🚚",
+    "colorFrom": "#065f46",
+    "colorTo": "#6ee7b7"
+  },
+  "story": {
+    "problem": "The `User` domain class has `save()` and `find()` methods full of raw SQL baked directly into it. Testing `User`'s business logic requires a real database connection, even for logic that has nothing to do with persistence.",
+    "solution": "The Courier introduces a separate `UserMapper` class that knows how to read and write `User` objects to the database. `User` itself has zero knowledge that a database exists.",
+    "result": "User's business logic can be tested with plain in-memory objects, no database required. All persistence knowledge lives entirely inside UserMapper."
+  },
+  "beforeAfter": {
+    "before": [
+      "Domain objects contain raw SQL and persistence logic",
+      "Testing business logic requires a real database",
+      "Domain model and database schema are tightly coupled"
+    ],
+    "after": [
+      "Domain objects have zero knowledge of persistence",
+      "Business logic tests run with plain in-memory objects",
+      "Domain model and database schema can evolve independently"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A unit test for User.calculateLoyaltyTier() fails because it can't connect to a test database it doesn't even need.",
+      "speaker": "Developer",
+      "dialogue": "I'm testing loyalty tier math, and it's failing because User.save() tries to open a database connection I never asked for.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Courier appears holding a delivery crate, ready to carry data between the domain and the database.",
+      "speaker": "The Courier",
+      "dialogue": "Your User object shouldn't know a database exists. Let me carry the data back and forth instead — User just stays pure business logic.",
+      "emoji": "🚚"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "UserMapper.save(user) and UserMapper.find(id) hold all the SQL. User itself has no save() or find() methods at all.",
+      "speaker": "The Courier",
+      "dialogue": "All the persistence knowledge lives in me. User is just data and business rules — nothing about tables, columns, or SQL.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The loyalty-tier test now runs instantly, with a plain in-memory User object, no database in sight.",
+      "speaker": "Developer",
+      "dialogue": "The test runs in milliseconds now, no database needed at all. User is finally just business logic.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class User {\n  constructor(public id: string, public email: string, public loyaltyPoints: number) {}\n\n  async save() {\n    await db.query(\"UPDATE users SET email=$1, loyalty_points=$2 WHERE id=$3\", [this.email, this.loyaltyPoints, this.id]);\n  }\n  static async find(id: string): Promise<User> {\n    const row = await db.query(\"SELECT * FROM users WHERE id=$1\", [id]);\n    return new User(row.id, row.email, row.loyalty_points);\n  }\n}",
+    "after": "// Domain object — zero knowledge of persistence\nclass User {\n  constructor(public id: string, public email: string, public loyaltyPoints: number) {}\n  calculateLoyaltyTier(): string {\n    return this.loyaltyPoints > 1000 ? \"gold\" : \"standard\";\n  }\n}\n\n// All persistence knowledge lives here instead\nclass UserMapper {\n  async save(user: User): Promise<void> {\n    await db.query(\"UPDATE users SET email=$1, loyalty_points=$2 WHERE id=$3\", [user.email, user.loyaltyPoints, user.id]);\n  }\n  async find(id: string): Promise<User> {\n    const row = await db.query(\"SELECT * FROM users WHERE id=$1\", [id]);\n    return new User(row.id, row.email, row.loyalty_points);\n  }\n}\n\n// Testing User's business logic needs no database at all\nconst user = new User(\"1\", \"a@example.com\", 1200);\nuser.calculateLoyaltyTier(); // \"gold\", tested with zero I/O"
+  },
+  "explanation": {
+    "useWhen": [
+      "You want domain objects to contain pure business logic, fully testable without a database.",
+      "The domain model's shape and the database schema need to evolve somewhat independently.",
+      "The application's persistence needs are complex enough that a simple active-record ORM style becomes limiting."
+    ],
+    "avoidWhen": [
+      "The app is simple CRUD with a domain model that maps almost 1:1 to database tables — an active-record ORM is far less code for the same result.",
+      "The team is small and the added mapper layer isn't paying for itself in testability or flexibility.",
+      "Performance-critical paths need tightly optimized, hand-tuned queries where a generic mapping layer would add overhead."
+    ],
+    "commonMistakes": [
+      "Introducing Data Mapper for a simple app where an active-record ORM (like most default Rails/Django/Laravel setups) would be simpler and just as effective.",
+      "Letting persistence details leak back into the domain model anyway (e.g. via database-specific ID types), quietly defeating the separation.",
+      "Not testing mappers against a real (or realistic) database, since their entire job is faithfully handling database specifics.",
+      "Confusing Data Mapper with Repository — Data Mapper handles low-level object-to-row translation; Repository provides a higher-level, collection-like interface often built on top of one or more mappers."
+    ],
+    "realWorldExample": "Hibernate/JPA in Java, Doctrine in PHP, and TypeORM's 'Data Mapper mode' (as opposed to its Active Record mode) are real-world Data Mapper implementations, deliberately keeping domain objects free of persistence code."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from just using an ORM?" },
+    { "speaker": "The Courier", "message": "Many ORMs default to 'Active Record' — the domain object itself has save()/find() baked in. I'm the opposite philosophy: the domain object knows NOTHING about persistence. A separate mapper carries data between the two worlds." },
+    { "speaker": "Mentor", "message": "When is that separation not worth it?" },
+    { "speaker": "The Courier", "message": "Simple CRUD apps, honestly. If your domain objects map cleanly to tables and testability against a database isn't a real pain point, Active Record's simplicity usually wins." }
+  ],
+  "codeBattle": {
+    "scenario": "Your domain layer has complex business rules that need thorough unit testing, but every test currently requires spinning up a real database because domain objects have SQL queries baked directly into their methods.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "data-mapper", "label": "Data Mapper" },
+      { "id": "repository", "label": "Repository" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "data-mapper",
+    "explanation": "The Courier moves all SQL out of the domain objects and into dedicated mapper classes, letting business logic be tested with plain in-memory objects and no database."
+  },
+  "quiz": [
+    {
+      "question": "What does Data Mapper keep the domain model free of?",
+      "options": [
+        "Any knowledge of the database or persistence mechanism",
+        "Business logic",
+        "All public methods",
+        "Constructor parameters"
+      ],
+      "answer": "Any knowledge of the database or persistence mechanism",
+      "explanation": "The domain object stays pure business logic; a separate mapper handles everything about talking to the database."
+    },
+    {
+      "question": "What is the main testability benefit of Data Mapper?",
+      "options": [
+        "Business logic in domain objects can be unit tested with plain in-memory objects, no database required",
+        "It makes every test run against a live production database",
+        "It removes the need for any tests at all",
+        "It automatically generates test data"
+      ],
+      "answer": "Business logic in domain objects can be unit tested with plain in-memory objects, no database required",
+      "explanation": "Because domain objects have no persistence code, testing them requires no database connection at all."
+    },
+    {
+      "question": "When is Data Mapper likely overkill?",
+      "options": [
+        "For simple CRUD apps where domain objects map almost 1:1 to database tables",
+        "For applications with complex business logic needing thorough unit testing",
+        "For domain models that need to evolve independently of the database schema",
+        "For teams with heavy testing requirements"
+      ],
+      "answer": "For simple CRUD apps where domain objects map almost 1:1 to database tables",
+      "explanation": "An active-record ORM is usually simpler and just as effective when the mapping is straightforward."
+    },
+    {
+      "question": "How does Data Mapper differ from Repository?",
+      "options": [
+        "Data Mapper handles low-level object-to-row translation; Repository provides a higher-level, collection-like interface often built atop mappers",
+        "They are the exact same pattern with different names",
+        "Repository requires SQL; Data Mapper forbids it",
+        "Data Mapper can only be used with NoSQL databases"
+      ],
+      "answer": "Data Mapper handles low-level object-to-row translation; Repository provides a higher-level, collection-like interface often built atop mappers",
+      "explanation": "The two patterns are often layered together: Repository as the friendly interface, Data Mapper doing the underlying translation work."
+    }
+  ]
+}
