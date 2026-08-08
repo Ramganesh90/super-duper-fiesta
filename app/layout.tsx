@@ -61,7 +61,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               PATTERN<span className="text-action-red">-VERSE</span>
             </Link>
             <Link
-              href="/#roster"
+              href="/patterns"
               className="comic-border-sm font-comic bg-comic-yellow px-3 py-1.5 text-sm text-ink transition-transform hover:-translate-y-0.5 sm:text-base"
             >
               Pattern Roster
