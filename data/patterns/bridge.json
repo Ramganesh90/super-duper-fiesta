@@ -1,0 +1,158 @@
+{
+  "id": "bridge",
+  "title": "Bridge Pattern",
+  "category": "structural",
+  "difficulty": "advanced",
+  "oneLiner": "Splits an abstraction from its implementation so both can change independently, instead of multiplying subclasses.",
+  "hero": {
+    "name": "Crossover",
+    "codename": "Bridge",
+    "catchphrase": "Change one side. The other doesn't even notice.",
+    "power": "Connects an abstraction to its implementation through composition, letting either evolve without touching the other.",
+    "weakness": "Sets up indirection before you need it — if the two sides never actually vary independently, Crossover is complexity with no payoff.",
+    "origin": "Crossover arrived after a shape-drawing library shipped `RedCircle`, `BlueCircle`, `RedSquare`, `BlueSquare` — a subclass explosion for every color/shape combination.",
+    "enemies": ["Subclass Explosion", "Rigid Inheritance", "Combinatorial Bloat"],
+    "emoji": "🌉",
+    "colorFrom": "#0369a1",
+    "colorTo": "#38bdf8"
+  },
+  "story": {
+    "problem": "A shape library models `Circle` and `Square`, then needs colors, so it creates `RedCircle`, `BlueCircle`, `RedSquare`, `BlueSquare`. Adding a third color or shape multiplies subclasses combinatorially.",
+    "solution": "Crossover splits the hierarchy in two: shapes hold a reference to a `Color` implementation instead of inheriting from it. Shapes and colors now vary independently.",
+    "result": "Adding a new color means one new Color class. Adding a new shape means one new Shape class. No combinatorial explosion, ever."
+  },
+  "beforeAfter": {
+    "before": [
+      "One subclass per shape/color combination",
+      "Adding a color multiplies the subclass count",
+      "Shape logic and color logic are tangled together"
+    ],
+    "after": [
+      "Shapes and colors are separate, independently-varying hierarchies",
+      "Adding a color or shape means exactly one new class",
+      "Shape logic and color logic stay cleanly separated"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A class diagram shows RedCircle, BlueCircle, GreenCircle, RedSquare, BlueSquare, GreenSquare — and a third shape is coming.",
+      "speaker": "Developer",
+      "dialogue": "We need a Triangle now. That's three MORE subclasses. This is multiplying out of control.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Crossover appears, standing exactly between two separate towers: Shapes and Colors.",
+      "speaker": "Crossover",
+      "dialogue": "Stop inheriting color into shape. Give shape a REFERENCE to a color instead — then they can grow separately.",
+      "emoji": "🌉"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Shape holds a Color implementation. Circle and Square each just call color.fill().",
+      "speaker": "Crossover",
+      "dialogue": "Any shape can use any color, with zero new classes for the combination itself. Just plug one implementation into another.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Triangle ships with one new class. It instantly works with every existing color.",
+      "speaker": "Developer",
+      "dialogue": "One Triangle class, and it already supports red, blue, and green. No combinatorial mess.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Subclass explosion: N shapes x M colors = N*M classes\nclass RedCircle { draw() { /* red circle */ } }\nclass BlueCircle { draw() { /* blue circle */ } }\nclass RedSquare { draw() { /* red square */ } }\nclass BlueSquare { draw() { /* blue square */ } }\n// Adding Triangle means 2 more classes. Adding Green means 3 more.",
+    "after": "interface Color {\n  fill(): string;\n}\nclass Red implements Color { fill() { return \"red\"; } }\nclass Blue implements Color { fill() { return \"blue\"; } }\n\nabstract class Shape {\n  constructor(protected color: Color) {}\n  abstract draw(): string;\n}\nclass Circle extends Shape {\n  draw() { return `circle filled ${this.color.fill()}`; }\n}\nclass Square extends Shape {\n  draw() { return `square filled ${this.color.fill()}`; }\n}\n\n// Any shape + any color, no new class needed for the combination\nnew Circle(new Red()).draw();\nnew Square(new Blue()).draw();"
+  },
+  "explanation": {
+    "useWhen": [
+      "You have two dimensions of variation (shape/color, device/OS, control/renderer) that would otherwise multiply subclasses.",
+      "You want to swap out an implementation at runtime without touching the abstraction that uses it.",
+      "Both the abstraction and its implementation are expected to grow independently over time."
+    ],
+    "avoidWhen": [
+      "There's really only one dimension of variation — a normal inheritance hierarchy is simpler.",
+      "The two 'sides' will never actually vary independently in practice — the split adds ceremony for nothing.",
+      "The codebase is small enough that a future refactor to Bridge would be cheap if the need ever arises."
+    ],
+    "commonMistakes": [
+      "Introducing Bridge preemptively for a single dimension of variation that doesn't need it yet.",
+      "Confusing Bridge with Adapter — Bridge is designed upfront to let two sides vary together; Adapter retrofits compatibility after the fact.",
+      "Letting the abstraction leak implementation details, defeating the point of separating the two hierarchies.",
+      "Not documenting which side is the 'abstraction' and which is the 'implementation', confusing future contributors."
+    ],
+    "realWorldExample": "JDBC/ODBC (a single Connection abstraction over many database driver implementations), cross-platform UI toolkits separating widget abstraction from OS-specific rendering, and device drivers separating a common API from vendor-specific implementations all use Bridge."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This looks a lot like Strategy — swapping an implementation behind an interface." },
+    { "speaker": "Crossover", "message": "Structurally similar, different intent. Strategy swaps ONE algorithm at a time for ONE class. I split a whole hierarchy in two so BOTH sides can grow independently, long-term." },
+    { "speaker": "Mentor", "message": "So I shouldn't reach for you on day one?" },
+    { "speaker": "Crossover", "message": "Right — that's my weakness. Wait until the subclass explosion actually starts, then split the hierarchy. Premature splitting is just extra indirection." }
+  ],
+  "codeBattle": {
+    "scenario": "Your remote-control app needs to support 3 device types (TV, Radio, Speaker) and 2 remote styles (Basic, Advanced), and both lists are expected to keep growing.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "bridge", "label": "Bridge" },
+      { "id": "adapter", "label": "Adapter" },
+      { "id": "composite", "label": "Composite" },
+      { "id": "decorator", "label": "Decorator" }
+    ],
+    "correct": "bridge",
+    "explanation": "Crossover splits Remote (abstraction) from Device (implementation) so new remote styles and new device types can each be added independently, without multiplying subclasses."
+  },
+  "quiz": [
+    {
+      "question": "What core problem does Bridge solve?",
+      "options": [
+        "Two independent dimensions of variation cause a combinatorial explosion of subclasses",
+        "An object needs to notify many listeners of a state change",
+        "A single instance needs to be shared globally",
+        "An interface needs a simplified entry point"
+      ],
+      "answer": "Two independent dimensions of variation cause a combinatorial explosion of subclasses",
+      "explanation": "Bridge exists specifically to split two independently-varying hierarchies apart via composition instead of inheritance."
+    },
+    {
+      "question": "How does Bridge separate abstraction from implementation?",
+      "options": [
+        "The abstraction holds a reference to an implementation interface instead of inheriting from it",
+        "It deletes the implementation entirely and hardcodes behavior",
+        "It merges abstraction and implementation into one class",
+        "It requires a database to store the implementation"
+      ],
+      "answer": "The abstraction holds a reference to an implementation interface instead of inheriting from it",
+      "explanation": "Composition over inheritance is exactly how the two sides become free to vary independently."
+    },
+    {
+      "question": "When is introducing Bridge premature?",
+      "options": [
+        "When there's only one dimension of variation and no combinatorial explosion is happening",
+        "When you already have four shape types and four color types",
+        "When both the abstraction and implementation change frequently",
+        "When you need to swap implementations at runtime"
+      ],
+      "answer": "When there's only one dimension of variation and no combinatorial explosion is happening",
+      "explanation": "Bridge's cost (an extra layer of indirection) only pays off once two dimensions are genuinely multiplying subclasses."
+    },
+    {
+      "question": "How does Bridge differ from Strategy?",
+      "options": [
+        "Bridge structurally splits a whole hierarchy in two; Strategy swaps one algorithm for a single class at a time",
+        "They are identical patterns with different names",
+        "Strategy requires inheritance, Bridge forbids it",
+        "Bridge can only be used with UI code"
+      ],
+      "answer": "Bridge structurally splits a whole hierarchy in two; Strategy swaps one algorithm for a single class at a time",
+      "explanation": "Bridge is a structural, long-term hierarchy split; Strategy is a narrower, single-class behavioral swap."
+    }
+  ]
+}

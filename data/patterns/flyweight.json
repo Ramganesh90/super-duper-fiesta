@@ -1,0 +1,158 @@
+{
+  "id": "flyweight",
+  "title": "Flyweight Pattern",
+  "category": "structural",
+  "difficulty": "advanced",
+  "oneLiner": "Shares the common, unchanging parts of many similar objects so a huge population of them fits comfortably in memory.",
+  "hero": {
+    "name": "Featherweight",
+    "codename": "Flyweight",
+    "catchphrase": "Why have a million copies when one shared core will do?",
+    "power": "Splits an object's data into shared (intrinsic) and unique (extrinsic) parts, so millions of instances can reuse one shared core.",
+    "weakness": "Splitting shared from unique state is real design work — and if that shared state is ever accidentally mutated, every 'independent' object using it corrupts at once.",
+    "origin": "Featherweight arrived after a text editor stored a full font, size, and color object for every single character on the page — a million-character document meant a million duplicate font objects.",
+    "enemies": ["Memory Bloat", "Duplicate Immutable Data", "Accidental Shared Mutation"],
+    "emoji": "🪶",
+    "colorFrom": "#0284c7",
+    "colorTo": "#7dd3fc"
+  },
+  "story": {
+    "problem": "A text editor stores `{ char, font, size, color }` for every character. A million-character document allocates a million nearly-identical font/size/color objects, eating gigabytes for data that's 99% duplicated.",
+    "solution": "Featherweight splits each character into a shared `CharacterStyle` (font, size, color — intrinsic, reused across thousands of characters) and unique per-character position (extrinsic, stored separately, cheap).",
+    "result": "A million characters that share the same 20 styles now allocate 20 style objects total, not a million. Memory drops by orders of magnitude."
+  },
+  "beforeAfter": {
+    "before": [
+      "Each character allocates its own font/size/color object",
+      "A million characters means a million near-duplicate objects",
+      "Memory usage scales linearly with character count"
+    ],
+    "after": [
+      "Identical styles are shared across every character that uses them",
+      "A million characters share a small pool of style objects",
+      "Memory usage scales with unique styles, not character count"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A memory profiler shows a document consuming 2GB — almost entirely duplicate font/size/color objects.",
+      "speaker": "Developer",
+      "dialogue": "This document has maybe 20 distinct styles in it, but we've allocated a million style objects, one per character!",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Featherweight appears holding one lightweight style object, gesturing at a thousand characters that all reference it.",
+      "speaker": "Featherweight",
+      "dialogue": "Stop copying the style for every character. Share ONE style object across every character that looks the same.",
+      "emoji": "🪶"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "A StyleFactory hands out the same CharacterStyle instance whenever the same font/size/color combo is requested.",
+      "speaker": "Featherweight",
+      "dialogue": "The style is intrinsic — shared and immutable. Only the character's position is extrinsic — unique, and cheap to store separately.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The memory profiler now shows 20 style objects total, shared across a million characters.",
+      "speaker": "Developer",
+      "dialogue": "2GB dropped to under 40MB. Same document, same styles — just shared instead of duplicated.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Every character allocates its own style — massively duplicated\nclass Character {\n  constructor(\n    public char: string,\n    public font: string,\n    public size: number,\n    public color: string,\n    public x: number,\n    public y: number\n  ) {}\n}\n\n// 1,000,000 characters = 1,000,000 near-identical font/size/color allocations\nconst doc = text.split(\"\").map((c, i) => new Character(c, \"Arial\", 12, \"black\", i, 0));",
+    "after": "// Intrinsic (shared) state\nclass CharacterStyle {\n  constructor(public font: string, public size: number, public color: string) {}\n}\n\nclass StyleFactory {\n  private static styles = new Map<string, CharacterStyle>();\n\n  static get(font: string, size: number, color: string): CharacterStyle {\n    const key = `${font}-${size}-${color}`;\n    if (!this.styles.has(key)) {\n      this.styles.set(key, new CharacterStyle(font, size, color));\n    }\n    return this.styles.get(key)!; // shared across every matching character\n  }\n}\n\n// Extrinsic (unique) state stays separate and cheap\nclass Character {\n  constructor(public char: string, public style: CharacterStyle, public x: number, public y: number) {}\n}\n\nconst sharedStyle = StyleFactory.get(\"Arial\", 12, \"black\");\nconst doc = text.split(\"\").map((c, i) => new Character(c, sharedStyle, i, 0));"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need a huge number of similar objects, and memory usage is a real, measured problem.",
+      "Most of each object's state is shared and immutable (intrinsic), with only a small part being unique (extrinsic).",
+      "The shared state can be safely made immutable — no object using it should ever mutate it directly."
+    ],
+    "avoidWhen": [
+      "The object count is small enough that memory isn't actually a concern — Flyweight adds complexity for no measured payoff.",
+      "Most of the object's state is genuinely unique per instance, leaving little to actually share.",
+      "The 'shared' state needs to be mutable per-instance — that breaks the sharing guarantee and causes silent bugs."
+    ],
+    "commonMistakes": [
+      "Applying Flyweight before confirming memory is actually a bottleneck — this pattern trades simplicity for memory savings, so measure first.",
+      "Accidentally mutating shared (intrinsic) state, corrupting every object that references it.",
+      "Forgetting to separate extrinsic state cleanly, ending up with a factory that isn't really sharing much after all.",
+      "Using a naive equality check in the factory's cache key, causing near-duplicate keys to create redundant flyweights anyway."
+    ],
+    "realWorldExample": "Text editors sharing glyph/font objects across characters, game engines sharing mesh/texture data across thousands of identical trees or bullets, and string interning in many languages (identical string literals sharing one memory location) are all Flyweight."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just caching?" },
+    { "speaker": "Featherweight", "message": "Caching avoids recomputation. I go further — I make MANY objects literally share the same underlying instance for their common data, splitting shared from unique state on purpose." },
+    { "speaker": "Mentor", "message": "What's the danger?" },
+    { "speaker": "Featherweight", "message": "If that shared state is ever mutated — even once — every object referencing it changes too, silently. Intrinsic state has to stay immutable, or I turn into a very confusing bug." }
+  ],
+  "codeBattle": {
+    "scenario": "Your forest-rendering game engine needs to draw 500,000 trees. Each tree shares the same mesh and texture but has a unique position and slight rotation, and memory is already tight.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "flyweight", "label": "Flyweight" },
+      { "id": "prototype", "label": "Prototype" },
+      { "id": "composite", "label": "Composite" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "flyweight",
+    "explanation": "Featherweight shares the identical mesh/texture (intrinsic) across all 500,000 trees, storing only position/rotation (extrinsic) per tree — cutting memory dramatically."
+  },
+  "quiz": [
+    {
+      "question": "What is 'intrinsic state' in the Flyweight pattern?",
+      "options": [
+        "The shared, typically immutable data that many objects have in common and can reuse from one instance",
+        "The unique, per-object data that must be stored separately for each instance",
+        "A random value generated at object creation",
+        "State that only exists during a database transaction"
+      ],
+      "answer": "The shared, typically immutable data that many objects have in common and can reuse from one instance",
+      "explanation": "Intrinsic state is exactly what gets factored out and shared across many flyweight instances."
+    },
+    {
+      "question": "What is 'extrinsic state', and where does it live?",
+      "options": [
+        "The unique, per-object data (like position) that's kept separate from the shared flyweight and supplied by the caller",
+        "It's stored inside the shared flyweight object alongside intrinsic state",
+        "It doesn't exist in the Flyweight pattern",
+        "It's always stored in a database"
+      ],
+      "answer": "The unique, per-object data (like position) that's kept separate from the shared flyweight and supplied by the caller",
+      "explanation": "Keeping extrinsic state out of the shared object is exactly what makes the sharing safe."
+    },
+    {
+      "question": "What's the biggest risk when implementing Flyweight?",
+      "options": [
+        "Accidentally mutating the shared intrinsic state, which corrupts every object referencing it",
+        "Using too much memory compared to not sharing at all",
+        "Making objects impossible to construct",
+        "Breaking type safety in a way TypeScript can't catch at compile time"
+      ],
+      "answer": "Accidentally mutating the shared intrinsic state, which corrupts every object referencing it",
+      "explanation": "Because many objects reference the same shared instance, any mutation to it silently affects everything sharing it."
+    },
+    {
+      "question": "When should you avoid Flyweight?",
+      "options": [
+        "When the number of objects is small enough that memory usage isn't actually a measured problem",
+        "When you have hundreds of thousands of similar objects",
+        "When most of the object's state can be shared safely",
+        "When memory is a confirmed bottleneck"
+      ],
+      "answer": "When the number of objects is small enough that memory usage isn't actually a measured problem",
+      "explanation": "Flyweight adds real design complexity that should only be paid for when memory savings are actually needed."
+    }
+  ]
+}

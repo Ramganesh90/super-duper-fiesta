@@ -1,0 +1,158 @@
+{
+  "id": "facade",
+  "title": "Facade Pattern",
+  "category": "structural",
+  "difficulty": "beginner",
+  "oneLiner": "Hides a tangle of subsystems behind one simple entry point, without removing access to the details when you need them.",
+  "hero": {
+    "name": "Simplifier",
+    "codename": "Facade",
+    "catchphrase": "One door. Behind it, all the complexity you'll never see.",
+    "power": "Exposes one clean, simple interface in front of a complicated subsystem of many moving parts.",
+    "weakness": "Try to route every possible operation through Simplifier and it swells into a god-object that knows too much about everything behind it.",
+    "origin": "Simplifier stepped in after a checkout flow had to directly call InventoryService, PricingEngine, TaxCalculator, PaymentGateway, and EmailService, in the exact right order, every single time.",
+    "enemies": ["Subsystem Sprawl", "Leaky Abstractions", "Order-Dependent Calls"],
+    "emoji": "🚪",
+    "colorFrom": "#4338ca",
+    "colorTo": "#818cf8"
+  },
+  "story": {
+    "problem": "Checkout code calls five different subsystems directly, in a precise order, with no single place that knows the whole flow. Every new call site risks getting the order wrong.",
+    "solution": "Simplifier introduces `CheckoutFacade.placeOrder()`, which internally calls inventory, pricing, tax, payment, and email in the right order — exposing just one method to the rest of the app.",
+    "result": "Every call site becomes one line: `checkoutFacade.placeOrder(cart)`. The five subsystems still exist and can still be used directly when truly needed, but nobody has to remember the dance."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every call site orchestrates five subsystems manually",
+      "Easy to call subsystems in the wrong order",
+      "New team members must learn the whole subsystem web to place an order"
+    ],
+    "after": [
+      "One method call handles the whole checkout flow",
+      "Order-of-operations logic lives in exactly one place",
+      "New team members can place an order without learning the subsystems"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A checkout function calls five different subsystems, in a specific order that's easy to get wrong.",
+      "speaker": "Developer",
+      "dialogue": "The new intern called PaymentGateway before TaxCalculator and charged the wrong amount. This is a landmine.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Simplifier stands in front of a tangle of five interconnected systems, holding open a single door.",
+      "speaker": "Simplifier",
+      "dialogue": "Stop asking every team to learn five subsystems. Give them one door — I'll handle what's behind it.",
+      "emoji": "🚪"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "CheckoutFacade.placeOrder() internally calls all five subsystems in the correct order.",
+      "speaker": "Simplifier",
+      "dialogue": "Call placeOrder(cart). I know the right order so you don't have to memorize it.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Every call site shrinks to one line. The five subsystems still exist for the checkout team who needs the detail.",
+      "speaker": "Developer",
+      "dialogue": "One line, correct every time. The subsystems are still there if we need to go deeper — but almost nobody has to.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Every call site has to know the exact order and every subsystem\nasync function checkout(cart: Cart) {\n  await InventoryService.reserve(cart.items);\n  const price = PricingEngine.calculate(cart);\n  const tax = TaxCalculator.compute(price, cart.region);\n  await PaymentGateway.charge(price + tax);\n  await EmailService.sendReceipt(cart.customerEmail, price + tax);\n}",
+    "after": "class CheckoutFacade {\n  async placeOrder(cart: Cart) {\n    await InventoryService.reserve(cart.items);\n    const price = PricingEngine.calculate(cart);\n    const tax = TaxCalculator.compute(price, cart.region);\n    await PaymentGateway.charge(price + tax);\n    await EmailService.sendReceipt(cart.customerEmail, price + tax);\n  }\n}\n\n// Every call site becomes one line — the order is now encapsulated\nconst checkoutFacade = new CheckoutFacade();\nawait checkoutFacade.placeOrder(cart);"
+  },
+  "explanation": {
+    "useWhen": [
+      "A subsystem is complex, with several classes that must be called in a particular order or combination.",
+      "Most callers only need the 'happy path' — a single simplified entry point covers 90% of use cases.",
+      "You want to decouple client code from a subsystem's internals so the subsystem can evolve independently."
+    ],
+    "avoidWhen": [
+      "The subsystem is already simple enough that a facade adds no real value.",
+      "Every caller genuinely needs fine-grained control over the subsystem — a facade would just get in the way.",
+      "You're tempted to route every possible operation through the facade, turning it into a god-object that knows too much."
+    ],
+    "commonMistakes": [
+      "Letting the facade grow into a god-object that reimplements every subsystem operation instead of just the common flows.",
+      "Hiding the subsystem so completely that power users can't drop down to the details when they genuinely need to.",
+      "Putting business logic inside the facade itself instead of just orchestrating calls to the real subsystems.",
+      "Confusing Facade (simplifies an already-compatible subsystem) with Adapter (fixes a genuinely incompatible interface)."
+    ],
+    "realWorldExample": "jQuery's simplified DOM API over the verbose native DOM, an SDK's `client.query()` hiding connection pooling/retries/serialization, and a `checkout()` service hiding inventory/payment/shipping subsystems are all Facade."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "So the five subsystems still exist behind you?" },
+    { "speaker": "Simplifier", "message": "Absolutely — I don't replace them, I just give most callers a shortcut. The checkout team can still call InventoryService directly if they need fine-grained control." },
+    { "speaker": "Mentor", "message": "When do you become a problem?" },
+    { "speaker": "Simplifier", "message": "When I try to expose EVERY possible operation from every subsystem. Then I'm not simplifying anything — I'm just a second, worse copy of five classes glued together." }
+  ],
+  "codeBattle": {
+    "scenario": "Your video-conversion library exposes a decoder, an encoder, a compressor, and a metadata writer — four classes that must be wired together correctly for the common case of 'just convert this MP4 to WebM'.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "facade", "label": "Facade" },
+      { "id": "adapter", "label": "Adapter" },
+      { "id": "builder", "label": "Builder" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "facade",
+    "explanation": "Simplifier bundles the four already-compatible classes behind one convertVideo() call for the common case, while still allowing direct access to each class for advanced needs."
+  },
+  "quiz": [
+    {
+      "question": "What is Facade's primary purpose?",
+      "options": [
+        "Provide one simple entry point in front of a complex subsystem",
+        "Make two incompatible interfaces work together",
+        "Guarantee an object has exactly one instance",
+        "Control access to another object"
+      ],
+      "answer": "Provide one simple entry point in front of a complex subsystem",
+      "explanation": "Facade's whole job is reducing 'call five things in the right order' to 'call one thing'."
+    },
+    {
+      "question": "Does using a Facade prevent callers from accessing the subsystem directly?",
+      "options": [
+        "No — the facade is a convenience layer, and direct subsystem access usually remains available for advanced needs",
+        "Yes — the subsystem classes should be made private and unreachable once a facade exists",
+        "Yes — that's the entire point of the pattern",
+        "It depends on whether Singleton is also used"
+      ],
+      "answer": "No — the facade is a convenience layer, and direct subsystem access usually remains available for advanced needs",
+      "explanation": "A good facade simplifies the common path without removing the option to go deeper when truly needed."
+    },
+    {
+      "question": "What's the risk of over-applying Facade?",
+      "options": [
+        "It can grow into a god-object that tries to expose every possible subsystem operation",
+        "It always makes the subsystem slower",
+        "It removes the need for the subsystem entirely",
+        "It requires all subsystem classes to be rewritten"
+      ],
+      "answer": "It can grow into a god-object that tries to expose every possible subsystem operation",
+      "explanation": "A facade should cover the common flows — trying to cover everything defeats the simplification."
+    },
+    {
+      "question": "How does Facade differ from Adapter?",
+      "options": [
+        "Facade simplifies access to an already-compatible subsystem; Adapter fixes a genuine interface incompatibility",
+        "Facade can only wrap one class; Adapter can wrap many",
+        "They are the same pattern under two names",
+        "Adapter is only for UI code, Facade is only for backend code"
+      ],
+      "answer": "Facade simplifies access to an already-compatible subsystem; Adapter fixes a genuine interface incompatibility",
+      "explanation": "Facade doesn't fix a mismatch — it reduces complexity for a subsystem that already works, just with too many moving parts to call directly."
+    }
+  ]
+}

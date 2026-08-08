@@ -1,0 +1,158 @@
+{
+  "id": "decorator",
+  "title": "Decorator Pattern",
+  "category": "structural",
+  "difficulty": "intermediate",
+  "oneLiner": "Wraps an object to add new behavior at runtime, without touching the original class or spawning a subclass for every combination.",
+  "hero": {
+    "name": "Enhancer",
+    "codename": "Decorator",
+    "catchphrase": "Wrap me. Stack me. Extend without altering.",
+    "power": "Layers new behavior onto an object at runtime by wrapping it, keeping every layer independently combinable.",
+    "weakness": "Stack enough decorators and it gets hard to tell which layer is responsible for which behavior — deep wrapping chains are hard to debug.",
+    "origin": "Enhancer showed up after a coffee-shop app shipped `DarkRoastWithMilkAndSugarAndWhip`, `DarkRoastWithMilk`, `LightRoastWithSugar` — a subclass for every single topping combination.",
+    "enemies": ["Subclass-Per-Combination", "Rigid Base Classes", "Feature Bloat"],
+    "emoji": "🧥",
+    "colorFrom": "#9d174d",
+    "colorTo": "#f472b6"
+  },
+  "story": {
+    "problem": "A coffee-ordering app models every topping combination as its own subclass: `DarkRoastWithMilk`, `DarkRoastWithMilkAndSugar`, and so on. Every new topping doubles the subclass count.",
+    "solution": "Enhancer wraps any `Beverage` in a `MilkDecorator`, `SugarDecorator`, or `WhipDecorator` — each one adds cost and description, then delegates the rest to whatever it's wrapping.",
+    "result": "Any topping combination is just stacking decorators at order time. No new subclass is ever needed for a new combination."
+  },
+  "beforeAfter": {
+    "before": [
+      "One subclass per topping combination",
+      "Adding a topping multiplies the subclass count",
+      "Reusing topping logic across drinks means copy-paste"
+    ],
+    "after": [
+      "Toppings are composable wrapper objects",
+      "Adding a topping means one new decorator class",
+      "Any drink + any combination of toppings, no new class needed"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A class list scrolls past: DarkRoastWithMilk, DarkRoastWithSugar, DarkRoastWithMilkAndSugar, DarkRoastWithMilkAndSugarAndWhip...",
+      "speaker": "Developer",
+      "dialogue": "We added 'oat milk' as an option and just created twelve more subclasses. Twelve.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Enhancer appears, pulling on layer after layer of coats over a plain base.",
+      "speaker": "Enhancer",
+      "dialogue": "Stop subclassing every combination. Wrap the drink in toppings instead — stack as many layers as you want.",
+      "emoji": "🧥"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "MilkDecorator wraps a Beverage. SugarDecorator wraps that. Each layer adds its own cost and description.",
+      "speaker": "Enhancer",
+      "dialogue": "new SugarDecorator(new MilkDecorator(new DarkRoast())). Each layer only knows its own job, then passes the rest down.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The topping menu adds 'oat milk' as one new decorator class, combinable with everything already built.",
+      "speaker": "Developer",
+      "dialogue": "One new decorator, and it already works with every existing drink and every existing topping. No subclass explosion.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Subclass per combination — doesn't scale\nclass DarkRoastWithMilk extends DarkRoast {\n  cost() { return super.cost() + 0.5; }\n}\nclass DarkRoastWithMilkAndSugar extends DarkRoastWithMilk {\n  cost() { return super.cost() + 0.25; }\n}\n// Adding a third topping means another subclass for every combo",
+    "after": "interface Beverage {\n  cost(): number;\n  describe(): string;\n}\n\nclass DarkRoast implements Beverage {\n  cost() { return 2.0; }\n  describe() { return \"Dark Roast\"; }\n}\n\nabstract class ToppingDecorator implements Beverage {\n  constructor(protected wrapped: Beverage) {}\n  abstract cost(): number;\n  abstract describe(): string;\n}\n\nclass MilkDecorator extends ToppingDecorator {\n  cost() { return this.wrapped.cost() + 0.5; }\n  describe() { return `${this.wrapped.describe()} + Milk`; }\n}\nclass SugarDecorator extends ToppingDecorator {\n  cost() { return this.wrapped.cost() + 0.25; }\n  describe() { return `${this.wrapped.describe()} + Sugar`; }\n}\n\n// Stack any combination at order time\nconst order = new SugarDecorator(new MilkDecorator(new DarkRoast()));\norder.cost(); // 2.75"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to add behavior to individual objects at runtime, not to every instance of a class.",
+      "The number of possible feature combinations would otherwise require a subclass per combination.",
+      "You want to add and remove responsibilities dynamically, in any order, without touching the original class."
+    ],
+    "avoidWhen": [
+      "There's only one or two fixed feature combinations — plain subclassing or a config flag is simpler.",
+      "The added behavior needs to know deep internals of the wrapped object (decorators should only interact through the public interface).",
+      "Deep decorator chains would make debugging (\"which layer set this?\") impractically hard for your team."
+    ],
+    "commonMistakes": [
+      "Stacking so many decorators that stack traces and debugging become unreadable — nobody can tell which layer misbehaved.",
+      "Letting a decorator break the interface contract (e.g. changing a return type), so callers can't treat decorated and undecorated objects the same way.",
+      "Reaching for Decorator to add a single, permanent piece of behavior — a subclass or composition would be simpler and clearer.",
+      "Confusing Decorator (adds behavior, same interface) with Adapter (changes the interface) — they wrap, but for different reasons."
+    ],
+    "realWorldExample": "Java's `BufferedReader(new FileReader(...))` and Node's stream `.pipe()` chains, Python decorators (a different but related idea), and UI component libraries wrapping components with `withLogging()`/`withAuth()` HOCs are all Decorator in spirit."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This sounds like Composite — wrapping objects inside objects." },
+    { "speaker": "Enhancer", "message": "Related shape, different purpose. Composite is about treating trees and leaves the same. I'm about layering NEW BEHAVIOR onto one object, one wrap at a time." },
+    { "speaker": "Mentor", "message": "How many layers is too many?" },
+    { "speaker": "Enhancer", "message": "When you can't explain what a stack of decorators does in one sentence, you've gone too deep. Keep each layer's job small and obvious." }
+  ],
+  "codeBattle": {
+    "scenario": "Your logging library needs to support combinations of timestamping, log-level filtering, and JSON formatting, applied in any order, without a subclass for every combination.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "decorator", "label": "Decorator" },
+      { "id": "composite", "label": "Composite" },
+      { "id": "proxy", "label": "Proxy" },
+      { "id": "adapter", "label": "Adapter" }
+    ],
+    "correct": "decorator",
+    "explanation": "Enhancer lets each feature (timestamp, filter, format) be its own wrapper, stacked in any order without multiplying subclasses."
+  },
+  "quiz": [
+    {
+      "question": "What does Decorator let you do that plain subclassing struggles with?",
+      "options": [
+        "Add or remove behavior on individual objects at runtime, in any combination, without a subclass per combination",
+        "Guarantee an object has exactly one instance",
+        "Make two incompatible interfaces work together",
+        "Recursively treat a tree of objects and a single object identically"
+      ],
+      "answer": "Add or remove behavior on individual objects at runtime, in any combination, without a subclass per combination",
+      "explanation": "Decorator trades subclass explosion for composable wrapper objects that layer behavior at runtime."
+    },
+    {
+      "question": "How does a Decorator typically implement the interface it shares with the object it wraps?",
+      "options": [
+        "It adds its own behavior, then delegates the rest of the call to the wrapped object",
+        "It completely replaces the wrapped object's behavior",
+        "It ignores the wrapped object entirely",
+        "It converts the wrapped object into a different interface"
+      ],
+      "answer": "It adds its own behavior, then delegates the rest of the call to the wrapped object",
+      "explanation": "The defining move is 'do my bit, then pass through' — that's what keeps decorators stackable."
+    },
+    {
+      "question": "What's a real risk of overusing Decorator?",
+      "options": [
+        "Long decorator chains become hard to debug — it's unclear which layer is responsible for what",
+        "It always makes code run slower than inheritance, with no exceptions",
+        "It prevents objects from ever being garbage collected",
+        "It requires a database to track the wrapping order"
+      ],
+      "answer": "Long decorator chains become hard to debug — it's unclear which layer is responsible for what",
+      "explanation": "Each added layer is another indirection to trace through when something goes wrong."
+    },
+    {
+      "question": "How does Decorator differ from Adapter?",
+      "options": [
+        "Decorator keeps the same interface and adds behavior; Adapter changes the interface to make it compatible",
+        "They are the same pattern with different names",
+        "Adapter can only wrap one object; Decorator can wrap unlimited objects",
+        "Decorator requires inheritance; Adapter forbids it"
+      ],
+      "answer": "Decorator keeps the same interface and adds behavior; Adapter changes the interface to make it compatible",
+      "explanation": "Both wrap an object, but for opposite reasons: Decorator preserves the interface while extending behavior, Adapter changes the interface to fix incompatibility."
+    }
+  ]
+}

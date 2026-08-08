@@ -1,0 +1,158 @@
+{
+  "id": "adapter",
+  "title": "Adapter Pattern",
+  "category": "structural",
+  "difficulty": "beginner",
+  "oneLiner": "Wraps an incompatible interface in a translator so two mismatched pieces of code can work together unchanged.",
+  "hero": {
+    "name": "The Translator",
+    "codename": "Adapter",
+    "catchphrase": "Speak your language, I'll speak theirs.",
+    "power": "Wraps an incompatible interface so existing code can call it without ever changing either side.",
+    "weakness": "Wrap enough mismatched systems and you get a maze of translators — sometimes the real fix is agreeing on one interface, not adapting forever.",
+    "origin": "The Translator appeared when a shipping module built for a `getRate(weight)` API had to suddenly talk to a legacy carrier whose API only exposed `computeCost(pounds, zone)`.",
+    "enemies": ["Interface Mismatch", "Legacy Lock-in", "Copy-Paste Rewrites"],
+    "emoji": "🔌",
+    "colorFrom": "#475569",
+    "colorTo": "#94a3b8"
+  },
+  "story": {
+    "problem": "Your app's checkout flow calls `gateway.charge(amount)` everywhere. The new legacy carrier's SDK only exposes `LegacyGateway.submitPayment(cents, currencyCode)` — a completely different shape.",
+    "solution": "The Translator wraps LegacyGateway in a small adapter class that implements the familiar `charge(amount)` interface, converting units and calling the legacy method underneath.",
+    "result": "Checkout code never learns the legacy SDK exists. It keeps calling `charge(amount)`, and the adapter handles the translation invisibly."
+  },
+  "beforeAfter": {
+    "before": [
+      "Checkout code riddled with special-casing for the legacy SDK's shape",
+      "Every call site has to know both APIs",
+      "Swapping providers means editing business logic"
+    ],
+    "after": [
+      "Checkout code calls one familiar interface everywhere",
+      "Only the adapter knows the legacy SDK's shape",
+      "Swapping providers means writing one new adapter"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Checkout code has a special if-branch just to call the legacy carrier's oddly-shaped API.",
+      "speaker": "Developer",
+      "dialogue": "Our whole checkout flow expects charge(amount). This legacy SDK wants submitPayment(cents, currencyCode). Now what?",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Translator steps between the two systems, headset on.",
+      "speaker": "The Translator",
+      "dialogue": "Don't rewrite your checkout flow. I'll stand between them and translate every call.",
+      "emoji": "🔌"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "A LegacyGatewayAdapter implements the familiar PaymentGateway interface, converting units underneath.",
+      "speaker": "The Translator",
+      "dialogue": "Call charge(amount) like always. I'll convert it to cents and call submitPayment() for you.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Checkout code is unchanged. Only one new adapter file exists.",
+      "speaker": "Developer",
+      "dialogue": "Zero changes to checkout logic. We just plugged in a translator and it worked.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Checkout expects this interface everywhere:\ninterface PaymentGateway {\n  charge(amountDollars: number): Promise<void>;\n}\n\n// But the legacy SDK looks nothing like it:\nclass LegacyGateway {\n  submitPayment(cents: number, currencyCode: string): Promise<void> { /* ... */ }\n}\n\n// Checkout code would have to special-case the legacy shape everywhere",
+    "after": "class LegacyGatewayAdapter implements PaymentGateway {\n  constructor(private legacy: LegacyGateway) {}\n\n  async charge(amountDollars: number): Promise<void> {\n    const cents = Math.round(amountDollars * 100);\n    await this.legacy.submitPayment(cents, \"USD\");\n  }\n}\n\n// Checkout code never changes:\nconst gateway: PaymentGateway = new LegacyGatewayAdapter(new LegacyGateway());\nawait gateway.charge(49.99);"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to use an existing class whose interface doesn't match what your code expects, and you can't change either side.",
+      "You're integrating a third-party or legacy library and want to isolate its quirks behind a clean interface.",
+      "You want to introduce a new implementation of an interface without touching any existing callers."
+    ],
+    "avoidWhen": [
+      "You control both interfaces — just make them match instead of adapting forever.",
+      "You'd need to adapt so many mismatched methods that the adapter becomes as complex as a rewrite.",
+      "The 'mismatch' is trivial (a renamed parameter) and doesn't justify a whole extra class."
+    ],
+    "commonMistakes": [
+      "Writing adapters for every third-party call instead of consolidating behind one clean boundary, leading to adapter sprawl.",
+      "Letting adapter-specific quirks (like unit conversion bugs) go untested, since the adapter is 'just plumbing'.",
+      "Adapting an interface so loosely that subtle behavior differences (error codes, edge cases) leak through unnoticed.",
+      "Confusing Adapter (make incompatible interfaces work together) with Decorator (add behavior to a compatible interface)."
+    ],
+    "realWorldExample": "Database driver wrappers that expose a uniform query interface over different vendors, `.forEach` polyfills adapting array-likes to real arrays, and payment SDK wrappers unifying multiple providers behind one interface are all Adapter."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this the same as Facade? Both hide something behind a simpler interface." },
+    { "speaker": "The Translator", "message": "Close cousins, different jobs. Facade simplifies a subsystem that was ALREADY compatible in spirit. I make two genuinely incompatible interfaces work together." },
+    { "speaker": "Mentor", "message": "When do I stop writing new adapters?" },
+    { "speaker": "The Translator", "message": "When you're adapting the same system in five different places — that's a sign to consolidate into one shared adapter instead of five one-off ones." }
+  ],
+  "codeBattle": {
+    "scenario": "Your app supports Stripe today. Tomorrow you need Razorpay and PayPal. Each provider has a different API.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "adapter", "label": "Adapter" },
+      { "id": "strategy", "label": "Strategy" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "adapter",
+    "explanation": "The Translator lets each provider's mismatched API be wrapped into one common interface your checkout code already expects, without changing the original implementations."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Adapter solve?",
+      "options": [
+        "Two interfaces are incompatible and neither can be changed to match the other",
+        "An object needs to be cloned instead of constructed",
+        "A class needs exactly one instance",
+        "A complex subsystem needs a simpler interface"
+      ],
+      "answer": "Two interfaces are incompatible and neither can be changed to match the other",
+      "explanation": "Adapter's entire purpose is bridging a mismatch you can't fix at the source."
+    },
+    {
+      "question": "How does an Adapter typically work internally?",
+      "options": [
+        "It wraps the incompatible object and translates calls to match the expected interface",
+        "It rewrites the incompatible class's source code",
+        "It deletes the incompatible interface and replaces it globally",
+        "It merges both interfaces into a single new class permanently"
+      ],
+      "answer": "It wraps the incompatible object and translates calls to match the expected interface",
+      "explanation": "The adapter holds a reference to the wrapped object and converts each call's shape on the way through."
+    },
+    {
+      "question": "What's the key difference between Adapter and Facade?",
+      "options": [
+        "Adapter bridges incompatible interfaces; Facade simplifies access to an already-usable subsystem",
+        "They are the exact same pattern with different names",
+        "Facade only works with legacy code, Adapter only works with new code",
+        "Adapter requires a database, Facade does not"
+      ],
+      "answer": "Adapter bridges incompatible interfaces; Facade simplifies access to an already-usable subsystem",
+      "explanation": "Facade is about hiding complexity in a compatible subsystem; Adapter is about resolving genuine incompatibility."
+    },
+    {
+      "question": "What's a sign you're overusing the Adapter pattern?",
+      "options": [
+        "You've written many one-off adapters for the same system instead of consolidating behind one boundary",
+        "You have exactly one adapter for one legacy dependency",
+        "Your adapter implements a well-defined interface",
+        "Your adapter has unit tests"
+      ],
+      "answer": "You've written many one-off adapters for the same system instead of consolidating behind one boundary",
+      "explanation": "Adapter sprawl around the same dependency usually means it's time to unify behind one clean wrapper."
+    }
+  ]
+}

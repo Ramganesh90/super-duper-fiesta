@@ -9,7 +9,7 @@
   --color-action-red: #e0263f;
   --color-action-red-dark: #a10f24;
   --color-comic-yellow: #ffd23f;
-  --color-comic-yellow-dark: #e6a800;
+  --color-comic-yellow-dark: #8a5a00;
 
   --font-comic: var(--font-bangers), "Impact", "Arial Narrow Bold", sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -132,4 +132,11 @@ body {
 .skip-link:focus {
   left: 1rem;
   top: 1rem;
+}
+
+/* Default outlines blend into the black comic borders everything already has — make focus unmistakable */
+:focus-visible {
+  outline: 3px solid var(--color-hero-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
 }

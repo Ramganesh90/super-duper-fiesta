@@ -1,0 +1,158 @@
+{
+  "id": "composite",
+  "title": "Composite Pattern",
+  "category": "structural",
+  "difficulty": "intermediate",
+  "oneLiner": "Lets you treat a single object and a whole tree of objects through the exact same interface.",
+  "hero": {
+    "name": "Nestor",
+    "codename": "Composite",
+    "catchphrase": "One leaf, one branch, one interface.",
+    "power": "Treats individual objects and entire nested groups of them identically, so tree structures can be processed recursively with no special cases.",
+    "weakness": "Because leaves and branches share one interface, it's hard to stop someone from calling 'add child' on something that was only ever meant to be a leaf.",
+    "origin": "Nestor formed after a file-explorer's render function needed one code path for `File` and a totally different one for `Folder`, doubling every feature added.",
+    "enemies": ["Type-Checking Trees", "Special-Cased Recursion", "Leaf/Branch Duplication"],
+    "emoji": "🪆",
+    "colorFrom": "#4d7c0f",
+    "colorTo": "#a3e635"
+  },
+  "story": {
+    "problem": "Rendering a file explorer means checking `if (item instanceof File) ... else if (item instanceof Folder) { for (const child of item.children) ... }` — every new feature needs both branches written and kept in sync.",
+    "solution": "Nestor gives File and Folder the same `FileSystemItem` interface, with `getSize()`. Folder's implementation just sums its children's `getSize()` — files and folders become interchangeable to the caller.",
+    "result": "Rendering, sizing, and searching all become one recursive function with zero type-checking, whether the item is a single file or a folder nested ten levels deep."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every feature needs a File branch and a Folder branch",
+      "instanceof checks scattered through the codebase",
+      "Adding a new item type means updating every branch everywhere"
+    ],
+    "after": [
+      "One interface, one recursive function, no branches",
+      "Files and folders are fully interchangeable to callers",
+      "A new item type just implements the shared interface"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "getTotalSize() has an instanceof File branch and a separate instanceof Folder branch that loops over children.",
+      "speaker": "Developer",
+      "dialogue": "I just added a third place with this exact same File-vs-Folder branching. There has to be a better way.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Nestor arrives holding a set of nesting dolls, each one opening to reveal another.",
+      "speaker": "Nestor",
+      "dialogue": "Stop treating leaves and branches differently. Give them the SAME interface — then one function handles both, forever.",
+      "emoji": "🪆"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "File and Folder both implement getSize(). Folder's getSize() just sums its children's getSize().",
+      "speaker": "Nestor",
+      "dialogue": "Call getSize() on anything — a single file or a folder nested ten levels deep. The recursion just... works.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "getTotalSize(), render(), and search() are each a single, branch-free function.",
+      "speaker": "Developer",
+      "dialogue": "Three functions went from 40 branching lines each to one clean recursive call. No more instanceof anywhere.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "function getTotalSize(item: File | Folder): number {\n  if (item instanceof File) {\n    return item.size;\n  } else {\n    let total = 0;\n    for (const child of item.children) {\n      total += getTotalSize(child); // duplicated branching everywhere this is needed\n    }\n    return total;\n  }\n}",
+    "after": "interface FileSystemItem {\n  getSize(): number;\n}\n\nclass File implements FileSystemItem {\n  constructor(private size: number) {}\n  getSize() { return this.size; }\n}\n\nclass Folder implements FileSystemItem {\n  private children: FileSystemItem[] = [];\n  add(child: FileSystemItem) { this.children.push(child); }\n  getSize(): number {\n    return this.children.reduce((sum, child) => sum + child.getSize(), 0);\n  }\n}\n\n// No branching, no instanceof — leaf or tree, same call\nfunction getTotalSize(item: FileSystemItem): number {\n  return item.getSize();\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Your data is naturally tree-shaped (file systems, UI component trees, org charts, menu structures) with individual items and groups of items.",
+      "You want client code to treat a single object and a composite of objects identically.",
+      "Operations (size, render, search) need to apply recursively across the whole tree with no special-casing."
+    ],
+    "avoidWhen": [
+      "The structure is flat — there's no meaningful 'group of groups' to recurse through.",
+      "Leaves and branches genuinely need very different interfaces — forcing them to match hides real differences.",
+      "You need to strictly prevent leaf-only operations (like 'add child') from being callable on leaves; the shared interface makes that awkward."
+    ],
+    "commonMistakes": [
+      "Putting child-management methods (add/remove) on the shared interface, so leaves are forced to implement (or throw on) operations that make no sense for them.",
+      "Forgetting cycle protection — a folder that (accidentally or maliciously) contains itself causes infinite recursion.",
+      "Using Composite for a structure that isn't really hierarchical, just to get 'one interface' for unrelated concerns.",
+      "Not caching expensive recursive computations (like total size) on large trees, recomputing the whole subtree on every call."
+    ],
+    "realWorldExample": "The DOM (`Element` nodes containing other nodes, all sharing the `Node` interface), file systems, UI component trees, and org-chart / BOM (bill of materials) structures are classic Composite implementations."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "So a single File pretends to be a tree too?" },
+    { "speaker": "Nestor", "message": "Exactly — a File is just a tree with zero children. Give it the same interface as Folder, and every recursive operation stops needing to ask 'which kind am I?'" },
+    { "speaker": "Mentor", "message": "What if only Folders should support add()?" },
+    { "speaker": "Nestor", "message": "That's my real weakness. Putting add() on the shared interface lets someone call it on a File. Some codebases accept that trade-off; others split a narrower 'Component' interface from a 'Composite' one that only branches implement." }
+  ],
+  "codeBattle": {
+    "scenario": "Your UI framework renders individual widgets (Button, Label) and container widgets (Panel, Form) that hold other widgets, and you want render() to work identically no matter how deep the nesting goes.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "composite", "label": "Composite" },
+      { "id": "decorator", "label": "Decorator" },
+      { "id": "bridge", "label": "Bridge" },
+      { "id": "flyweight", "label": "Flyweight" }
+    ],
+    "correct": "composite",
+    "explanation": "Nestor gives every widget the same render() interface, so a single Button and a deeply nested Form both render through the identical recursive call."
+  },
+  "quiz": [
+    {
+      "question": "What structural problem does Composite solve?",
+      "options": [
+        "Client code has to special-case individual objects versus groups of objects in a tree",
+        "Two incompatible interfaces need to work together",
+        "An object needs to notify many listeners of changes",
+        "A class needs to guarantee only one instance"
+      ],
+      "answer": "Client code has to special-case individual objects versus groups of objects in a tree",
+      "explanation": "Composite's entire purpose is eliminating that leaf-vs-branch special-casing by giving both the same interface."
+    },
+    {
+      "question": "In a file-system Composite, how does a Folder typically implement `getSize()`?",
+      "options": [
+        "By recursively summing `getSize()` across all of its children",
+        "By storing a fixed size set at construction time",
+        "By always returning zero",
+        "By delegating to a Singleton size calculator"
+      ],
+      "answer": "By recursively summing `getSize()` across all of its children",
+      "explanation": "The composite's implementation of the shared operation is exactly where the recursion happens — leaves just return their own value."
+    },
+    {
+      "question": "What's a common design tension in Composite?",
+      "options": [
+        "Putting child-management methods (add/remove) on the shared interface forces leaves to support operations that don't make sense for them",
+        "Composite cannot be used with recursive functions",
+        "Every leaf must contain at least one child",
+        "Composite requires a database to track parent-child relationships"
+      ],
+      "answer": "Putting child-management methods (add/remove) on the shared interface forces leaves to support operations that don't make sense for them",
+      "explanation": "This is the classic Composite trade-off: interface uniformity versus type safety for leaf-only or branch-only operations."
+    },
+    {
+      "question": "What real-world structure is a textbook example of Composite?",
+      "options": [
+        "The DOM, where every node (element or text) shares the same base Node interface",
+        "A single global configuration object",
+        "A payment gateway with only one implementation",
+        "A quiz question bank"
+      ],
+      "answer": "The DOM, where every node (element or text) shares the same base Node interface",
+      "explanation": "The DOM's uniform Node interface across both container and leaf nodes is one of the most widely used real-world Composite implementations."
+    }
+  ]
+}

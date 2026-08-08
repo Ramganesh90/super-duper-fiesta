@@ -1,0 +1,158 @@
+{
+  "id": "proxy",
+  "title": "Proxy Pattern",
+  "category": "structural",
+  "difficulty": "intermediate",
+  "oneLiner": "Stands in for a real object, controlling, deferring, or logging access to it without the caller knowing the difference.",
+  "hero": {
+    "name": "Gatekeeper",
+    "codename": "Proxy",
+    "catchphrase": "Nothing gets to the real object without going through me first.",
+    "power": "Impersonates the real object perfectly, adding access control, caching, or lazy loading transparently in front of it.",
+    "weakness": "A proxy that doesn't perfectly mimic the real object's contract — timing, errors, edge cases — becomes a subtle source of bugs that are hard to trace back to 'oh, it's the proxy'.",
+    "origin": "Gatekeeper was summoned after a dashboard loaded every full-resolution profile image on page load, even the 400 that were never scrolled into view.",
+    "enemies": ["Wasteful Eager Loading", "Unchecked Access", "Untraceable Indirection"],
+    "emoji": "🛡️",
+    "colorFrom": "#581c87",
+    "colorTo": "#c084fc"
+  },
+  "story": {
+    "problem": "A profile page loads all 400 full-resolution avatar images immediately, even though the user only ever scrolls past 12 of them. Bandwidth and load time both suffer badly.",
+    "solution": "Gatekeeper stands in as an `ImageProxy` implementing the same `Image` interface. It only loads the real, heavy image the first time `display()` is actually called — never before.",
+    "result": "Only the images the user actually scrolls to ever load. The rest stay as lightweight proxies until (and unless) they're needed."
+  },
+  "beforeAfter": {
+    "before": [
+      "All 400 images load immediately, regardless of visibility",
+      "Bandwidth and load time paid upfront for unseen content",
+      "No way to intercept or control access to the image"
+    ],
+    "after": [
+      "Images load lazily, only when actually displayed",
+      "Bandwidth is paid only for what's actually viewed",
+      "The proxy can add caching, logging, or access checks transparently"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A network tab shows 400 full-resolution images loading on page load, most never seen.",
+      "speaker": "Developer",
+      "dialogue": "We're downloading 200MB of avatars the user will never scroll to. The page takes eight seconds to load.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "Gatekeeper stands in front of the real image, holding up a hand.",
+      "speaker": "Gatekeeper",
+      "dialogue": "Don't load the real thing yet. Let me stand in its place — I'll fetch it the moment it's actually needed, and not a second before.",
+      "emoji": "🛡️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "ImageProxy implements the same Image interface. display() lazily fetches the real image on first call.",
+      "speaker": "Gatekeeper",
+      "dialogue": "Callers can't tell me apart from the real image — same interface. I just don't do the expensive work until display() is actually invoked.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Only the 12 visible avatars ever fetch their real image. Page load drops from eight seconds to under one.",
+      "speaker": "Developer",
+      "dialogue": "We didn't change a single line of the rendering code — just swapped in proxies. Load time dropped 8x.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class RealImage {\n  constructor(private url: string) {\n    this.loadFromDisk(); // expensive, happens immediately on construction\n  }\n  private loadFromDisk() { /* fetch full-resolution image */ }\n  display() { /* render already-loaded image */ }\n}\n\n// Every image loads immediately, even ones never scrolled to\nconst avatars = urls.map((url) => new RealImage(url));",
+    "after": "interface Image {\n  display(): void;\n}\n\nclass RealImage implements Image {\n  constructor(private url: string) { this.loadFromDisk(); }\n  private loadFromDisk() { /* fetch full-resolution image */ }\n  display() { /* render already-loaded image */ }\n}\n\nclass ImageProxy implements Image {\n  private real: RealImage | null = null;\n  constructor(private url: string) {}\n\n  display() {\n    if (!this.real) {\n      this.real = new RealImage(this.url); // only loads on first real use\n    }\n    this.real.display();\n  }\n}\n\n// Nothing loads until display() is actually called\nconst avatars = urls.map((url) => new ImageProxy(url));"
+  },
+  "explanation": {
+    "useWhen": [
+      "You want to defer expensive object creation until it's actually needed (virtual proxy / lazy loading).",
+      "You need to add access control, logging, or caching in front of an object without changing its interface (protection or caching proxy).",
+      "The real object lives remotely (a network service) and you want a local stand-in that handles the communication (remote proxy)."
+    ],
+    "avoidWhen": [
+      "The object is cheap to create and access — a proxy adds indirection with no real benefit.",
+      "You can't guarantee the proxy behaves identically to the real object in every edge case (timing, errors), risking subtle bugs.",
+      "The added indirection would make debugging significantly harder for a marginal gain."
+    ],
+    "commonMistakes": [
+      "Building a proxy that doesn't perfectly match the real object's interface and error behavior, causing bugs that only show up 'through' the proxy.",
+      "Forgetting to invalidate a caching proxy, silently serving stale data forever.",
+      "Using a proxy for access control but leaving the real object independently reachable (some other code path bypasses the proxy).",
+      "Confusing Proxy (same interface, controls access) with Decorator (same interface, adds behavior) — the intents differ even when the shape looks similar."
+    ],
+    "realWorldExample": "ORMs' lazy-loaded relations (a placeholder object that fetches from the database only when a field is accessed), JavaScript's built-in `Proxy` object, API gateways / rate limiters standing in front of real services, and virtual DOM diffing are all Proxy in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from Decorator? Both wrap an object behind the same interface." },
+    { "speaker": "Gatekeeper", "message": "Decorator ADDS behavior to something already accessible. I CONTROL whether — and when — you reach the real thing at all: lazy loading, access checks, caching." },
+    { "speaker": "Mentor", "message": "What breaks if the proxy isn't careful?" },
+    { "speaker": "Gatekeeper", "message": "If I don't behave EXACTLY like the real object — same errors, same timing contract — callers get bugs they can't explain, because as far as they know, they're just talking to the real thing." }
+  ],
+  "codeBattle": {
+    "scenario": "Your app calls a third-party geocoding API that charges per request and rate-limits aggressively. The same addresses get looked up repeatedly across the app.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "proxy", "label": "Proxy" },
+      { "id": "decorator", "label": "Decorator" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "flyweight", "label": "Flyweight" }
+    ],
+    "correct": "proxy",
+    "explanation": "Gatekeeper can sit in front of the real geocoding client as a caching proxy, serving repeated lookups from cache and only hitting the real API — and the rate limit — when truly necessary."
+  },
+  "quiz": [
+    {
+      "question": "What does a Proxy do that distinguishes it from a plain wrapper?",
+      "options": [
+        "It implements the exact same interface as the real object and controls access to it — lazily, securely, or with caching",
+        "It always changes the interface of the object it wraps",
+        "It permanently replaces the real object",
+        "It requires the real object to be a Singleton"
+      ],
+      "answer": "It implements the exact same interface as the real object and controls access to it — lazily, securely, or with caching",
+      "explanation": "Matching the real object's interface exactly is what lets a proxy stand in transparently."
+    },
+    {
+      "question": "What is a 'virtual proxy' used for?",
+      "options": [
+        "Deferring expensive object creation until it's actually needed",
+        "Translating one interface into another incompatible one",
+        "Guaranteeing a single shared instance",
+        "Adding new behavior permanently to every instance of a class"
+      ],
+      "answer": "Deferring expensive object creation until it's actually needed",
+      "explanation": "Virtual proxies delay the expensive work (like loading a full-resolution image) until the moment it's genuinely required."
+    },
+    {
+      "question": "How does Proxy differ from Decorator?",
+      "options": [
+        "Proxy controls whether/when you reach the real object; Decorator adds behavior to an object you already have full access to",
+        "They are identical patterns under different names",
+        "Decorator can only be used with remote objects",
+        "Proxy always makes code faster, Decorator always makes it slower"
+      ],
+      "answer": "Proxy controls whether/when you reach the real object; Decorator adds behavior to an object you already have full access to",
+      "explanation": "The structural shape is similar, but the intent differs: access control versus behavior extension."
+    },
+    {
+      "question": "What's the biggest risk of a poorly-implemented Proxy?",
+      "options": [
+        "It doesn't perfectly replicate the real object's behavior and errors, causing bugs that are hard to trace back to the proxy",
+        "It always uses more memory than the real object",
+        "It prevents the real object from ever being created",
+        "It requires rewriting every caller of the real object"
+      ],
+      "answer": "It doesn't perfectly replicate the real object's behavior and errors, causing bugs that are hard to trace back to the proxy",
+      "explanation": "Because callers believe they're talking to the real object, any behavioral mismatch in the proxy becomes a confusing, hidden bug."
+    }
+  ]
+}
