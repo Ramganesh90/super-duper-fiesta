@@ -1,0 +1,158 @@
+{
+  "id": "static-factory-method",
+  "title": "Static Factory Method Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "A named static method that builds instances — able to return cached objects or subtypes, something a constructor can never do.",
+  "hero": {
+    "name": "The Herald",
+    "codename": "Static Factory Method",
+    "catchphrase": "A name that says what it does, not just 'new'.",
+    "power": "Constructs objects through a descriptively-named static method that can cache, validate, or return the right subtype — things a bare constructor can't do.",
+    "weakness": "Static factory methods aren't discoverable through 'implements' the way constructors are conventionally found, and you can't subclass to override construction the way real Factory Method allows.",
+    "origin": "The Herald appeared after `new Color(255, 0, 0, 255)` left every reader guessing which number was red, green, blue, or alpha — versus `Color.fromHex(\"#FF0000\")`, which explains itself.",
+    "enemies": ["Ambiguous Constructor Calls", "Redundant Object Allocation", "Undiscoverable Construction"],
+    "emoji": "🏷️",
+    "colorFrom": "#831843",
+    "colorTo": "#f9a8d4"
+  },
+  "story": {
+    "problem": "`new Color(255, 0, 0, 255)` gives no hint which number means what. Every call site needs a comment or a trip to the class definition just to know the argument order.",
+    "solution": "The Herald replaces raw constructor calls with descriptively-named static methods: `Color.fromHex(\"#FF0000\")`, `Color.fromRgb(255, 0, 0)`, `Color.transparent()`. Each name explains exactly what it builds.",
+    "result": "Call sites are self-documenting. `Color.transparent()` can even return the same cached instance every time, instead of allocating a new one for a value that never changes."
+  },
+  "beforeAfter": {
+    "before": [
+      "Constructor calls give no hint what each argument means",
+      "Every construction always allocates a brand-new object",
+      "Can't return a subtype or cached instance from a constructor"
+    ],
+    "after": [
+      "Named static methods make intent explicit at the call site",
+      "Common values (like transparent) can return a cached instance",
+      "A static method can freely return a subtype when appropriate"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A code reviewer squints at new Color(255, 0, 0, 255), unsure which number is which channel.",
+      "speaker": "Developer",
+      "dialogue": "Is the fourth argument alpha or is it hue? I have to open the Color class every single time to remember.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Herald appears holding a set of clearly labeled banners: fromHex, fromRgb, transparent.",
+      "speaker": "The Herald",
+      "dialogue": "Stop naming construction 'new'. Give it a name that says exactly what it builds — fromHex, fromRgb, transparent.",
+      "emoji": "🏷️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Color.fromHex('#FF0000') and Color.transparent() are static methods, one of which returns a cached shared instance.",
+      "speaker": "The Herald",
+      "dialogue": "The name IS the documentation. And transparent() doesn't even need to allocate — it can hand back the same cached instance, every time.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Every call site now reads clearly, with zero need to check the class definition.",
+      "speaker": "Developer",
+      "dialogue": "Color.fromHex('#FF0000') tells me exactly what it does. No more guessing games at the call site.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class Color {\n  constructor(public r: number, public g: number, public b: number, public a: number) {}\n}\n\n// What does argument order mean? Not obvious at the call site.\nconst red = new Color(255, 0, 0, 255);",
+    "after": "class Color {\n  private static readonly TRANSPARENT = new Color(0, 0, 0, 0);\n\n  private constructor(public r: number, public g: number, public b: number, public a: number) {}\n\n  static fromRgb(r: number, g: number, b: number): Color {\n    return new Color(r, g, b, 255);\n  }\n\n  static fromHex(hex: string): Color {\n    const [r, g, b] = parseHex(hex);\n    return new Color(r, g, b, 255);\n  }\n\n  // Reuses one cached instance instead of allocating every time\n  static transparent(): Color {\n    return Color.TRANSPARENT;\n  }\n}\n\nconst red = Color.fromHex(\"#FF0000\"); // self-documenting\nconst clear = Color.transparent(); // no new allocation"
+  },
+  "explanation": {
+    "useWhen": [
+      "Multiple meaningful ways exist to construct an object, and each deserves its own descriptive name.",
+      "You want to return a cached or shared instance instead of always allocating a fresh one.",
+      "You might need to return a subtype of the declared return type, which a constructor can never do."
+    ],
+    "avoidWhen": [
+      "There's only one obvious way to construct the object — a plain constructor is simpler and equally clear.",
+      "You need the class to be subclassable with construction overridden per-subclass — that's real Factory Method's job, not this idiom's.",
+      "Hiding the constructor entirely would surprise developers used to conventional `new ClassName()` discovery."
+    ],
+    "commonMistakes": [
+      "Confusing this idiom with GoF's actual Factory Method — Static Factory Method doesn't involve subclassing or an abstract creation method at all.",
+      "Forgetting to make the constructor private when the static method is meant to be the only entry point, letting callers bypass caching/validation.",
+      "Giving static factory methods vague names (`create()`) instead of descriptive ones (`fromHex()`, `transparent()`) — the whole benefit is a clear name.",
+      "Not caching genuinely reusable immutable values (like a shared 'empty' or 'zero' instance), missing an easy allocation win."
+    ],
+    "realWorldExample": "Java's `Integer.valueOf()` (caches small integers instead of always allocating), `Optional.of()`/`Optional.empty()`, and JavaScript's `Array.from()`/`Object.fromEntries()` are all Static Factory Methods."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this exactly the same as GoF's Factory Method?" },
+    { "speaker": "The Herald", "message": "Different tool entirely, despite the similar name. Factory Method uses SUBCLASSES overriding an abstract creation method. I'm just a well-named static method — no subclassing, no abstract method, often on the very class being constructed." },
+    { "speaker": "Mentor", "message": "When would I want a subtype returned instead?" },
+    { "speaker": "The Herald", "message": "Say `List.of()` — it might return an optimized internal 'immutable list' subtype behind the scenes. Callers only see the interface, `List`. A constructor could never do that; a static method can." }
+  ],
+  "codeBattle": {
+    "scenario": "Your `Optional<T>` value type needs an `empty()` case that's used constantly throughout the codebase, and you want to avoid allocating a fresh 'empty' object every single time it's needed.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "static-factory-method", "label": "Static Factory Method" },
+      { "id": "factory-method", "label": "Factory Method" },
+      { "id": "builder", "label": "Builder" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "static-factory-method",
+    "explanation": "The Herald's Optional.empty() can return one cached shared instance every time, instead of a constructor that would always allocate fresh."
+  },
+  "quiz": [
+    {
+      "question": "What can a Static Factory Method do that a plain constructor cannot?",
+      "options": [
+        "Return a cached instance or a subtype, and have a descriptive name",
+        "Accept any arguments at all",
+        "Run asynchronously",
+        "Be called more than once"
+      ],
+      "answer": "Return a cached instance or a subtype, and have a descriptive name",
+      "explanation": "Constructors always allocate a new instance of exactly the declared class; static factory methods have neither restriction."
+    },
+    {
+      "question": "How does Static Factory Method differ from GoF's Factory Method pattern?",
+      "options": [
+        "It's a single named static method, with no subclassing or abstract creation method involved",
+        "They are the exact same pattern",
+        "Static Factory Method requires an interface; Factory Method does not",
+        "Factory Method can only be used with primitive types"
+      ],
+      "answer": "It's a single named static method, with no subclassing or abstract creation method involved",
+      "explanation": "Despite the similar name, Static Factory Method is a simpler idiom — no abstract method, no subclass hierarchy required."
+    },
+    {
+      "question": "What's a real benefit of naming a factory method `fromHex()` instead of just using `new Color(...)`?",
+      "options": [
+        "The name documents exactly what the arguments mean and what gets constructed",
+        "It makes the code run faster in every case",
+        "It removes the need for any constructor at all",
+        "It automatically validates all input"
+      ],
+      "answer": "The name documents exactly what the arguments mean and what gets constructed",
+      "explanation": "Self-documenting names are the core readability win of this idiom over positional constructor arguments."
+    },
+    {
+      "question": "What's a common mistake with Static Factory Method?",
+      "options": [
+        "Forgetting to make the constructor private, letting callers bypass caching or validation logic entirely",
+        "Giving the method a descriptive name",
+        "Returning a cached instance for an immutable value",
+        "Using it alongside a private constructor"
+      ],
+      "answer": "Forgetting to make the constructor private, letting callers bypass caching or validation logic entirely",
+      "explanation": "If the raw constructor stays public, callers can skip the factory method's benefits (caching, validation) entirely."
+    }
+  ]
+}

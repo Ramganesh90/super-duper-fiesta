@@ -1,0 +1,158 @@
+{
+  "id": "lazy-initialization",
+  "title": "Lazy Initialization Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Delays creating an object until the exact moment it's first actually needed.",
+  "hero": {
+    "name": "The Procrastinator",
+    "codename": "Lazy Initialization",
+    "catchphrase": "Why build it now if nobody's asked for it yet?",
+    "power": "Defers expensive construction until the first real access, so unused objects never cost anything.",
+    "weakness": "Whoever triggers the first access unexpectedly pays the full construction cost — and in multi-threaded code, two threads can race to initialize at once if it's not synchronized.",
+    "origin": "The Procrastinator appeared after an app's startup time ballooned to 8 seconds because every feature module eagerly loaded its data on boot, whether the user ever opened that feature or not.",
+    "enemies": ["Wasteful Eager Loading", "Startup Time Bloat", "Unsynchronized Double Init"],
+    "emoji": "😴",
+    "colorFrom": "#6b21a8",
+    "colorTo": "#d8b4fe"
+  },
+  "story": {
+    "problem": "App startup eagerly constructs every feature module's data — including the rarely-used 'export to legacy format' module — adding seconds to every launch, whether or not the user ever touches it.",
+    "solution": "The Procrastinator wraps the expensive module in a lazy accessor. The module isn't constructed until the very first time something actually calls `getLegacyExporter()`.",
+    "result": "Startup time drops because unused modules are never built at all. The one time a user does need legacy export, it initializes on the spot."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every module is constructed eagerly at startup",
+      "Rarely-used features cost startup time for everyone",
+      "Startup time scales with total feature count, not usage"
+    ],
+    "after": [
+      "Modules construct only on first actual use",
+      "Rarely-used features cost nothing until touched",
+      "Startup time scales with what's actually used, not total features"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A startup profiler shows 8 seconds spent constructing twenty feature modules, most never opened.",
+      "speaker": "Developer",
+      "dialogue": "We're building the legacy exporter on every single launch, and maybe one user in a thousand ever touches it.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Procrastinator appears, yawning, refusing to build anything until someone actually asks.",
+      "speaker": "The Procrastinator",
+      "dialogue": "Why build it now? Wait until someone actually calls for it. Most of these modules will never be asked for at all.",
+      "emoji": "😴"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "getLegacyExporter() checks if the instance exists; if not, it builds it right then, on first access.",
+      "speaker": "The Procrastinator",
+      "dialogue": "The first caller pays the construction cost. Everyone before that pays nothing at all.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Startup drops to under a second. The legacy exporter builds itself the one time someone actually needs it.",
+      "speaker": "Developer",
+      "dialogue": "Startup went from 8 seconds to under 1. The features nobody uses now cost nobody anything.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class App {\n  legacyExporter = new LegacyExporter(); // built eagerly, every launch\n  pdfExporter = new PdfExporter();       // built eagerly, every launch\n  // ...eighteen more modules, all built whether used or not\n}",
+    "after": "class App {\n  private _legacyExporter: LegacyExporter | null = null;\n\n  // Built only the first time it's actually accessed\n  getLegacyExporter(): LegacyExporter {\n    if (!this._legacyExporter) {\n      this._legacyExporter = new LegacyExporter();\n    }\n    return this._legacyExporter;\n  }\n}\n\n// Most users never call this — so it's never built at all\napp.getLegacyExporter().export(data);"
+  },
+  "explanation": {
+    "useWhen": [
+      "An object is expensive to create but only sometimes (or rarely) actually used.",
+      "You want to reduce startup time by deferring non-essential initialization.",
+      "The cost of checking 'has this been created yet?' is much cheaper than construction itself."
+    ],
+    "avoidWhen": [
+      "The object is cheap to construct — laziness adds a branch for no real savings.",
+      "The object is virtually always used anyway, so deferring it just adds complexity with no benefit.",
+      "Multiple threads might trigger first access simultaneously without proper synchronization, risking a race condition."
+    ],
+    "commonMistakes": [
+      "Forgetting synchronization in multi-threaded environments, letting two threads both see 'not yet created' and construct two instances.",
+      "Making an object lazy that's needed almost immediately anyway — the deferred cost doesn't actually move, it just gets paid at an unpredictable moment.",
+      "Hiding a very expensive first-access cost behind an innocent-looking getter, surprising callers with unexpected latency.",
+      "Confusing Lazy Initialization with Singleton — they're often combined (a lazily-created single instance), but they solve different problems."
+    ],
+    "realWorldExample": "Lazily-loaded database connections, lazy image loading in web pages (`loading=\"lazy\"`), and framework dependency injection containers that construct services on first request rather than at startup are all Lazy Initialization."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this basically how Singleton's getInstance() already works?" },
+    { "speaker": "The Procrastinator", "message": "Often, yes — Singleton frequently uses me under the hood. But I'm a broader idea: ANY expensive value can be deferred this way, not just single shared instances." },
+    { "speaker": "Mentor", "message": "What goes wrong if I'm careless?" },
+    { "speaker": "The Procrastinator", "message": "Multi-threaded races. Two threads can both check 'not built yet' at the same instant and both build it — you need proper synchronization, or you'll get two instances where you expected exactly one." }
+  ],
+  "codeBattle": {
+    "scenario": "Your app's settings screen has a rarely-visited 'Advanced Diagnostics' panel that loads 50MB of debug tooling data on every app launch, even though fewer than 1% of users ever open it.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "lazy-initialization", "label": "Lazy Initialization" },
+      { "id": "object-pool", "label": "Object Pool" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "lazy-initialization",
+    "explanation": "The Procrastinator defers loading the 50MB of diagnostics data until the user actually opens that panel, keeping app launch fast for everyone else."
+  },
+  "quiz": [
+    {
+      "question": "What does Lazy Initialization primarily save?",
+      "options": [
+        "The cost of constructing objects that end up never being used",
+        "Memory used by objects that are already in active use",
+        "Network bandwidth for API calls",
+        "Disk space on the user's device"
+      ],
+      "answer": "The cost of constructing objects that end up never being used",
+      "explanation": "By deferring construction until first use, objects that are never touched never cost anything at all."
+    },
+    {
+      "question": "What's the classic multi-threaded bug risk with Lazy Initialization?",
+      "options": [
+        "Two threads can both see 'not yet created' at the same time and construct two separate instances",
+        "It always causes a memory leak",
+        "It prevents the object from ever being garbage collected",
+        "It requires a database connection to function"
+      ],
+      "answer": "Two threads can both see 'not yet created' at the same time and construct two separate instances",
+      "explanation": "Without synchronization, the check-then-create sequence isn't atomic across threads, creating a race condition."
+    },
+    {
+      "question": "When is Lazy Initialization unnecessary?",
+      "options": [
+        "When the object is cheap to construct or is used almost every time regardless",
+        "When the object is expensive and rarely used",
+        "When startup time is a measured concern",
+        "When most users never touch the feature the object supports"
+      ],
+      "answer": "When the object is cheap to construct or is used almost every time regardless",
+      "explanation": "If construction is cheap, or the object is needed anyway, deferring it adds complexity without meaningful savings."
+    },
+    {
+      "question": "How does Lazy Initialization commonly relate to Singleton?",
+      "options": [
+        "Singleton's getInstance() often uses lazy initialization internally to defer creating the single instance until first requested",
+        "They are mutually exclusive and can never be combined",
+        "Lazy Initialization requires multiple instances to exist",
+        "Singleton always initializes eagerly and never lazily"
+      ],
+      "answer": "Singleton's getInstance() often uses lazy initialization internally to defer creating the single instance until first requested",
+      "explanation": "The two patterns are frequently combined: a Singleton whose single instance is created lazily on first access."
+    }
+  ]
+}

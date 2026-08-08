@@ -22,6 +22,12 @@ import templateMethod from "@/data/patterns/template-method.json";
 import visitor from "@/data/patterns/visitor.json";
 import chainOfResponsibility from "@/data/patterns/chain-of-responsibility.json";
 import interpreter from "@/data/patterns/interpreter.json";
+import objectPool from "@/data/patterns/object-pool.json";
+import lazyInitialization from "@/data/patterns/lazy-initialization.json";
+import multiton from "@/data/patterns/multiton.json";
+import simpleFactory from "@/data/patterns/simple-factory.json";
+import parameterizedConstructor from "@/data/patterns/parameterized-constructor.json";
+import staticFactoryMethod from "@/data/patterns/static-factory-method.json";
 
 const patterns = [
   singleton,
@@ -29,6 +35,12 @@ const patterns = [
   abstractFactory,
   builder,
   prototype,
+  simpleFactory,
+  staticFactoryMethod,
+  parameterizedConstructor,
+  multiton,
+  objectPool,
+  lazyInitialization,
   adapter,
   bridge,
   composite,

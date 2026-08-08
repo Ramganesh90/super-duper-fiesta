@@ -1,0 +1,158 @@
+{
+  "id": "multiton",
+  "title": "Multiton Pattern",
+  "category": "creational",
+  "difficulty": "intermediate",
+  "oneLiner": "Guarantees exactly one instance per key, backed by a registry — Singleton's guarantee, multiplied across a lookup table.",
+  "hero": {
+    "name": "The Registrar",
+    "codename": "Multiton",
+    "catchphrase": "Not one instance — one instance PER KEY, and I keep the ledger.",
+    "power": "Maintains one guaranteed instance per key, so the same key always resolves to the exact same object.",
+    "weakness": "It's Singleton's hidden-dependency problem, multiplied by every key — a global registry in disguise, with all the same testability headaches.",
+    "origin": "The Registrar appeared after a multi-region app's logger was accidentally instantiated twice for the same 'us-east' region, causing two separate log buffers to silently split what should've been one stream.",
+    "enemies": ["Duplicate Per-Key State", "Hidden Global Registries", "Untestable Coupling"],
+    "emoji": "🗂️",
+    "colorFrom": "#0c4a6e",
+    "colorTo": "#7dd3fc"
+  },
+  "story": {
+    "problem": "A regional logger is constructed wherever it's needed: `new RegionLogger(\"us-east\")` appears in three different files. Each call creates a separate instance for the same region, splitting what should be one unified log stream.",
+    "solution": "The Registrar keeps a map from region key to logger instance. `RegionLogger.getInstance(\"us-east\")` always returns the exact same object for that key, creating it only the first time.",
+    "result": "Every part of the app sharing a region key now shares the exact same logger instance. Logs for 'us-east' are finally unified into one stream."
+  },
+  "beforeAfter": {
+    "before": [
+      "Same key constructs a new instance every time",
+      "State for the same logical key gets split across instances",
+      "No single source of truth per key"
+    ],
+    "after": [
+      "Same key always resolves to the exact same instance",
+      "State for a given key stays unified, no matter who asks",
+      "One registry is the single source of truth per key"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Two log buffers exist for 'us-east', each missing half the entries the other one has.",
+      "speaker": "Developer",
+      "dialogue": "We have two separate RegionLogger instances for the same region! No wonder the log stream looks incomplete.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Registrar appears holding a ledger, one row per region key, each pointing to exactly one logger.",
+      "speaker": "The Registrar",
+      "dialogue": "Stop constructing a new logger every time. Ask ME for the 'us-east' logger — I'll hand you the same one, every time.",
+      "emoji": "🗂️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "getInstance('us-east') checks the registry map. If it exists, return it. If not, create it once and register it.",
+      "speaker": "The Registrar",
+      "dialogue": "Ask for the same key twice, get the same object twice. The registry guarantees it, no matter who's asking or when.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "One unified log stream per region, no matter how many files ask for it.",
+      "speaker": "Developer",
+      "dialogue": "One logger per region now, guaranteed. The log stream is finally complete and unified.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Every call site constructs its own instance for the same key\nclass RegionLogger {\n  constructor(public region: string) {}\n}\n\nconst logger1 = new RegionLogger(\"us-east\"); // in file A\nconst logger2 = new RegionLogger(\"us-east\"); // in file B — a DIFFERENT object!",
+    "after": "class RegionLogger {\n  private static instances = new Map<string, RegionLogger>();\n  private constructor(public region: string) {}\n\n  static getInstance(region: string): RegionLogger {\n    if (!this.instances.has(region)) {\n      this.instances.set(region, new RegionLogger(region));\n    }\n    return this.instances.get(region)!;\n  }\n}\n\nconst logger1 = RegionLogger.getInstance(\"us-east\"); // file A\nconst logger2 = RegionLogger.getInstance(\"us-east\"); // file B\nconsole.log(logger1 === logger2); // true, always"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need Singleton's 'exactly one instance' guarantee, but scoped per key rather than globally (per tenant, per region, per connection type).",
+      "The set of valid keys is well-understood and the number of instances stays reasonable.",
+      "Multiple parts of the app need to share the exact same instance for a given key without explicitly passing it around."
+    ],
+    "avoidWhen": [
+      "A single global instance (plain Singleton) or explicit dependency injection would work just as well.",
+      "The set of keys is unbounded or attacker-controlled, risking unbounded memory growth in the registry.",
+      "You're using it as a shortcut to avoid proper dependency injection — it hides coupling exactly like Singleton does."
+    ],
+    "commonMistakes": [
+      "Letting the registry grow unbounded with dynamic or untrusted keys, silently leaking memory over time.",
+      "Using Multiton where a simple parameterized constructor plus normal dependency injection would be clearer and more testable.",
+      "Forgetting that Multiton inherits every one of Singleton's testing and hidden-coupling problems, just multiplied across keys.",
+      "Not thread-safing the registry's get-or-create logic, risking two instances being created for the same key under concurrency."
+    ],
+    "realWorldExample": "Per-tenant service instances in multi-tenant SaaS apps, per-database-connection-type client caches, and per-region configuration objects are common real-world Multiton use cases."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "So you're just... Singleton, but with a map instead of one variable?" },
+    { "speaker": "The Registrar", "message": "That's exactly it. Same guarantee — exactly one instance — just keyed instead of singular. And I inherit Singleton's exact same weakness: hidden global state, just spread across more keys." },
+    { "speaker": "Mentor", "message": "When should I reach for plain dependency injection instead?" },
+    { "speaker": "The Registrar", "message": "Almost always, honestly. If you can pass the right instance to whoever needs it explicitly, do that. I'm for cases where a global, key-based lookup genuinely can't be avoided." }
+  ],
+  "codeBattle": {
+    "scenario": "Your multi-region app needs exactly one metrics collector per AWS region, shared across every service in that region, with no duplicate collectors ever created for the same region.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "multiton", "label": "Multiton" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "object-pool", "label": "Object Pool" },
+      { "id": "factory-method", "label": "Factory Method" }
+    ],
+    "correct": "multiton",
+    "explanation": "The Registrar guarantees exactly one metrics collector per region key, unlike Singleton (only one instance total) or Object Pool (many interchangeable instances)."
+  },
+  "quiz": [
+    {
+      "question": "How does Multiton differ from Singleton?",
+      "options": [
+        "Multiton guarantees one instance per key, via a registry; Singleton guarantees exactly one instance total",
+        "They are identical patterns under different names",
+        "Multiton allows unlimited instances per key; Singleton allows none",
+        "Singleton requires a database; Multiton does not"
+      ],
+      "answer": "Multiton guarantees one instance per key, via a registry; Singleton guarantees exactly one instance total",
+      "explanation": "Multiton generalizes Singleton's guarantee across a set of keys instead of a single global instance."
+    },
+    {
+      "question": "What internal structure does Multiton typically use to enforce its guarantee?",
+      "options": [
+        "A map/registry from key to instance",
+        "A single boolean flag",
+        "A linked list of all created objects",
+        "A database table that's queried on every access"
+      ],
+      "answer": "A map/registry from key to instance",
+      "explanation": "The registry is what lets Multiton check 'does this key already have an instance?' before creating a new one."
+    },
+    {
+      "question": "What weakness does Multiton inherit directly from Singleton?",
+      "options": [
+        "Hidden global state that complicates testing and creates implicit coupling",
+        "The inability to ever have more than one instance",
+        "A requirement for asynchronous construction",
+        "Incompatibility with TypeScript"
+      ],
+      "answer": "Hidden global state that complicates testing and creates implicit coupling",
+      "explanation": "Multiton is still a global, static registry — just keyed — so it carries Singleton's classic downsides, multiplied across keys."
+    },
+    {
+      "question": "What's a risk specific to Multiton (beyond plain Singleton)?",
+      "options": [
+        "An unbounded or attacker-controlled set of keys can cause the registry to grow without limit",
+        "It can only ever store one key at a time",
+        "It cannot be used in TypeScript",
+        "It always requires network access"
+      ],
+      "answer": "An unbounded or attacker-controlled set of keys can cause the registry to grow without limit",
+      "explanation": "Because Multiton keeps one instance per distinct key, an uncontrolled key space can lead to unbounded memory growth."
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "id": "simple-factory",
+  "title": "Simple Factory Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Centralizes every 'new X()' call behind one function, hiding construction details without the full Factory Method subclass hierarchy.",
+  "hero": {
+    "name": "The Dispatcher",
+    "codename": "Simple Factory",
+    "catchphrase": "One function, every type — say what you need, I'll hand you the class.",
+    "power": "Centralizes object construction behind one function, so callers never write 'new SpecificClass()' directly.",
+    "weakness": "Unlike Factory Method, it can't be extended by subclassing — adding a new type means editing the dispatcher's own code, not just adding a new file.",
+    "origin": "The Dispatcher appeared after `new StripeGateway()`, `new PaypalGateway()`, and `new RazorpayGateway()` calls were scattered across 40 different files, each needing to know every concrete gateway class.",
+    "enemies": ["Scattered 'new' Calls", "Leaked Construction Details", "Copy-Pasted Type Checks"],
+    "emoji": "🏭",
+    "colorFrom": "#854d0e",
+    "colorTo": "#fde047"
+  },
+  "story": {
+    "problem": "Forty different files each call `new StripeGateway()` or `new PaypalGateway()` directly, depending on which provider they need. Every file has to know every concrete gateway class that exists.",
+    "solution": "The Dispatcher introduces one function, `createGateway(type)`, that hides every 'new' call behind a single switch. Callers just ask for a type by name.",
+    "result": "Forty call sites shrink to `createGateway(\"stripe\")`. No file outside the factory itself needs to know the concrete gateway classes exist."
+  },
+  "beforeAfter": {
+    "before": [
+      "Forty files each construct concrete classes directly",
+      "Every caller needs to know every concrete class",
+      "Construction logic is duplicated wherever a gateway is needed"
+    ],
+    "after": [
+      "One function centralizes every construction call",
+      "Callers only need to know a type name, not a concrete class",
+      "Construction logic exists in exactly one place"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A codebase search for 'new StripeGateway' returns 14 matches across 14 different files.",
+      "speaker": "Developer",
+      "dialogue": "We renamed the Stripe class and now I have to update 14 files that all constructed it directly.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Dispatcher appears behind a single counter, taking requests and handing back the right class.",
+      "speaker": "The Dispatcher",
+      "dialogue": "Stop calling 'new' all over your codebase. Ask ME for what you need by name — I'll hand you the right instance.",
+      "emoji": "🏭"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "createGateway('stripe') hides the concrete class behind one function that every caller shares.",
+      "speaker": "The Dispatcher",
+      "dialogue": "Only I need to know the concrete classes exist. Every caller just says the type name and gets back a working gateway.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The 14 scattered call sites collapse into one function with one switch statement.",
+      "speaker": "Developer",
+      "dialogue": "Renaming the Stripe class now means editing one file, not fourteen.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Scattered across dozens of files\nconst gateway = provider === \"stripe\" ? new StripeGateway() : new PaypalGateway();",
+    "after": "type GatewayType = \"stripe\" | \"paypal\" | \"razorpay\";\n\nfunction createGateway(type: GatewayType): PaymentGateway {\n  switch (type) {\n    case \"stripe\": return new StripeGateway();\n    case \"paypal\": return new PaypalGateway();\n    case \"razorpay\": return new RazorpayGateway();\n  }\n}\n\n// Every call site, everywhere, just does this:\nconst gateway = createGateway(\"stripe\");"
+  },
+  "explanation": {
+    "useWhen": [
+      "Multiple places in the codebase construct one of a known, small set of related classes.",
+      "You want to hide concrete class names from callers without building a full subclassed Factory Method hierarchy.",
+      "The set of types is relatively stable and doesn't need to be extended without touching the factory itself."
+    ],
+    "avoidWhen": [
+      "There's only one type being constructed — there's nothing to centralize.",
+      "The set of types needs to be extended by third parties without modifying your factory's source — that calls for real Factory Method or a registry.",
+      "The construction logic per type is trivial enough that the factory function adds more indirection than value."
+    ],
+    "commonMistakes": [
+      "Calling this 'the Factory pattern' and assuming it's the GoF Factory Method — Simple Factory isn't a formal GoF pattern, and doesn't support subclass-based extension the way Factory Method does.",
+      "Letting the switch statement grow unbounded instead of eventually graduating to Factory Method or a lookup registry once the type count gets large.",
+      "Leaking the concrete class back to the caller anyway (e.g. via casting), quietly defeating the point of centralizing construction.",
+      "Forgetting to handle the 'unknown type' case, letting an invalid input fail confusingly deep inside the factory."
+    ],
+    "realWorldExample": "UI component factories (`createIcon(name)`), logging library factories that return the right logger implementation per environment, and most `create*()`-style helper functions found in everyday codebases are Simple Factory, whether labeled that way or not."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just Factory Method?" },
+    { "speaker": "The Dispatcher", "message": "Close cousin, but simpler — and not actually a GoF pattern. Factory Method uses SUBCLASSES to let new creators be added without touching existing code. I'm one function with a switch — extending me means editing my own source." },
+    { "speaker": "Mentor", "message": "So when do I graduate from you to real Factory Method?" },
+    { "speaker": "The Dispatcher", "message": "When outside code needs to plug in NEW types without ever touching my source file. That's exactly the extension point Factory Method gives you, and I don't." }
+  ],
+  "codeBattle": {
+    "scenario": "Your app constructs one of three known logger implementations (console, file, remote) in about a dozen places, and you just want one place that hides which concrete logger class gets built.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "simple-factory", "label": "Simple Factory" },
+      { "id": "abstract-factory", "label": "Abstract Factory" },
+      { "id": "builder", "label": "Builder" },
+      { "id": "singleton", "label": "Singleton" }
+    ],
+    "correct": "simple-factory",
+    "explanation": "The Dispatcher is exactly right for a small, stable set of known types where you just want one function centralizing construction — no subclass hierarchy needed."
+  },
+  "quiz": [
+    {
+      "question": "Is Simple Factory one of the 23 official Gang of Four patterns?",
+      "options": [
+        "No — it's a widely-used idiom, but not a formal GoF pattern",
+        "Yes — it's the first pattern in the Creational category",
+        "Yes — it's the same as Abstract Factory",
+        "No — it doesn't actually exist in real codebases"
+      ],
+      "answer": "No — it's a widely-used idiom, but not a formal GoF pattern",
+      "explanation": "Simple Factory is an extremely common construction idiom, but the GoF book's actual Creational patterns are Factory Method and Abstract Factory."
+    },
+    {
+      "question": "How does Simple Factory typically decide which concrete class to construct?",
+      "options": [
+        "A single function uses a switch or lookup on a type parameter",
+        "Each concrete class is a subclass overriding a shared creation method",
+        "It always returns a Singleton instance",
+        "It reads the type from a database at compile time"
+      ],
+      "answer": "A single function uses a switch or lookup on a type parameter",
+      "explanation": "The defining trait of Simple Factory is exactly this: one function branching on a type value to decide what to construct."
+    },
+    {
+      "question": "What's the main structural limitation of Simple Factory compared to Factory Method?",
+      "options": [
+        "Adding a new type requires editing the factory's own source, rather than adding a new subclass",
+        "It can only ever construct one type of object",
+        "It cannot be called more than once",
+        "It requires inheritance to work at all"
+      ],
+      "answer": "Adding a new type requires editing the factory's own source, rather than adding a new subclass",
+      "explanation": "Factory Method's subclass-based extension point is exactly what Simple Factory trades away for simplicity."
+    },
+    {
+      "question": "When should you consider graduating from Simple Factory to real Factory Method?",
+      "options": [
+        "When outside code needs to add new types without modifying the factory's own source",
+        "When you only ever have one type to construct",
+        "When performance is the only concern",
+        "When you want to remove all construction logic entirely"
+      ],
+      "answer": "When outside code needs to add new types without modifying the factory's own source",
+      "explanation": "That open-for-extension property is exactly what formal Factory Method provides via subclassing."
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "id": "parameterized-constructor",
+  "title": "Parameterized Constructor Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Sets up varied initial object state through constructor arguments, instead of a bare constructor plus a pile of manual setters.",
+  "hero": {
+    "name": "The Customizer",
+    "codename": "Parameterized Constructor",
+    "catchphrase": "Same blueprint, different starting values — tell me what you need up front.",
+    "power": "Builds a fully-valid, correctly-configured object in one step, using arguments instead of setters called after the fact.",
+    "weakness": "Push it too far — a dozen parameters — and it becomes exactly the telescoping-constructor mess that Builder exists to fix.",
+    "origin": "The Customizer appeared after a `Point` class shipped with a no-arg constructor and two setters, allowing a Point to exist in an invalid, half-set state between `new Point()` and the second setter call.",
+    "enemies": ["Half-Constructed Objects", "Setter-After-Construction Bugs", "Telescoping Overloads"],
+    "emoji": "🎛️",
+    "colorFrom": "#52525b",
+    "colorTo": "#d4d4d8"
+  },
+  "story": {
+    "problem": "`new Point()` creates a Point at (0, 0), and code must remember to call `.setX()` and `.setY()` immediately after. Forgetting either setter leaves a Point silently sitting at the wrong coordinates.",
+    "solution": "The Customizer replaces the no-arg constructor with `new Point(x, y)`. Every Point is fully, correctly configured the instant it's constructed — there's no invalid in-between state.",
+    "result": "It's now impossible to have a half-configured Point. If you have a Point instance, its coordinates are correct by construction."
+  },
+  "beforeAfter": {
+    "before": [
+      "Objects can exist in an invalid, half-set state",
+      "Easy to forget a required setter call",
+      "Construction and configuration are two separate, error-prone steps"
+    ],
+    "after": [
+      "Objects are fully valid the moment they're constructed",
+      "Required values can't be forgotten — the constructor demands them",
+      "Construction and configuration happen in one atomic step"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A rendered shape appears at (0, 0) because a developer forgot to call setY() after construction.",
+      "speaker": "Developer",
+      "dialogue": "The point defaulted to (0, 0) because I forgot the second setter call. The compiler didn't catch it — nothing did.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Customizer appears, holding a control panel with two required dials: x and y.",
+      "speaker": "The Customizer",
+      "dialogue": "Don't leave your object half-built. Take the values you need right in the constructor — then it's never wrong.",
+      "emoji": "🎛️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "new Point(x, y) requires both values up front. There's no way to construct a Point without them.",
+      "speaker": "The Customizer",
+      "dialogue": "The compiler enforces it now. You literally cannot create a Point without both coordinates.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "Every Point in the codebase is now guaranteed to have valid coordinates from the moment it exists.",
+      "speaker": "Developer",
+      "dialogue": "That entire bug class is gone. A Point simply can't exist without valid coordinates anymore.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class Point {\n  x = 0;\n  y = 0;\n  setX(x: number) { this.x = x; }\n  setY(y: number) { this.y = y; }\n}\n\nconst p = new Point();\np.setX(10);\n// Forgot p.setY(20) — p silently sits at (10, 0)",
+    "after": "class Point {\n  constructor(public readonly x: number, public readonly y: number) {}\n}\n\n// Impossible to construct without both required values\nconst p = new Point(10, 20);\n// p is guaranteed valid the instant it exists"
+  },
+  "explanation": {
+    "useWhen": [
+      "An object has a small number of required fields that must all be set for it to be valid.",
+      "You want to make invalid, half-configured object states impossible by construction.",
+      "The object's fields should typically be immutable once created (`readonly` constructor-assigned fields)."
+    ],
+    "avoidWhen": [
+      "The object has many optional fields with complex combinations — that's Builder's job, not a long parameter list.",
+      "The number of required parameters grows past 3-4, making call sites hard to read (was that 4th argument the width or the height?).",
+      "Fields genuinely need to be set later, after construction, based on runtime conditions."
+    ],
+    "commonMistakes": [
+      "Letting a parameterized constructor grow into a 10-argument telescoping mess — that's exactly the trigger for switching to Builder.",
+      "Using a no-arg constructor plus setters purely out of habit, when required fields are known at construction time and should just be parameters.",
+      "Not marking constructor-assigned fields as `readonly`/`final` when they're meant to be immutable, leaving them open to accidental later mutation.",
+      "Overloading many constructor signatures instead of using default parameters or a Builder once the combinations multiply."
+    ],
+    "realWorldExample": "Value objects like `Point(x, y)`, `Money(amount, currency)`, and `DateRange(start, end)` — anywhere a small set of fields are always required together — use Parameterized Constructor."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... how constructors normally work?" },
+    { "speaker": "The Customizer", "message": "It should be the default, yes — but plenty of code defaults to a no-arg constructor plus setters out of habit, leaving objects in invalid states in between. I'm the reminder: if a field is required, put it in the constructor." },
+    { "speaker": "Mentor", "message": "When do I stop adding constructor parameters and switch to Builder?" },
+    { "speaker": "The Customizer", "message": "Once you're past 3 or 4 parameters, or several of them are optional. At that point, named, chainable Builder steps read far better than a long list of positional arguments." }
+  ],
+  "codeBattle": {
+    "scenario": "Your `Money` value object currently has a no-arg constructor plus `.setAmount()` and `.setCurrency()`, and a recent bug shipped a Money object with an amount set but currency left as the default 'USD' by mistake.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "parameterized-constructor", "label": "Parameterized Constructor" },
+      { "id": "builder", "label": "Builder" },
+      { "id": "factory-method", "label": "Factory Method" },
+      { "id": "prototype", "label": "Prototype" }
+    ],
+    "correct": "parameterized-constructor",
+    "explanation": "The Customizer makes both amount and currency required constructor arguments, so a Money object can never exist with one set and the other forgotten."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Parameterized Constructor solve?",
+      "options": [
+        "Objects can exist in an invalid, half-configured state between construction and required setter calls",
+        "Two incompatible interfaces need to work together",
+        "An object needs to notify listeners of state changes",
+        "A complex object needs many optional configuration steps"
+      ],
+      "answer": "Objects can exist in an invalid, half-configured state between construction and required setter calls",
+      "explanation": "Requiring values at construction time eliminates the invalid in-between state entirely."
+    },
+    {
+      "question": "What's a sign you should switch from Parameterized Constructor to Builder?",
+      "options": [
+        "The constructor has grown past 3-4 parameters, several of which are optional",
+        "The object has exactly one required field",
+        "The fields are meant to be immutable",
+        "You want to prevent invalid object states"
+      ],
+      "answer": "The constructor has grown past 3-4 parameters, several of which are optional",
+      "explanation": "That's exactly the threshold where named, chainable Builder steps become clearer than a long parameter list."
+    },
+    {
+      "question": "Why are constructor-assigned fields often marked readonly/final?",
+      "options": [
+        "Because Parameterized Constructor is often paired with immutability — the values are correct once, and shouldn't change later",
+        "Because TypeScript requires it for all classes",
+        "Because it makes the constructor run faster",
+        "Because it's required for the class to compile"
+      ],
+      "answer": "Because Parameterized Constructor is often paired with immutability — the values are correct once, and shouldn't change later",
+      "explanation": "If a field is guaranteed valid at construction and never needs to change, marking it readonly prevents accidental later mutation."
+    },
+    {
+      "question": "What's a common real-world example of Parameterized Constructor?",
+      "options": [
+        "A `Point(x, y)` or `Money(amount, currency)` value object requiring both fields at construction",
+        "A Singleton's getInstance() method",
+        "An event listener subscription",
+        "A quiz question randomizer"
+      ],
+      "answer": "A `Point(x, y)` or `Money(amount, currency)` value object requiring both fields at construction",
+      "explanation": "Value objects with a small set of always-required fields are the textbook use case for this idiom."
+    }
+  ]
+}
