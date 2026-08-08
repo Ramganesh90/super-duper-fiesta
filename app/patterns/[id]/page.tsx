@@ -73,7 +73,7 @@ export default async function PatternPage({ params }: PatternPageProps) {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <Link href={`/#category-${pattern.category}`} className="underline-offset-2 hover:underline">
+            <Link href={`/patterns#category-${pattern.category}`} className="underline-offset-2 hover:underline">
               {CATEGORY_ICONS[pattern.category]} {CATEGORY_LABELS[pattern.category]}
             </Link>
           </li>
@@ -197,7 +197,7 @@ export default async function PatternPage({ params }: PatternPageProps) {
           {CATEGORY_ORDER.filter((category) => category !== pattern.category).map((category) => (
             <li key={category}>
               <Link
-                href={`/#category-${category}`}
+                href={`/patterns#category-${category}`}
                 className="comic-border-sm inline-flex items-center gap-1.5 bg-paper px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5"
               >
                 {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}

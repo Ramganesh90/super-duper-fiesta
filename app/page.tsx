@@ -1,6 +1,7 @@
+import Link from "next/link";
 import ComicPanel from "@/components/comic/ComicPanel";
-import PatternRoster from "@/components/patterns/PatternRoster";
 import ProgressIndicator from "@/components/learning/ProgressIndicator";
+import RandomHeroButton from "@/components/homepage/RandomHeroButton";
 import { getAllPatterns } from "@/lib/patterns";
 import type { ComicPanelData } from "@/lib/types";
 
@@ -33,6 +34,7 @@ const INTRO_PANELS: ComicPanelData[] = [
 
 export default function Home() {
   const patterns = getAllPatterns();
+  const heroSummaries = patterns.map((p) => ({ id: p.id, name: p.hero.name, emoji: p.hero.emoji }));
 
   return (
     <div id="top" className="flex flex-col gap-16 pb-20 sm:gap-24">
@@ -49,7 +51,7 @@ export default function Home() {
           and walk away with real architectural intuition.
         </p>
         <a
-          href="#roster"
+          href="#showcase"
           className="comic-border font-comic mt-8 inline-block bg-action-red px-8 py-4 text-lg text-paper tracking-wide transition-transform hover:-translate-y-1 sm:text-xl"
         >
           Enter the Pattern-Verse
@@ -71,15 +73,26 @@ export default function Home() {
         <ProgressIndicator totalPatterns={patterns.length} />
       </section>
 
-      <section id="roster" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 sm:px-6">
-        <div className="mb-8 text-center">
-          <h2 className="font-comic text-4xl tracking-wide sm:text-5xl">THE PATTERN ROSTER</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-            {patterns.length} heroes and counting. Every pattern has a personality, a superpower, and a weakness.
-            Pick one and start training.
-          </p>
+      <section
+        id="showcase"
+        className="bg-halftone-yellow comic-border mx-auto w-full max-w-3xl scroll-mt-20 bg-paper-dim px-4 py-12 text-center sm:px-6 sm:py-16"
+        aria-labelledby="showcase-heading"
+      >
+        <h2 id="showcase-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
+          NOT SURE WHERE TO START?
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-ink/80 sm:text-lg">
+          Let fate pick your first pattern. Summon a random hero and see who shows up.
+        </p>
+        <div className="mt-8">
+          <RandomHeroButton patterns={heroSummaries} />
         </div>
-        <PatternRoster patterns={patterns} />
+        <Link
+          href="/patterns"
+          className="mt-10 inline-block underline-offset-4 hover:underline"
+        >
+          Or browse the full roster of {patterns.length} heroes →
+        </Link>
       </section>
     </div>
   );

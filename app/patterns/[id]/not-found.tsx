@@ -11,7 +11,7 @@ export default function PatternNotFound() {
         This pattern hasn&apos;t joined the Pattern-Verse yet. Check the roster for the heroes who have.
       </p>
       <Link
-        href="/#roster"
+        href="/patterns"
         className="comic-border-sm font-comic bg-hero-blue px-5 py-3 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
       >
         Back to the Roster
