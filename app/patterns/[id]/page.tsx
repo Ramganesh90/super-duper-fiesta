@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import PatternHeader from "@/components/patterns/PatternHeader";
 import PatternExplanation from "@/components/patterns/PatternExplanation";
 import BeforeAfter from "@/components/patterns/BeforeAfter";
-import ComicPage from "@/components/comic/ComicPage";
-import SpeechBubble from "@/components/comic/SpeechBubble";
+import ComicReader from "@/components/comic/ComicReader";
+import ConversationReader from "@/components/comic/ConversationReader";
 import CodeBlock from "@/components/code/CodeBlock";
 import CodeBattle from "@/components/learning/CodeBattle";
 import Quiz from "@/components/learning/Quiz";
@@ -92,7 +92,7 @@ export default async function PatternPage({ params }: PatternPageProps) {
         <h2 id="comic-story-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
           📖 THE COMIC STORY
         </h2>
-        <ComicPage panels={pattern.panels} accent={pattern.hero.colorFrom} />
+        <ComicReader panels={pattern.panels} accent={pattern.hero.colorFrom} />
       </section>
 
       <section aria-labelledby="problem-solution-heading" className="flex flex-col gap-4">
@@ -132,16 +132,12 @@ export default async function PatternPage({ params }: PatternPageProps) {
         <h2 id="conversation-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
           🗨️ HERO CONVERSATION
         </h2>
-        <div className="comic-border-sm flex flex-col gap-6 bg-paper-dim p-5 sm:p-8">
-          {pattern.conversation.map((line, i) => (
-            <SpeechBubble
-              key={`${line.speaker}-${i}`}
-              speaker={line.speaker}
-              message={line.message}
-              align={i % 2 === 0 ? "left" : "right"}
-              accent={line.speaker === pattern.hero.name ? pattern.hero.colorFrom : undefined}
-            />
-          ))}
+        <div className="comic-border-sm bg-paper-dim p-5 sm:p-8">
+          <ConversationReader
+            conversation={pattern.conversation}
+            heroName={pattern.hero.name}
+            accent={pattern.hero.colorFrom}
+          />
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PatternRoster from "@/components/patterns/PatternRoster";
+import GuessThePattern from "@/components/learning/GuessThePattern";
 import { getAllPatterns } from "@/lib/patterns";
 
 export const metadata: Metadata = {
@@ -21,6 +22,12 @@ export default function PatternsIndexPage() {
           Search, jump to a category, or scroll and pick one.
         </p>
       </div>
+
+      <div className="mx-auto mb-12 max-w-3xl">
+        <h2 className="sr-only">Guess the Pattern</h2>
+        <GuessThePattern patterns={patterns} />
+      </div>
+
       <PatternRoster patterns={patterns} />
     </div>
   );
