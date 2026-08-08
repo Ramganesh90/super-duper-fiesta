@@ -1,0 +1,158 @@
+{
+  "id": "builder",
+  "title": "Builder Pattern",
+  "category": "creational",
+  "difficulty": "beginner",
+  "oneLiner": "Assembles a complex object step by step, so construction logic doesn't live in one overloaded constructor.",
+  "hero": {
+    "name": "The Architect",
+    "codename": "Builder",
+    "catchphrase": "Step by step, exactly to spec.",
+    "power": "Assembles complex objects piece by piece through a clear, fluent sequence of steps.",
+    "weakness": "For a simple object with two or three fields, The Architect is pure ceremony — a plain constructor is faster.",
+    "origin": "The Architect emerged from a `new HttpRequest(url, null, null, true, false, null, 3000, null, \"GET\", null)` call that nobody could read six months later.",
+    "enemies": ["Telescoping Constructors", "Mystery Boolean Flags", "Half-Built Objects"],
+    "emoji": "🏗️",
+    "colorFrom": "#b45309",
+    "colorTo": "#fbbf24"
+  },
+  "story": {
+    "problem": "HttpRequest has a 10-argument constructor. Every call site is a wall of positional booleans and nulls that nobody can read or safely modify.",
+    "solution": "The Architect replaces the constructor with a chain of named steps: `.method(\"GET\").timeout(3000).header(...)`. Each step is self-explanatory, and only `.build()` produces the final object.",
+    "result": "Call sites read like sentences. Optional fields are simply skipped instead of passed as null, and the object can't exist half-configured."
+  },
+  "beforeAfter": {
+    "before": [
+      "10-argument constructor nobody can read",
+      "Optional fields forced into every call as null",
+      "Easy to swap two positional arguments by mistake"
+    ],
+    "after": [
+      "Fluent, self-documenting construction steps",
+      "Optional fields are simply omitted",
+      "Impossible to swap arguments — each step is named"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A ten-argument constructor call stretches across the screen, half of it null.",
+      "speaker": "Developer",
+      "dialogue": "Is the 7th argument the timeout or the retry count? I have to open the class to find out. Again.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Architect rolls out a blueprint and starts stacking labeled construction steps.",
+      "speaker": "The Architect",
+      "dialogue": "Stop cramming everything into one call. Build it step by step — name every piece as you place it.",
+      "emoji": "🏗️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "A fluent chain of named methods assembles the request, then .build() seals it.",
+      "speaker": "The Architect",
+      "dialogue": "Each step is self-explanatory. Skip what you don't need. Call build() only when it's actually ready.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The new call site reads like plain English, no nulls in sight.",
+      "speaker": "Developer",
+      "dialogue": "I can read this six months from now without opening the class. That alone was worth it.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// What does argument 7 mean? Nobody remembers.\nconst req = new HttpRequest(\n  \"https://api.example.com\",\n  null,\n  null,\n  true,\n  false,\n  null,\n  3000,\n  null,\n  \"GET\",\n  null\n);",
+    "after": "class HttpRequestBuilder {\n  private req: Partial<HttpRequest> = {};\n\n  url(url: string) { this.req.url = url; return this; }\n  method(method: string) { this.req.method = method; return this; }\n  timeout(ms: number) { this.req.timeoutMs = ms; return this; }\n  header(key: string, value: string) {\n    this.req.headers = { ...this.req.headers, [key]: value };\n    return this;\n  }\n  build(): HttpRequest {\n    if (!this.req.url) throw new Error(\"url is required\");\n    return this.req as HttpRequest;\n  }\n}\n\n// Reads like a sentence — no mystery arguments\nconst req = new HttpRequestBuilder()\n  .url(\"https://api.example.com\")\n  .method(\"GET\")\n  .timeout(3000)\n  .build();"
+  },
+  "explanation": {
+    "useWhen": [
+      "An object has many optional fields, and most combinations of them are valid.",
+      "Construction involves several steps that benefit from being explicit and named.",
+      "You want to prevent a half-configured object from ever being used (only `.build()` returns the finished object)."
+    ],
+    "avoidWhen": [
+      "The object has two or three required fields and no meaningful optional variation — a constructor is simpler.",
+      "The 'steps' don't actually need names or ordering — a plain options object achieves the same clarity.",
+      "You're building the same object shape every single time with no variation."
+    ],
+    "commonMistakes": [
+      "Building a Builder for an object that only ever has one valid configuration — pure overhead.",
+      "Forgetting to validate required fields in `.build()`, letting an incomplete object slip through.",
+      "Making the builder mutable and reusable in a way that lets one `.build()` call's state leak into the next.",
+      "Recreating a full options-object pattern but calling it 'Builder' without the fluent, guided step sequence that makes the pattern worth it."
+    ],
+    "realWorldExample": "Java's `StringBuilder`, most HTTP client libraries' request builders, and UI component libraries with fluent `.padding().color().onClick()` chains are all Builder in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Couldn't we just use an options object instead — `{ url, method, timeout }`?" },
+    { "speaker": "The Architect", "message": "You could, for simple cases. I earn my keep when construction has real steps — validation, defaults, conditional pieces — that benefit from being spelled out and chained." },
+    { "speaker": "Mentor", "message": "When am I overusing you?" },
+    { "speaker": "The Architect", "message": "When every field is required and there's only one way to build the thing. Then I'm just ceremony — use a constructor." }
+  ],
+  "codeBattle": {
+    "scenario": "Your PDF report generator has a constructor with 12 optional parameters (margins, header, footer, watermark, page size, orientation...), and half of every call site is `null`.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "builder", "label": "Builder" },
+      { "id": "prototype", "label": "Prototype" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "decorator", "label": "Decorator" }
+    ],
+    "correct": "builder",
+    "explanation": "The Architect turns those 12 positional nulls into named, optional, chainable steps that only assemble the report once .build() is called."
+  },
+  "quiz": [
+    {
+      "question": "What problem does Builder primarily solve?",
+      "options": [
+        "Constructors that need many optional parameters become unreadable and error-prone",
+        "Two objects need to be kept in sync automatically",
+        "A class needs to guarantee only one instance exists",
+        "An interface needs to be adapted to another interface"
+      ],
+      "answer": "Constructors that need many optional parameters become unreadable and error-prone",
+      "explanation": "Builder replaces a long, positional constructor with clear, named, chainable steps."
+    },
+    {
+      "question": "What typically finalizes a Builder and returns the constructed object?",
+      "options": [
+        "A terminal method like `.build()`",
+        "Automatic construction on the first `.` chain call",
+        "Garbage collection",
+        "A static factory method on the product class"
+      ],
+      "answer": "A terminal method like `.build()`",
+      "explanation": "The build step is where validation happens and the finished, immutable object is handed back."
+    },
+    {
+      "question": "When is Builder unnecessary overhead?",
+      "options": [
+        "When the object has few required fields and no meaningful optional variation",
+        "When the object has ten or more optional fields",
+        "When construction involves several conditional steps",
+        "When you want to prevent half-configured objects"
+      ],
+      "answer": "When the object has few required fields and no meaningful optional variation",
+      "explanation": "A plain constructor is simpler and clearer when there's nothing complex to guide the caller through."
+    },
+    {
+      "question": "How does Builder improve on a constructor with many positional boolean/null arguments?",
+      "options": [
+        "Each configuration step is named, so call sites are self-documenting and hard to misuse",
+        "It removes the need for any validation",
+        "It makes the object mutable forever",
+        "It guarantees the object is a singleton"
+      ],
+      "answer": "Each configuration step is named, so call sites are self-documenting and hard to misuse",
+      "explanation": "Named, chained steps replace error-prone positional arguments, making intent obvious at the call site."
+    }
+  ]
+}

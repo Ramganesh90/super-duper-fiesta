@@ -1,0 +1,158 @@
+{
+  "id": "prototype",
+  "title": "Prototype Pattern",
+  "category": "creational",
+  "difficulty": "intermediate",
+  "oneLiner": "Creates new objects by cloning a fully-configured existing one, instead of rebuilding from scratch every time.",
+  "hero": {
+    "name": "The Clone",
+    "codename": "Prototype",
+    "catchphrase": "One original. Infinite copies.",
+    "power": "Duplicates a fully-configured object instantly, sidestepping expensive or complex construction.",
+    "weakness": "Cloning gets dangerous with deep object graphs — copy the reference instead of the value, and two 'independent' clones start mutating the same shared state.",
+    "origin": "The Clone appeared after a game engine spent 40ms rebuilding an identical enemy-goblin object from scratch, a thousand times a second, instead of just copying one already-built goblin.",
+    "enemies": ["Shallow Copy Bugs", "Expensive Reconstruction", "Shared Mutable State"],
+    "emoji": "🧫",
+    "colorFrom": "#0e7490",
+    "colorTo": "#22d3ee"
+  },
+  "story": {
+    "problem": "Spawning a new enemy means re-running its entire expensive setup — loading its stats, mesh, and AI config from disk — every single time, even though 999 identical goblins were already built moments ago.",
+    "solution": "The Clone keeps one fully-built goblin around as a prototype. Spawning a new one is just `goblin.clone()` — no reconstruction, no disk reads.",
+    "result": "Spawning goblins goes from a disk-bound operation to an in-memory copy, and every clone starts from an already-valid, fully-configured state."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every new object re-runs expensive setup from scratch",
+      "Construction cost is paid again and again for identical objects",
+      "No easy way to spawn 'a copy of this, but tweaked'"
+    ],
+    "after": [
+      "New objects are copied from an already-built prototype",
+      "Construction cost is paid once, cloning is cheap",
+      "Cloning plus a small tweak replaces re-running full setup"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A profiler shows enemy spawning eating 40ms per goblin, every single spawn.",
+      "speaker": "Developer",
+      "dialogue": "Why are we reloading the goblin's mesh and stats from disk every time? We already built one two seconds ago!",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Clone steps forward holding a fully-assembled goblin, ready to duplicate.",
+      "speaker": "The Clone",
+      "dialogue": "Stop rebuilding from zero. Keep one finished original — I'll copy it instantly, every time you need another.",
+      "emoji": "🧫"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "goblin.clone() produces a fresh, independent copy in microseconds.",
+      "speaker": "The Clone",
+      "dialogue": "Implement clone() once, deep-copying anything mutable inside. After that, spawning is just calling it.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "A thousand goblins spawn in a single frame, no disk I/O in sight.",
+      "speaker": "Developer",
+      "dialogue": "Spawn time dropped from 40ms to under a microsecond. We shipped the horde level on schedule.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class Goblin {\n  constructor(configPath: string) {\n    // Expensive: reads disk, parses JSON, loads a mesh\n    const config = loadConfigFromDisk(configPath);\n    this.stats = config.stats;\n    this.mesh = loadMesh(config.meshPath);\n  }\n}\n\n// Every spawn re-pays the full construction cost\nfor (let i = 0; i < 1000; i++) {\n  spawnGoblin(new Goblin(\"goblin.json\"));\n}",
+    "after": "class Goblin {\n  constructor(public stats: Stats, public mesh: Mesh) {}\n\n  // Deep-copy anything mutable so clones are truly independent\n  clone(): Goblin {\n    return new Goblin({ ...this.stats }, this.mesh);\n  }\n}\n\nconst prototypeGoblin = new Goblin(loadStats(), loadMesh(\"goblin\"));\n\n// Every spawn is a cheap in-memory copy\nfor (let i = 0; i < 1000; i++) {\n  spawnGoblin(prototypeGoblin.clone());\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Constructing an object from scratch is expensive (disk I/O, network calls, heavy computation) but you need many similar instances.",
+      "You want to create objects whose exact class isn't known until runtime, but you have a compatible instance to copy.",
+      "You need 'this, but slightly different' instances — clone, then tweak the copy."
+    ],
+    "avoidWhen": [
+      "Construction is already cheap — cloning adds an interface (`clone()`) for no real benefit.",
+      "The object holds resources that can't be safely duplicated (open file handles, network sockets, database connections).",
+      "You can't guarantee a correct deep copy, and shallow-copy bugs would cause subtle shared-state corruption."
+    ],
+    "commonMistakes": [
+      "Doing a shallow copy of a nested object graph — two 'independent' clones end up sharing (and corrupting) the same inner array or object.",
+      "Cloning objects that hold live resources (sockets, file handles) without re-establishing those resources properly.",
+      "Using Prototype where the object is cheap to construct anyway — the cloning machinery isn't worth it.",
+      "Forgetting to override default clone behavior in subclasses, so a subclass clone silently loses its extra fields."
+    ],
+    "realWorldExample": "JavaScript's own prototype-based inheritance, `Object.create()`, cell/document duplication in design tools (Figma's 'duplicate' or a spreadsheet's 'copy row'), and game engines spawning many similar entities all lean on Prototype."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... copying an object? Why does it need a pattern name?" },
+    { "speaker": "The Clone", "message": "Because naive copying is dangerous. A shallow copy shares nested objects between 'independent' clones — mutate one, and the other silently changes too. I formalize doing it correctly." },
+    { "speaker": "Mentor", "message": "So deep copy is always the answer?" },
+    { "speaker": "The Clone", "message": "Not always — sometimes sharing an immutable piece (like a mesh that never changes) is fine and saves memory. The skill is knowing exactly what needs its own copy." }
+  ],
+  "codeBattle": {
+    "scenario": "Your document editor needs a 'Duplicate Slide' button. Each slide holds a complex tree of shapes, text boxes, and styles that took real work to construct.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "prototype", "label": "Prototype" },
+      { "id": "builder", "label": "Builder" },
+      { "id": "factory", "label": "Factory Method" },
+      { "id": "flyweight", "label": "Flyweight" }
+    ],
+    "correct": "prototype",
+    "explanation": "The Clone copies the fully-built slide (with a correct deep copy of its shape tree) instantly, instead of reconstructing an equivalent slide from scratch."
+  },
+  "quiz": [
+    {
+      "question": "What is the core idea behind the Prototype pattern?",
+      "options": [
+        "Create new objects by copying an existing, fully-configured instance",
+        "Ensure a class has exactly one instance",
+        "Assemble an object through a sequence of named construction steps",
+        "Define a family of related object-creation methods"
+      ],
+      "answer": "Create new objects by copying an existing, fully-configured instance",
+      "explanation": "Prototype's defining move is cloning a ready-made object instead of building a new one from raw inputs."
+    },
+    {
+      "question": "What's the most common bug when implementing Prototype?",
+      "options": [
+        "A shallow copy leaves clones sharing the same nested mutable object",
+        "The clone accidentally becomes a Singleton",
+        "Cloning is always slower than constructing from scratch",
+        "TypeScript doesn't allow a clone() method"
+      ],
+      "answer": "A shallow copy leaves clones sharing the same nested mutable object",
+      "explanation": "If clone() doesn't deep-copy mutable internals, 'independent' clones end up silently entangled."
+    },
+    {
+      "question": "When should you avoid Prototype?",
+      "options": [
+        "When the object holds live resources like open sockets or file handles that can't be safely duplicated",
+        "When you need to create many similar, expensive-to-construct objects",
+        "When you want a copy of an object with a small tweak applied",
+        "When the object's exact class isn't known until runtime"
+      ],
+      "answer": "When the object holds live resources like open sockets or file handles that can't be safely duplicated",
+      "explanation": "Cloning a live connection doesn't give you a second working connection — those resources need proper re-acquisition instead."
+    },
+    {
+      "question": "What real-world benefit does Prototype provide over always constructing from scratch?",
+      "options": [
+        "It skips repeating expensive setup work by copying an already-built object",
+        "It guarantees thread safety automatically",
+        "It removes the need for constructors entirely",
+        "It automatically validates the cloned object's fields"
+      ],
+      "answer": "It skips repeating expensive setup work by copying an already-built object",
+      "explanation": "The whole payoff is paying the expensive construction cost once, then cloning cheaply afterward."
+    }
+  ]
+}
