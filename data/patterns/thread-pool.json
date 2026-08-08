@@ -1,0 +1,158 @@
+{
+  "id": "thread-pool",
+  "title": "Thread Pool Pattern",
+  "category": "concurrency",
+  "difficulty": "intermediate",
+  "oneLiner": "Reuses a fixed crew of worker threads to run many tasks, instead of spawning and destroying a thread for every single one.",
+  "hero": {
+    "name": "The Crew",
+    "codename": "Thread Pool",
+    "catchphrase": "Same crew, every job. No hiring a new worker for every task.",
+    "power": "Maintains a fixed set of worker threads pulling from a shared task queue, avoiding the cost of spawning a new thread per task.",
+    "weakness": "Size the crew wrong and everything suffers — too small starves under load, too large wastes memory and burns time on context switching.",
+    "origin": "The Crew appeared after a web server spawned a brand-new OS thread for every incoming request and fell over under load, spending more time creating and destroying threads than actually serving requests.",
+    "enemies": ["Thread Creation Overhead", "Unbounded Thread Growth", "Context-Switch Thrashing"],
+    "emoji": "🧵",
+    "colorFrom": "#365314",
+    "colorTo": "#bef264"
+  },
+  "story": {
+    "problem": "Every incoming HTTP request spawns a brand-new OS thread. Under a traffic spike, thread creation and teardown overhead alone consumes more CPU than actually handling requests, and the server falls over.",
+    "solution": "The Crew pre-creates a fixed pool of 20 worker threads at startup. Incoming requests are placed on a shared queue; idle workers pull the next request the instant they're free.",
+    "result": "Thread creation happens exactly 20 times, at startup — never again. The server handles traffic spikes by queueing, not by exploding its thread count."
+  },
+  "beforeAfter": {
+    "before": [
+      "A new thread is created and destroyed for every task",
+      "Thread creation overhead dominates under heavy load",
+      "Thread count grows unbounded with incoming traffic"
+    ],
+    "after": [
+      "A fixed set of threads is created exactly once",
+      "Thread creation overhead is paid only at startup",
+      "Thread count stays capped no matter how much traffic arrives"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A server monitor shows CPU usage spiking not from request handling, but from constant thread creation and teardown.",
+      "speaker": "Developer",
+      "dialogue": "We're spending more CPU spinning up and tearing down threads than actually serving requests. This traffic spike is killing us.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Crew appears — twenty workers standing ready, no hiring needed for the next job.",
+      "speaker": "The Crew",
+      "dialogue": "Stop hiring a new worker for every task. Keep the same crew on hand — we'll pull the next job the instant we're free.",
+      "emoji": "🧵"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Twenty pre-created worker threads pull tasks from a shared queue. New requests just get queued, never spawn a thread.",
+      "speaker": "The Crew",
+      "dialogue": "We were created once, at startup. Every request after that just waits in line for the next free worker — no new threads, ever.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The same traffic spike now just grows the queue briefly, with thread count never moving.",
+      "speaker": "Developer",
+      "dialogue": "Thread count stays flat at 20 no matter what traffic throws at us. Requests queue gracefully instead of crashing the server.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "server.on(\"request\", (req, res) => {\n  spawnThread(() => {\n    handleRequest(req, res); // a brand-new OS thread, every single request\n  });\n});",
+    "after": "class ThreadPool {\n  private queue: Task[] = [];\n  private workers: Worker[];\n\n  constructor(size: number) {\n    // Created exactly once, at startup\n    this.workers = Array.from({ length: size }, () => this.spawnWorker());\n  }\n\n  submit(task: Task) {\n    this.queue.push(task); // never spawns a new thread\n  }\n\n  private spawnWorker(): Worker {\n    return runLoop(async () => {\n      while (true) {\n        const task = this.queue.shift();\n        if (task) await task.run();\n        else await yieldToScheduler();\n      }\n    });\n  }\n}\n\nconst pool = new ThreadPool(20);\nserver.on(\"request\", (req, res) => {\n  pool.submit({ run: () => handleRequest(req, res) });\n});"
+  },
+  "explanation": {
+    "useWhen": [
+      "You process many short-lived tasks and thread creation/teardown overhead is a measurable cost.",
+      "You need to cap concurrent resource usage (threads, memory) under unpredictable load.",
+      "Tasks are roughly independent and can be processed in any order by any available worker."
+    ],
+    "avoidWhen": [
+      "Task volume is low enough that thread creation overhead was never actually a bottleneck.",
+      "Tasks are long-running or blocking in ways that would starve the fixed-size pool — you'd need a much larger pool or a different model entirely.",
+      "Your runtime already provides a well-tuned thread/worker pool (many frameworks and languages do) — building your own duplicates that work."
+    ],
+    "commonMistakes": [
+      "Sizing the pool too small, causing tasks to queue and starve under load even though CPU capacity exists.",
+      "Sizing the pool too large, wasting memory and causing excessive context-switching overhead that hurts throughput.",
+      "Submitting long-blocking tasks to a pool sized for short, fast tasks, starving the rest of the queue.",
+      "Not monitoring queue depth, missing the early warning signs of a pool that's undersized for current load."
+    ],
+    "realWorldExample": "Web server worker pools (Node.js's libuv thread pool, Java's `ExecutorService`, most HTTP server frameworks), and database connection pools' 'worker' counterparts, are all Thread Pool in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from Object Pool?" },
+    { "speaker": "The Crew", "message": "Same core idea — reuse instead of recreate — applied specifically to threads instead of arbitrary objects. I manage WORKERS that pull TASKS from a queue; Object Pool manages reusable objects that get borrowed and returned directly." },
+    { "speaker": "Mentor", "message": "How do I pick the right crew size?" },
+    { "speaker": "The Crew", "message": "That's the real art. Too few, and tasks queue up and starve even with spare CPU capacity. Too many, and you're burning memory and context-switch time on workers that mostly wait around. Measure, don't guess." }
+  ],
+  "codeBattle": {
+    "scenario": "Your image-resizing API spawns a new OS thread for every incoming resize request, and under a traffic spike the server spends most of its CPU just creating and destroying threads instead of resizing images.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "thread-pool", "label": "Thread Pool" },
+      { "id": "object-pool", "label": "Object Pool" },
+      { "id": "reactor", "label": "Reactor" },
+      { "id": "active-object", "label": "Active Object" }
+    ],
+    "correct": "thread-pool",
+    "explanation": "The Crew pre-creates a fixed set of worker threads once, so resize requests queue and get processed without ever paying thread-creation cost per request."
+  },
+  "quiz": [
+    {
+      "question": "What does Thread Pool primarily save?",
+      "options": [
+        "The overhead of creating and destroying a thread for every task",
+        "The memory used by task data itself",
+        "Network bandwidth",
+        "Disk I/O for logging"
+      ],
+      "answer": "The overhead of creating and destroying a thread for every task",
+      "explanation": "Thread Pool's entire value is amortizing thread creation cost across many reused workers instead of paying it per task."
+    },
+    {
+      "question": "What happens when more tasks arrive than there are available worker threads?",
+      "options": [
+        "Tasks wait in a queue until a worker becomes free",
+        "New threads are spawned automatically without limit",
+        "The extra tasks are silently dropped",
+        "The entire pool crashes"
+      ],
+      "answer": "Tasks wait in a queue until a worker becomes free",
+      "explanation": "Queueing excess tasks, rather than spawning unlimited threads, is exactly what keeps thread count capped and predictable."
+    },
+    {
+      "question": "What's the risk of sizing a Thread Pool too small?",
+      "options": [
+        "Tasks queue up and starve even when there's spare CPU capacity available",
+        "It uses too much memory",
+        "It creates too many threads",
+        "It becomes impossible to submit any tasks at all"
+      ],
+      "answer": "Tasks queue up and starve even when there's spare CPU capacity available",
+      "explanation": "An undersized pool can bottleneck throughput even when the machine has room to do more concurrent work."
+    },
+    {
+      "question": "How does Thread Pool differ from Object Pool?",
+      "options": [
+        "Thread Pool manages reusable worker threads pulling tasks from a queue; Object Pool manages reusable objects borrowed and returned directly",
+        "They are the exact same pattern with different names",
+        "Object Pool can only be used with threads",
+        "Thread Pool requires a database connection to function"
+      ],
+      "answer": "Thread Pool manages reusable worker threads pulling tasks from a queue; Object Pool manages reusable objects borrowed and returned directly",
+      "explanation": "Both apply the same 'reuse instead of recreate' idea, but to different kinds of expensive resources."
+    }
+  ]
+}

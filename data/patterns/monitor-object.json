@@ -1,0 +1,158 @@
+{
+  "id": "monitor-object",
+  "title": "Monitor Object Pattern",
+  "category": "concurrency",
+  "difficulty": "advanced",
+  "oneLiner": "Ensures only one thread executes any of an object's methods at a time, with built-in waiting for the right conditions.",
+  "hero": {
+    "name": "The Sentinel",
+    "codename": "Monitor Object",
+    "catchphrase": "One thread in this room at a time. Everyone else waits their turn, safely.",
+    "power": "Synchronizes every method on an object so only one thread executes any of them at once, coordinating waiting threads through built-in conditions.",
+    "weakness": "A lock around too much code turns parallel work into serial work — an overly broad monitor kills the very concurrency you needed in the first place.",
+    "origin": "The Sentinel appeared after a shared BankAccount object let two threads both read a balance of $100, both approve a $60 withdrawal, and both succeed — leaving the account at -$20 with nobody noticing the race.",
+    "enemies": ["Race Conditions", "Torn Reads", "Deadlocks From Broad Locking"],
+    "emoji": "🔒",
+    "colorFrom": "#991b1b",
+    "colorTo": "#fca5a5"
+  },
+  "story": {
+    "problem": "Two threads both call `withdraw(60)` on a shared BankAccount with a $100 balance at nearly the same instant. Both read $100, both see enough funds, both succeed — draining the account to -$20.",
+    "solution": "The Sentinel wraps every method on BankAccount so only one thread can execute any of them at a time. The second `withdraw()` call simply waits until the first one fully finishes.",
+    "result": "Only one withdrawal executes at a time. The second thread sees the correctly updated balance and is safely rejected if funds are now insufficient."
+  },
+  "beforeAfter": {
+    "before": [
+      "Multiple threads can execute methods on the same object simultaneously",
+      "Reads and writes can interleave unpredictably",
+      "Race conditions silently corrupt shared state"
+    ],
+    "after": [
+      "Only one thread executes any method on the object at a time",
+      "Reads and writes never interleave",
+      "Shared state stays consistent no matter how many threads call in"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A bank account log shows two withdrawals of $60 both succeeding against a $100 balance.",
+      "speaker": "Developer",
+      "dialogue": "The account is at negative twenty dollars. Both withdrawals read the same starting balance and both went through!",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Sentinel stands at the account's only door, letting exactly one thread in at a time.",
+      "speaker": "The Sentinel",
+      "dialogue": "Stop letting threads barge in simultaneously. One thread executes a method on this account at a time. Everyone else waits.",
+      "emoji": "🔒"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "withdraw() acquires the object's lock before running, releases it after. A second call simply waits its turn.",
+      "speaker": "The Sentinel",
+      "dialogue": "The second withdraw() call doesn't even start until the first is completely done. It sees the TRUE, updated balance.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The second $60 withdrawal now correctly fails against the true $40 remaining balance.",
+      "speaker": "Developer",
+      "dialogue": "The second withdrawal now correctly sees $40 left and gets rejected. No more phantom negative balances.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class BankAccount {\n  balance = 100;\n\n  withdraw(amount: number) {\n    if (this.balance >= amount) {\n      // Another thread can interleave right here, between the check and the update\n      this.balance -= amount;\n      return true;\n    }\n    return false;\n  }\n}",
+    "after": "class BankAccount {\n  private balance = 100;\n  private mutex = new Mutex(); // only one thread inside at a time\n\n  async withdraw(amount: number): Promise<boolean> {\n    return this.mutex.runExclusive(() => {\n      // No other thread can be inside ANY method on this object right now\n      if (this.balance >= amount) {\n        this.balance -= amount;\n        return true;\n      }\n      return false;\n    });\n  }\n\n  async deposit(amount: number): Promise<void> {\n    return this.mutex.runExclusive(() => {\n      this.balance += amount;\n    });\n  }\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "Multiple threads share access to the same mutable object, and unsynchronized access could corrupt its state.",
+      "You need a thread to wait for a specific condition on the shared object (like 'balance is sufficient') before proceeding.",
+      "The correctness cost of a race condition (financial data, inventory counts) is high enough to justify the synchronization overhead."
+    ],
+    "avoidWhen": [
+      "The object's state is immutable, or only ever accessed from a single thread — there's no race to prevent.",
+      "The lock would need to cover a large, slow operation, serializing work that should run in parallel.",
+      "A lock-free or higher-level concurrency primitive (atomic operations, channels) fits the problem better."
+    ],
+    "commonMistakes": [
+      "Locking around more code than necessary, turning genuinely parallelizable work into a serial bottleneck.",
+      "Forgetting that a monitor only protects against concurrent access WITHIN itself — external state accessed outside the monitor is still unprotected.",
+      "Creating deadlocks by acquiring multiple monitors' locks in inconsistent orders across different code paths.",
+      "Using a monitor as a substitute for actually thinking about the concurrency model, instead of designing for it deliberately."
+    ],
+    "realWorldExample": "Java's `synchronized` methods, C#'s `lock` statement, and any class using a mutex to guard all of its public methods are Monitor Object in practice — it's one of the most fundamental concurrency patterns in mainstream languages."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... putting a lock around a class?" },
+    { "speaker": "The Sentinel", "message": "That's the mechanism, yes — but the discipline matters. EVERY method that touches shared state needs the same lock, consistently, or you get partial protection that's worse than none at all — false confidence." },
+    { "speaker": "Mentor", "message": "What's your biggest danger?" },
+    { "speaker": "The Sentinel", "message": "Locking too broadly. Wrap an entire slow operation in my protection and you've turned parallel work into a single-file line — sometimes worse for performance than having no synchronization design at all." }
+  ],
+  "codeBattle": {
+    "scenario": "Your inventory service lets two warehouse workers simultaneously decrement the same product's stock count, and under load the count occasionally goes negative because both reads happen before either write.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "monitor-object", "label": "Monitor Object" },
+      { "id": "active-object", "label": "Active Object" },
+      { "id": "singleton", "label": "Singleton" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "monitor-object",
+    "explanation": "The Sentinel ensures only one thread can execute the stock-decrement method at a time, eliminating the read-then-write race that let the count go negative."
+  },
+  "quiz": [
+    {
+      "question": "What guarantee does a Monitor Object provide?",
+      "options": [
+        "Only one thread can execute any of the object's synchronized methods at a time",
+        "Every thread executes methods simultaneously without any waiting",
+        "The object can never be accessed by more than one thread ever",
+        "Method calls are automatically retried on failure"
+      ],
+      "answer": "Only one thread can execute any of the object's synchronized methods at a time",
+      "explanation": "This mutual exclusion across all synchronized methods is the defining guarantee of Monitor Object."
+    },
+    {
+      "question": "What's the classic bug Monitor Object prevents?",
+      "options": [
+        "A race condition where two threads read stale shared state before either writes an update",
+        "A memory leak from unclosed file handles",
+        "An interface mismatch between two classes",
+        "A missing null check on user input"
+      ],
+      "answer": "A race condition where two threads read stale shared state before either writes an update",
+      "explanation": "The classic 'check-then-act' race (like the bank withdrawal example) is exactly what mutual exclusion prevents."
+    },
+    {
+      "question": "What's a common mistake that reduces Monitor Object's effectiveness?",
+      "options": [
+        "Locking around only some methods that touch shared state, leaving others unsynchronized",
+        "Synchronizing every method that touches shared state consistently",
+        "Using a mutex to guard the object's methods",
+        "Applying it to genuinely shared mutable state"
+      ],
+      "answer": "Locking around only some methods that touch shared state, leaving others unsynchronized",
+      "explanation": "Partial synchronization gives false confidence — any unsynchronized method leaves a gap for the same race condition."
+    },
+    {
+      "question": "What's a mainstream language feature that implements Monitor Object directly?",
+      "options": [
+        "Java's `synchronized` keyword on methods",
+        "TypeScript's `interface` keyword",
+        "SQL's `SELECT` statement",
+        "HTML's `<script>` tag"
+      ],
+      "answer": "Java's `synchronized` keyword on methods",
+      "explanation": "`synchronized` methods are a built-in, language-level implementation of the Monitor Object pattern."
+    }
+  ]
+}

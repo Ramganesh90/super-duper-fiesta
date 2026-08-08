@@ -1,0 +1,158 @@
+{
+  "id": "proactor",
+  "title": "Proactor Pattern",
+  "category": "concurrency",
+  "difficulty": "advanced",
+  "oneLiner": "Hands the entire I/O operation to the OS and gets notified only when it's fully complete — no readiness polling required.",
+  "hero": {
+    "name": "The Delegate",
+    "codename": "Proactor",
+    "catchphrase": "Don't wait for it to be ready — hand it off, and I'll tell you when it's DONE.",
+    "power": "Delegates the actual I/O operation to the OS/runtime, freeing the calling thread entirely until a completion notification arrives.",
+    "weakness": "True async I/O completion support isn't available everywhere, and completion-based code can be genuinely harder to reason about than simple readiness-based code.",
+    "origin": "The Delegate appeared inside a file-processing service where the Reactor pattern still required the app to actively read once notified — an extra step that async disk I/O could skip entirely.",
+    "enemies": ["Redundant Read/Write Calls", "Platform Inconsistency", "Completion-Order Confusion"],
+    "emoji": "📬",
+    "colorFrom": "#5b21b6",
+    "colorTo": "#ddd6fe"
+  },
+  "story": {
+    "problem": "A Reactor-based file service gets notified when a file descriptor is 'readable', then still has to perform the actual read itself — an extra round-trip that, for disk I/O, the OS could have done directly.",
+    "solution": "The Delegate hands the OS the entire read operation upfront — buffer and all. The OS performs it asynchronously and notifies the app only once the data is fully copied into the buffer.",
+    "result": "The app thread never touches the read operation itself. It submits the request once and reacts only to a 'here's your finished data' notification."
+  },
+  "beforeAfter": {
+    "before": [
+      "App is notified when I/O is merely ready, then must perform it itself",
+      "An extra read/write call happens on every I/O readiness event",
+      "The app thread does real work for every I/O operation"
+    ],
+    "after": [
+      "App submits the operation once; the OS performs it entirely",
+      "The app is notified only when the operation is fully complete",
+      "The app thread does no I/O work itself — just handles the result"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A profiler shows the app performing a read() call immediately after every single readiness notification, every time.",
+      "speaker": "Developer",
+      "dialogue": "Every readiness event is immediately followed by us calling read() ourselves. Couldn't the OS just do the whole thing and tell us when it's done?",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Delegate appears holding a sealed package, handing the entire task to a courier.",
+      "speaker": "The Delegate",
+      "dialogue": "Don't wait to be told 'it's ready to read'. Hand the WHOLE operation to the OS — I'll tell you the moment it's actually finished.",
+      "emoji": "📬"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "readAsync(buffer) submits the entire operation to the OS. A completion handler fires only once the buffer is fully filled.",
+      "speaker": "The Delegate",
+      "dialogue": "You never call read() yourself. The OS performs it entirely and hands you the finished buffer through the completion callback.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The redundant read() call disappears entirely from the app's hot path.",
+      "speaker": "Developer",
+      "dialogue": "The app thread doesn't touch the I/O operation at all anymore. It just reacts to finished results.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Reactor-style: notified when READY, then must perform the read ourselves\nreactor.watch(fileHandle, \"readable\", () => {\n  const buffer = Buffer.alloc(4096);\n  fileHandle.readSync(buffer); // still our job to actually perform the I/O\n  process(buffer);\n});",
+    "after": "// Proactor-style: submit the WHOLE operation, get notified on COMPLETION\nconst buffer = Buffer.alloc(4096);\n\nfileHandle.readAsync(buffer, (err, bytesRead) => {\n  // Called only once the OS has fully completed the read into `buffer`\n  if (!err) process(buffer.subarray(0, bytesRead));\n});\n\n// The calling thread is free immediately — no polling, no manual read() call"
+  },
+  "explanation": {
+    "useWhen": [
+      "The platform provides true asynchronous I/O completion (Windows IOCP, io_uring on Linux, or a runtime built on them).",
+      "You want to eliminate the extra 'notified ready, then perform the operation' round-trip that Reactor requires.",
+      "I/O throughput at scale matters enough to justify the added complexity of completion-based programming."
+    ],
+    "avoidWhen": [
+      "The platform doesn't support efficient async I/O completion — a hand-rolled Proactor may perform worse than a well-tuned Reactor.",
+      "The added complexity of completion-based (vs. readiness-based) reasoning isn't worth it for your actual I/O volume.",
+      "Your runtime's async I/O abstraction already handles this for you (many modern async runtimes blend Reactor and Proactor internally)."
+    ],
+    "commonMistakes": [
+      "Assuming Proactor and Reactor are interchangeable — mixing readiness-based and completion-based assumptions in the same codebase causes subtle bugs.",
+      "Not handling partial completions or errors in the completion callback, assuming every operation always fully succeeds.",
+      "Overestimating platform support — true async I/O completion isn't uniformly available across every OS and file/network I/O type.",
+      "Building a hand-rolled Proactor when the runtime (like .NET's async I/O or a modern async runtime) already provides one, tested and tuned."
+    ],
+    "realWorldExample": "Windows I/O Completion Ports (IOCP), Linux's io_uring, and .NET's asynchronous file/socket APIs are real-world Proactor implementations, often abstracted away by higher-level async/await runtimes."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this actually different from Reactor? Both feel 'asynchronous'." },
+    { "speaker": "The Delegate", "message": "The difference is WHO does the I/O. Reactor tells you 'this is ready — go read it yourself'. I perform the entire read for you and only notify you once it's genuinely finished." },
+    { "speaker": "Mentor", "message": "So why isn't everyone always using you instead of Reactor?" },
+    { "speaker": "The Delegate", "message": "Because true async completion needs real OS support — IOCP, io_uring — which isn't uniform everywhere. Reactor's readiness model is simpler and more portable, which is exactly why it's so much more common." }
+  ],
+  "codeBattle": {
+    "scenario": "Your high-throughput file-processing service on Windows needs to issue thousands of disk reads per second with minimal thread overhead, and the platform offers native async I/O completion support (IOCP).",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "proactor", "label": "Proactor" },
+      { "id": "reactor", "label": "Reactor" },
+      { "id": "thread-pool", "label": "Thread Pool" },
+      { "id": "active-object", "label": "Active Object" }
+    ],
+    "correct": "proactor",
+    "explanation": "The Delegate lets the OS perform each read entirely via IOCP, notifying the app only on completion, avoiding both thread-per-read overhead and the extra readiness-then-read round-trip."
+  },
+  "quiz": [
+    {
+      "question": "What is the key difference between Proactor and Reactor?",
+      "options": [
+        "Proactor is notified when an I/O operation is fully complete; Reactor is notified when I/O is merely ready to be performed",
+        "They are exactly the same pattern",
+        "Reactor requires more threads than Proactor in every case",
+        "Proactor can only be used for network I/O, never disk I/O"
+      ],
+      "answer": "Proactor is notified when an I/O operation is fully complete; Reactor is notified when I/O is merely ready to be performed",
+      "explanation": "This readiness-vs-completion distinction is the defining difference between the two patterns."
+    },
+    {
+      "question": "What does the calling thread do in a Proactor-based read?",
+      "options": [
+        "Submits the operation once, then does nothing until a completion notification arrives",
+        "Continuously polls the file descriptor for readiness",
+        "Performs the entire read itself, synchronously",
+        "Spawns a new thread for every byte read"
+      ],
+      "answer": "Submits the operation once, then does nothing until a completion notification arrives",
+      "explanation": "The whole point of Proactor is that the calling thread never performs the I/O operation itself."
+    },
+    {
+      "question": "What limits Proactor's applicability in practice?",
+      "options": [
+        "True asynchronous I/O completion support isn't uniformly available across every OS and I/O type",
+        "It can only be used with exactly one file at a time",
+        "It requires a database connection",
+        "It cannot be combined with async/await"
+      ],
+      "answer": "True asynchronous I/O completion support isn't uniformly available across every OS and I/O type",
+      "explanation": "Mechanisms like IOCP and io_uring exist, but aren't as universally available as basic readiness notification (used by Reactor)."
+    },
+    {
+      "question": "What's a real-world example of the Proactor pattern?",
+      "options": [
+        "Windows I/O Completion Ports (IOCP)",
+        "Node.js's event loop",
+        "A relational database index",
+        "The HTTP request/response cycle"
+      ],
+      "answer": "Windows I/O Completion Ports (IOCP)",
+      "explanation": "IOCP is a textbook OS-level Proactor implementation, notifying applications only once an I/O operation has fully completed."
+    }
+  ]
+}

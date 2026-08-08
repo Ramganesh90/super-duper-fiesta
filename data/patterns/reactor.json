@@ -1,0 +1,158 @@
+{
+  "id": "reactor",
+  "title": "Reactor Pattern",
+  "category": "concurrency",
+  "difficulty": "advanced",
+  "oneLiner": "Handles many concurrent I/O sources with a single thread, dispatching to the right handler the instant each one is ready.",
+  "hero": {
+    "name": "The Watchtower",
+    "codename": "Reactor",
+    "catchphrase": "One thread, watching everything, dispatching the instant it's ready.",
+    "power": "Watches many I/O sources at once from a single thread, dispatching each event to its registered handler the moment it's ready.",
+    "weakness": "One slow or blocking handler stalls the entire event loop — every other connection waits behind it.",
+    "origin": "The Watchtower appeared after a server spawned a new thread per connection and collapsed under 10,000 simultaneous clients, each thread eating memory just to sit idle waiting for data.",
+    "enemies": ["Thread-Per-Connection Overload", "Blocking Handlers", "Idle Resource Waste"],
+    "emoji": "🗼",
+    "colorFrom": "#0f172a",
+    "colorTo": "#7dd3fc"
+  },
+  "story": {
+    "problem": "A server spawns one thread per client connection. At 10,000 concurrent connections, most idle and waiting, the server runs out of memory just from thread overhead.",
+    "solution": "The Watchtower replaces one-thread-per-connection with a single event loop that watches all sockets at once, using the OS's readiness notification (like `epoll`) to know exactly when each socket has data.",
+    "result": "One thread now handles all 10,000 connections. CPU and memory usage scale with actual activity, not the raw connection count."
+  },
+  "beforeAfter": {
+    "before": [
+      "One OS thread allocated per connection, mostly idle",
+      "Memory and context-switch overhead scale with connection count",
+      "Thousands of idle threads for thousands of idle connections"
+    ],
+    "after": [
+      "One thread watches every connection via readiness notification",
+      "Memory scales with actual activity, not connection count",
+      "Thousands of idle connections cost almost nothing"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A server monitor shows 10,000 threads, 9,900 of them idle, all eating memory just waiting for data.",
+      "speaker": "Developer",
+      "dialogue": "We're out of memory and 99% of these threads are just sitting there, doing absolutely nothing but waiting.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Watchtower appears on one high perch, scanning every connection at once.",
+      "speaker": "The Watchtower",
+      "dialogue": "You don't need a thread per connection. Give me one thread — I'll watch everything, and only wake up work when there's actually something ready.",
+      "emoji": "🗼"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "One event loop asks the OS which sockets have data ready, then dispatches to each socket's registered handler.",
+      "speaker": "The Watchtower",
+      "dialogue": "The OS tells me exactly who's ready. I dispatch to the right handler instantly, then go back to watching everyone else.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The same server now handles 10,000 idle connections on one thread with minimal memory.",
+      "speaker": "Developer",
+      "dialogue": "One thread, 10,000 connections, and memory usage barely moved. The idle ones cost us almost nothing now.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// One thread per connection — doesn't scale\nserver.on(\"connection\", (socket) => {\n  spawnThread(() => {\n    while (socket.connected) {\n      const data = socket.blockingRead(); // this thread just sits here, mostly idle\n      handle(data);\n    }\n  });\n});",
+    "after": "// One event loop, watching every socket via OS readiness notification\nconst reactor = createEventLoop();\n\nfunction registerHandler(socket: Socket, handler: (data: Buffer) => void) {\n  reactor.watch(socket, \"readable\", () => {\n    const data = socket.readNonBlocking();\n    handler(data); // dispatched only when data is actually ready\n  });\n}\n\nserver.on(\"connection\", (socket) => {\n  registerHandler(socket, (data) => handle(data));\n});\n\nreactor.run(); // single thread services every registered socket"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to handle a very large number of mostly-idle concurrent connections (chat servers, long-poll APIs, IoT device fleets).",
+      "Thread-per-connection overhead (memory, context switching) is the actual bottleneck.",
+      "I/O readiness notification is available from the OS or runtime (epoll, kqueue, IOCP, or a language runtime built on them)."
+    ],
+    "avoidWhen": [
+      "Connection counts are small enough that thread-per-connection isn't actually a problem.",
+      "Handlers do genuinely CPU-heavy work — a Reactor's single thread means one slow handler blocks everyone else.",
+      "The platform/runtime doesn't provide efficient readiness notification, making a hand-rolled reactor slower than the alternative."
+    ],
+    "commonMistakes": [
+      "Putting CPU-bound or blocking work directly in a Reactor handler, stalling the entire event loop for every other connection.",
+      "Reimplementing a Reactor from scratch instead of using a mature runtime that already provides one (Node.js, Netty, nginx all have battle-tested reactors built in).",
+      "Not handling partial reads/writes correctly, since non-blocking I/O may return less data than expected on any given call.",
+      "Confusing Reactor (notified when I/O is ready to be performed) with Proactor (notified when I/O is already complete)."
+    ],
+    "realWorldExample": "Node.js's event loop, nginx's connection handling, Redis's single-threaded event loop, and Java NIO's Selector are all real-world Reactor implementations."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "This sounds like it's just... Node.js's whole architecture." },
+    { "speaker": "The Watchtower", "message": "Exactly right — Node's entire event loop is a Reactor. One thread, watching everything, dispatching callbacks the instant something's ready to read or write." },
+    { "speaker": "Mentor", "message": "What's my biggest risk running on top of you?" },
+    { "speaker": "The Watchtower", "message": "Blocking me. If your handler does something slow — CPU-heavy computation, a synchronous file read — every other connection on my one thread waits behind it. Keep handlers fast, or offload heavy work elsewhere." }
+  ],
+  "codeBattle": {
+    "scenario": "Your chat server needs to handle 50,000 simultaneous idle WebSocket connections, most sending a message only once every few minutes, on a machine with limited memory.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "reactor", "label": "Reactor" },
+      { "id": "thread-pool", "label": "Thread Pool" },
+      { "id": "active-object", "label": "Active Object" },
+      { "id": "observer", "label": "Observer" }
+    ],
+    "correct": "reactor",
+    "explanation": "The Watchtower handles all 50,000 mostly-idle connections on one thread via readiness notification, instead of allocating a thread per connection that would exhaust memory."
+  },
+  "quiz": [
+    {
+      "question": "What is the core mechanism a Reactor relies on?",
+      "options": [
+        "OS-level readiness notification telling it which I/O sources have data waiting",
+        "A separate thread for every connection",
+        "Polling every connection in a tight loop, constantly",
+        "A database transaction log"
+      ],
+      "answer": "OS-level readiness notification telling it which I/O sources have data waiting",
+      "explanation": "Mechanisms like epoll/kqueue/IOCP let the Reactor efficiently know exactly which sockets are ready, without busy-polling."
+    },
+    {
+      "question": "What's the single biggest risk of using a Reactor?",
+      "options": [
+        "A slow or blocking handler stalls the entire event loop, delaying every other connection",
+        "It requires one thread per connection",
+        "It can only handle a single connection at a time",
+        "It cannot be combined with any other pattern"
+      ],
+      "answer": "A slow or blocking handler stalls the entire event loop, delaying every other connection",
+      "explanation": "Because one thread services every registered event, any handler that blocks holds up all the others."
+    },
+    {
+      "question": "How does Reactor differ from Proactor?",
+      "options": [
+        "Reactor notifies when I/O is ready to be performed; Proactor notifies when the I/O operation has already completed",
+        "They are identical patterns with different names",
+        "Proactor requires multiple threads; Reactor forbids threads entirely",
+        "Reactor can only be used for file I/O"
+      ],
+      "answer": "Reactor notifies when I/O is ready to be performed; Proactor notifies when the I/O operation has already completed",
+      "explanation": "This readiness-vs-completion distinction is exactly what separates the two closely related concurrency patterns."
+    },
+    {
+      "question": "What's a well-known real-world Reactor implementation?",
+      "options": [
+        "Node.js's event loop",
+        "A relational database's transaction isolation level",
+        "Java's ArrayList",
+        "The HTTP protocol itself"
+      ],
+      "answer": "Node.js's event loop",
+      "explanation": "Node.js's single-threaded, callback-dispatching event loop is one of the most widely used Reactor implementations in practice."
+    }
+  ]
+}

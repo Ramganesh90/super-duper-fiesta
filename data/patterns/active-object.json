@@ -1,0 +1,158 @@
+{
+  "id": "active-object",
+  "title": "Active Object Pattern",
+  "category": "concurrency",
+  "difficulty": "advanced",
+  "oneLiner": "Decouples calling a method from executing it, by queueing the request and running it later on the object's own thread.",
+  "hero": {
+    "name": "The Scheduler",
+    "codename": "Active Object",
+    "catchphrase": "Call me anytime. I'll do it on my own time, in my own thread.",
+    "power": "Accepts method calls instantly, queues them, and executes them asynchronously on its own dedicated thread — returning a future the caller can wait on.",
+    "weakness": "Queueing, scheduling, and synchronization are real complexity — worth it only when concurrent access is an actual, measured problem.",
+    "origin": "The Scheduler appeared after a UI thread froze for two seconds every time a background image filter ran directly on it, blocking every click and keystroke.",
+    "enemies": ["Blocked Main Threads", "Unsynchronized Shared State", "Callback Chaos"],
+    "emoji": "🎫",
+    "colorFrom": "#1e40af",
+    "colorTo": "#60a5fa"
+  },
+  "story": {
+    "problem": "`imageProcessor.applyFilter(image)` runs directly on the UI thread, freezing the entire interface for two seconds on every call. Users can't click anything while it runs.",
+    "solution": "The Scheduler turns ImageProcessor into an Active Object: `applyFilter()` just enqueues the request and returns a future immediately. A dedicated worker thread pulls requests off the queue and runs them.",
+    "result": "The UI thread never blocks. `applyFilter()` returns instantly with a future; the actual filtering happens on its own thread, and the caller is notified when it's done."
+  },
+  "beforeAfter": {
+    "before": [
+      "Method calls block the calling thread until finished",
+      "A slow method freezes the entire caller",
+      "No way to run multiple requests concurrently, safely"
+    ],
+    "after": [
+      "Method calls return instantly with a future",
+      "Slow work runs on its own thread, never blocking the caller",
+      "Requests queue safely without manual thread juggling at each call site"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "The UI freezes for two full seconds every time an image filter runs, mid-click.",
+      "speaker": "Developer",
+      "dialogue": "Users think the app crashed every time they apply a filter. It's just blocking the UI thread for two seconds.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Scheduler appears holding a ticket dispenser — calls come in instantly, work happens elsewhere.",
+      "speaker": "The Scheduler",
+      "dialogue": "Don't run that on the calling thread. Hand me the request — I'll queue it and run it on my own thread instead.",
+      "emoji": "🎫"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "applyFilter() enqueues a request and returns a Future immediately. A worker thread processes the queue.",
+      "speaker": "The Scheduler",
+      "dialogue": "You get your ticket instantly. The UI thread is free the whole time — I'll notify you the moment it's actually done.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The UI stays responsive throughout every filter operation.",
+      "speaker": "Developer",
+      "dialogue": "Users can click around freely while filters process in the background. No more frozen UI.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "class ImageProcessor {\n  applyFilter(image: Image): Image {\n    return runExpensiveFilter(image); // blocks the calling thread for ~2s\n  }\n}\n\n// Called directly on the UI thread — freezes everything\nconst result = imageProcessor.applyFilter(image);",
+    "after": "class ActiveImageProcessor {\n  private queue: Array<{ image: Image; resolve: (r: Image) => void }> = [];\n\n  constructor() {\n    this.startWorker(); // runs on its own thread/worker\n  }\n\n  applyFilter(image: Image): Promise<Image> {\n    return new Promise((resolve) => {\n      this.queue.push({ image, resolve }); // returns instantly\n    });\n  }\n\n  private async startWorker() {\n    while (true) {\n      const request = this.queue.shift();\n      if (request) {\n        const result = runExpensiveFilter(request.image);\n        request.resolve(result);\n      }\n      await yieldToEventLoop();\n    }\n  }\n}\n\n// UI thread stays free — await only when the caller actually needs the result\nconst result = await activeProcessor.applyFilter(image);"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need to keep a critical thread (like the UI thread) responsive while expensive work happens elsewhere.",
+      "Multiple callers need to safely queue requests to an object without manually managing threads or locks themselves.",
+      "You want method calls to return immediately with a future/promise rather than blocking."
+    ],
+    "avoidWhen": [
+      "The work is fast enough that synchronous execution never actually blocks anything meaningfully.",
+      "You're in a single-threaded environment with cooperative async (like JavaScript's event loop) where a simpler async function already solves the problem.",
+      "The overhead of queueing and scheduling outweighs the benefit for your actual workload."
+    ],
+    "commonMistakes": [
+      "Adding Active Object's machinery in environments (like Node.js) where async/await already provides non-blocking behavior without a dedicated thread.",
+      "Letting the request queue grow unbounded under heavy load, silently consuming memory instead of applying backpressure.",
+      "Forgetting proper error handling in the worker loop, letting one failed request silently kill the whole processing thread.",
+      "Not making the shared state between the scheduler and the worker properly synchronized, reintroducing the concurrency bugs the pattern exists to prevent."
+    ],
+    "realWorldExample": "GUI frameworks running expensive work off the UI thread, actor-model systems (like Akka) where each actor processes its own mailbox sequentially, and background job processors decoupling task submission from execution are all Active Object in spirit."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just... async/await?" },
+    { "speaker": "The Scheduler", "message": "In cooperative single-threaded environments, async/await often gives you enough of my benefit already. I matter most in true multi-threaded environments, where I own an actual dedicated thread and safely serialize access to it." },
+    { "speaker": "Mentor", "message": "What's the real cost of using me?" },
+    { "speaker": "The Scheduler", "message": "Complexity. Queueing, scheduling, futures, error propagation across threads — none of it is free. Reach for me when blocking is a real, measured problem, not by default." }
+  ],
+  "codeBattle": {
+    "scenario": "Your desktop app's UI freezes every time a user exports a large file, because the export logic runs synchronously on the same thread that handles clicks and redraws.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "active-object", "label": "Active Object" },
+      { "id": "thread-pool", "label": "Thread Pool" },
+      { "id": "command", "label": "Command" },
+      { "id": "proxy", "label": "Proxy" }
+    ],
+    "correct": "active-object",
+    "explanation": "The Scheduler moves the export work onto its own thread and returns a future immediately, keeping the UI thread free to handle clicks and redraws throughout."
+  },
+  "quiz": [
+    {
+      "question": "What does Active Object decouple?",
+      "options": [
+        "The moment a method is called from the moment it actually executes",
+        "An object's data from its behavior",
+        "A subject from its observers",
+        "An interface from its implementation"
+      ],
+      "answer": "The moment a method is called from the moment it actually executes",
+      "explanation": "That's the defining move — calling returns instantly, while execution happens later on a dedicated thread."
+    },
+    {
+      "question": "What does an Active Object typically return immediately to the caller?",
+      "options": [
+        "A future/promise representing the eventual result",
+        "The fully computed result, synchronously",
+        "Nothing at all, ever",
+        "A new thread object"
+      ],
+      "answer": "A future/promise representing the eventual result",
+      "explanation": "The caller gets something to await or check later, without blocking on the actual work."
+    },
+    {
+      "question": "When is Active Object likely unnecessary?",
+      "options": [
+        "In a cooperative single-threaded async environment where async/await already avoids blocking",
+        "In a UI application where expensive work must not block the interface thread",
+        "In a multi-threaded server handling many concurrent requests to one shared object",
+        "When you need requests to queue safely without manual thread management at each call site"
+      ],
+      "answer": "In a cooperative single-threaded async environment where async/await already avoids blocking",
+      "explanation": "Where async/await already solves the blocking problem, Active Object's dedicated-thread machinery is often redundant."
+    },
+    {
+      "question": "What's a real risk of Active Object's request queue?",
+      "options": [
+        "It can grow unbounded under heavy load if there's no backpressure",
+        "It can never hold more than one request at a time",
+        "It always causes a deadlock",
+        "It requires a database to function"
+      ],
+      "answer": "It can grow unbounded under heavy load if there's no backpressure",
+      "explanation": "Without limits or backpressure, a queue accepting requests faster than they're processed will keep growing."
+    }
+  ]
+}

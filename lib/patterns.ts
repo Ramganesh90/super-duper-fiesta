@@ -28,6 +28,11 @@ import multiton from "@/data/patterns/multiton.json";
 import simpleFactory from "@/data/patterns/simple-factory.json";
 import parameterizedConstructor from "@/data/patterns/parameterized-constructor.json";
 import staticFactoryMethod from "@/data/patterns/static-factory-method.json";
+import activeObject from "@/data/patterns/active-object.json";
+import reactor from "@/data/patterns/reactor.json";
+import proactor from "@/data/patterns/proactor.json";
+import monitorObject from "@/data/patterns/monitor-object.json";
+import threadPool from "@/data/patterns/thread-pool.json";
 
 const patterns = [
   singleton,
@@ -59,6 +64,11 @@ const patterns = [
   strategy,
   templateMethod,
   visitor,
+  activeObject,
+  reactor,
+  proactor,
+  monitorObject,
+  threadPool,
 ] as unknown as Pattern[];
 
 export function getAllPatterns(): Pattern[] {
