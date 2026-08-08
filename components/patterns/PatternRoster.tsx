@@ -6,7 +6,14 @@ interface PatternRosterProps {
   patterns: Pattern[];
 }
 
-const CATEGORY_ORDER: PatternCategory[] = ["creational", "structural", "behavioral"];
+const CATEGORY_ORDER: PatternCategory[] = [
+  "creational",
+  "structural",
+  "behavioral",
+  "concurrency",
+  "architectural",
+  "enterprise",
+];
 
 export default function PatternRoster({ patterns }: PatternRosterProps) {
   const byCategory = CATEGORY_ORDER.map((category) => ({

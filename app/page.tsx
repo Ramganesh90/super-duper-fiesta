@@ -44,8 +44,9 @@ export default function Home() {
           Where Design Patterns Come to Life
         </p>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-          Meet an original universe of superheroes — one for every Gang of Four design pattern. Fight bad code,
-          learn the pattern power that beats it, and walk away with real architectural intuition.
+          Meet an original universe of superheroes — one for every Gang of Four design pattern, plus concurrency,
+          architectural, and enterprise patterns beyond. Fight bad code, learn the pattern power that beats it,
+          and walk away with real architectural intuition.
         </p>
         <a
           href="#roster"
@@ -74,7 +75,8 @@ export default function Home() {
         <div className="mb-8 text-center">
           <h2 className="font-comic text-4xl tracking-wide sm:text-5xl">THE PATTERN ROSTER</h2>
           <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-            Every pattern is a hero with a personality, a superpower, and a weakness. Pick one and start training.
+            {patterns.length} heroes and counting. Every pattern has a personality, a superpower, and a weakness.
+            Pick one and start training.
           </p>
         </div>
         <PatternRoster patterns={patterns} />

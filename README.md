@@ -1,6 +1,6 @@
 # Pattern-Verse
 
-**Where Design Patterns Come to Life** — an interactive learning platform that teaches Gang of Four design
+**Where Design Patterns Come to Life** — an interactive learning platform that teaches software design
 patterns through an original comic-book universe. Every pattern is a superhero with a personality, a
 superpower, a weakness, and a story.
 
@@ -36,11 +36,24 @@ The comic engine (`components/comic`), pattern layout (`components/patterns`), a
 Quiz results, Code Battle wins, bookmarks, and XP persist in `localStorage` (see `lib/progress.ts`) — no
 backend or database required for the MVP.
 
-## Current scope (Phase 1–4 MVP)
+## Current scope
 
-Three patterns are live: **Singleton** (The One), **Factory Method** (Forge Master), and **Observer**
-(Signal-Man) — one from each GoF category. Each pattern page includes the full learning loop: comic story,
-problem/solution, before/after, code example, hero conversation, use/avoid guidance, common mistakes,
-real-world examples, a Code Battle scenario, and a scored quiz that awards XP and a "Pattern Mastered" badge.
+52 patterns are live, spanning six categories:
 
-Expanding to the full 23 GoF patterns (and beyond) is purely a content task — see [Content model](#content-model).
+- **Creational** (11): all 5 GoF patterns (Singleton, Factory Method, Abstract Factory, Builder, Prototype)
+  plus common idioms (Object Pool, Lazy Initialization, Multiton, Simple Factory, Parameterized Constructor,
+  Static Factory Method)
+- **Structural** (8): all 7 GoF patterns (Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Proxy)
+  plus Private Class Data
+- **Behavioral** (12): all 11 GoF patterns (Chain of Responsibility, Command, Interpreter, Iterator,
+  Mediator, Memento, Observer, State, Strategy, Template Method, Visitor) plus Filter/Criteria
+- **Concurrency** (5): Active Object, Reactor, Proactor, Monitor Object, Thread Pool
+- **Architectural** (7): MVC, MVP, MVVM, Layered Architecture, Microkernel, SOA, CQRS
+- **Enterprise** (9): View Helper, Data Mapper, Dependency Injection, Inversion of Control, Service Locator,
+  Repository, Unit of Work, DAO, Business Delegate
+
+Every pattern page includes the full learning loop: comic story, problem/solution, before/after, code
+example, hero conversation, use/avoid guidance, common mistakes, a real-world example, a Code Battle
+scenario, and a scored quiz that awards XP and a "Pattern Mastered" badge.
+
+Adding a pattern beyond these 52 is purely a content task — see [Content model](#content-model).

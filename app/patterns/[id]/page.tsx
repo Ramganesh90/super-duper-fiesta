@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import PatternHeader from "@/components/patterns/PatternHeader";
 import PatternExplanation from "@/components/patterns/PatternExplanation";
@@ -8,7 +9,9 @@ import SpeechBubble from "@/components/comic/SpeechBubble";
 import CodeBlock from "@/components/code/CodeBlock";
 import CodeBattle from "@/components/learning/CodeBattle";
 import Quiz from "@/components/learning/Quiz";
+import ProgressIndicator from "@/components/learning/ProgressIndicator";
 import { getAllPatternIds, getAllPatterns, getPatternById } from "@/lib/patterns";
+import { CATEGORY_ICONS, CATEGORY_LABELS } from "@/lib/types";
 
 interface PatternPageProps {
   params: Promise<{ id: string }>;
@@ -48,10 +51,33 @@ export default async function PatternPage({ params }: PatternPageProps) {
   }
 
   const allPatterns = getAllPatterns();
+  const categoryPeers = allPatterns.filter((p) => p.category === pattern.category && p.id !== pattern.id);
 
   return (
     <article className="mx-auto flex max-w-5xl flex-col gap-14 px-4 py-10 sm:px-6 sm:py-14">
+      <nav aria-label="Breadcrumb" className="-mb-6 text-sm font-semibold">
+        <ol className="flex flex-wrap items-center gap-1.5 text-ink/70">
+          <li>
+            <Link href="/" className="underline-offset-2 hover:underline">
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link href="/#roster" className="underline-offset-2 hover:underline">
+              {CATEGORY_ICONS[pattern.category]} {CATEGORY_LABELS[pattern.category]}
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li className="text-ink" aria-current="page">
+            {pattern.hero.name}
+          </li>
+        </ol>
+      </nav>
+
       <PatternHeader pattern={pattern} />
+
+      <ProgressIndicator totalPatterns={allPatterns.length} />
 
       <section aria-labelledby="comic-story-heading" className="flex flex-col gap-4">
         <h2 id="comic-story-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
@@ -117,34 +143,40 @@ export default async function PatternPage({ params }: PatternPageProps) {
         <PatternExplanation pattern={pattern} />
       </section>
 
-      <section aria-labelledby="code-battle-heading" className="flex flex-col gap-4">
-        <h2 id="code-battle-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
-          🎯 YOUR TURN
-        </h2>
-        <CodeBattle patternId={pattern.id} battle={pattern.codeBattle} />
-      </section>
+      <div className="comic-border flex flex-col gap-14 border-comic-yellow-dark bg-comic-yellow/10 p-5 sm:p-8">
+        <p className="font-comic -mt-1 text-center text-sm tracking-widest text-comic-yellow-dark sm:text-base">
+          ⚡ THE FINAL CHALLENGE ⚡
+        </p>
 
-      <section aria-labelledby="quiz-heading" className="flex flex-col gap-4">
-        <h2 id="quiz-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
-          🏆 QUIZ
-        </h2>
-        <Quiz patternId={pattern.id} heroName={pattern.hero.name} questions={pattern.quiz} />
-      </section>
+        <section aria-labelledby="code-battle-heading" className="flex flex-col gap-4">
+          <h2 id="code-battle-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
+            🎯 YOUR TURN
+          </h2>
+          <CodeBattle patternId={pattern.id} battle={pattern.codeBattle} />
+        </section>
 
-      <nav aria-label="More patterns" className="border-t-4 border-ink pt-8">
-        <h2 className="font-comic text-xl tracking-wide">MORE HEROES TO MEET</h2>
+        <section aria-labelledby="quiz-heading" className="flex flex-col gap-4">
+          <h2 id="quiz-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
+            🏆 QUIZ
+          </h2>
+          <Quiz patternId={pattern.id} heroName={pattern.hero.name} questions={pattern.quiz} />
+        </section>
+      </div>
+
+      <nav aria-label="More patterns in this category" className="border-t-4 border-ink pt-8">
+        <h2 className="font-comic text-xl tracking-wide">
+          MORE {CATEGORY_LABELS[pattern.category].toUpperCase()} HEROES
+        </h2>
         <ul className="mt-3 flex flex-wrap gap-3">
-          {allPatterns
-            .filter((p) => p.id !== pattern.id)
-            .map((p) => (
+          {categoryPeers.map((p) => (
               <li key={p.id}>
-                <a
+                <Link
                   href={`/patterns/${p.id}`}
                   className="comic-border-sm inline-flex items-center gap-2 bg-paper px-3 py-2 text-sm font-semibold transition-transform hover:-translate-y-0.5"
                 >
                   <span aria-hidden="true">{p.hero.emoji}</span>
                   {p.hero.name}
-                </a>
+                </Link>
               </li>
             ))}
         </ul>

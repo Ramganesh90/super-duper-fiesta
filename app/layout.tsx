@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Pattern-Verse",
   },
   description:
-    "Learn the 23 Gang of Four design patterns through an original comic-book universe. Meet the Pattern Heroes, battle bad code, and master software architecture.",
+    "Learn the 23 Gang of Four design patterns, plus concurrency, architectural, and enterprise patterns, through an original comic-book universe. Meet the Pattern Heroes, battle bad code, and master software architecture.",
   openGraph: {
     title: "Pattern-Verse — Where Design Patterns Come to Life",
     description:
