@@ -34,27 +34,43 @@ function matches(pattern: Pattern, query: string): boolean {
 
 export default function PatternRoster({ patterns }: PatternRosterProps) {
   const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<PatternCategory | null>(null);
+
   const trimmedQuery = query.trim().toLowerCase();
   const isSearching = trimmedQuery.length > 0;
-
-  const searchResults = useMemo(
-    () => (isSearching ? patterns.filter((p) => matches(p, trimmedQuery)) : []),
-    [patterns, trimmedQuery, isSearching]
-  );
+  const hasFilters = isSearching || activeCategory !== null;
 
   const categoriesPresent = useMemo(
     () => CATEGORY_ORDER.filter((category) => patterns.some((p) => p.category === category)),
     [patterns]
   );
 
-  const byCategory = useMemo(
-    () =>
-      categoriesPresent.map((category) => ({
-        category,
-        patterns: patterns.filter((p) => p.category === category),
-      })),
-    [categoriesPresent, patterns]
+  const scopedPatterns = useMemo(
+    () => (activeCategory ? patterns.filter((p) => p.category === activeCategory) : patterns),
+    [patterns, activeCategory]
   );
+
+  const searchResults = useMemo(
+    () => (isSearching ? scopedPatterns.filter((p) => matches(p, trimmedQuery)) : []),
+    [scopedPatterns, trimmedQuery, isSearching]
+  );
+
+  const byCategory = useMemo(() => {
+    const visibleCategories = activeCategory ? [activeCategory] : categoriesPresent;
+    return visibleCategories.map((category) => ({
+      category,
+      patterns: patterns.filter((p) => p.category === category),
+    }));
+  }, [patterns, activeCategory, categoriesPresent]);
+
+  const handleCategoryClick = (category: PatternCategory) => {
+    setActiveCategory((current) => (current === category ? null : category));
+  };
+
+  const handleReset = () => {
+    setQuery("");
+    setActiveCategory(null);
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -67,33 +83,57 @@ export default function PatternRoster({ patterns }: PatternRosterProps) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="🔍 Search heroes by name, power, or category…"
+          placeholder={
+            activeCategory
+              ? `🔍 Search within ${CATEGORY_LABELS[activeCategory]}…`
+              : "🔍 Search heroes by name, power, or category…"
+          }
           className="comic-border-sm bg-paper px-4 py-3 text-base placeholder:text-ink/50 sm:text-lg"
         />
-        <nav aria-label="Jump to category" className="flex flex-wrap gap-2">
-          {categoriesPresent.map((category) => (
-            <a
-              key={category}
-              href={`#category-${category}`}
-              className="comic-border-sm inline-flex items-center gap-1.5 bg-paper px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5"
+        <div className="flex flex-wrap items-center gap-2">
+          <nav aria-label="Filter by category" className="flex flex-wrap gap-2">
+            {categoriesPresent.map((category) => {
+              const isActive = activeCategory === category;
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => handleCategoryClick(category)}
+                  aria-pressed={isActive}
+                  className={`comic-border-sm inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${
+                    isActive ? "bg-hero-blue text-paper" : "bg-paper"
+                  }`}
+                >
+                  {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
+                </button>
+              );
+            })}
+          </nav>
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={handleReset}
+              className="font-comic text-sm tracking-wide text-action-red underline-offset-2 hover:underline"
             >
-              {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
-            </a>
-          ))}
-        </nav>
+              ✕ Reset
+            </button>
+          )}
+        </div>
       </div>
 
       {isSearching ? (
         <section aria-live="polite">
           <p className="mb-5 font-semibold">
             {searchResults.length === 0
-              ? `No heroes match "${query}".`
-              : `${searchResults.length} hero${searchResults.length === 1 ? "" : "es"} match "${query}"`}
+              ? `No heroes match "${query}"${activeCategory ? ` in ${CATEGORY_LABELS[activeCategory]}` : ""}.`
+              : `${searchResults.length} hero${searchResults.length === 1 ? "" : "es"} match "${query}"${
+                  activeCategory ? ` in ${CATEGORY_LABELS[activeCategory]}` : ""
+                }`}
           </p>
           {searchResults.length > 0 && (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {searchResults.map((pattern) => (
-                <HeroCard key={pattern.id} pattern={pattern} showCategory />
+                <HeroCard key={pattern.id} pattern={pattern} showCategory={!activeCategory} />
               ))}
             </div>
           )}
