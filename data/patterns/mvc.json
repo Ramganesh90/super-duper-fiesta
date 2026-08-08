@@ -1,0 +1,158 @@
+{
+  "id": "mvc",
+  "title": "MVC (Model-View-Controller) Pattern",
+  "category": "architectural",
+  "difficulty": "beginner",
+  "oneLiner": "Splits an application into Model (data), View (display), and Controller (input handling) so each can change independently.",
+  "hero": {
+    "name": "The Triad",
+    "codename": "MVC",
+    "catchphrase": "Three roles, one flow: data, display, and decisions, each in their lane.",
+    "power": "Separates data, presentation, and input-handling into three distinct roles, so a UI redesign never touches business logic.",
+    "weakness": "As apps grow, the Controller becomes a magnet for logic that doesn't cleanly belong to Model or View — the classic 'fat controller' problem.",
+    "origin": "The Triad appeared after a blog engine's single `PostPage.php` file mixed SQL queries, HTML markup, and form-handling logic in one 800-line file that nobody wanted to touch.",
+    "enemies": ["Tangled Logic-Markup-Data Files", "Fat Controllers", "Untestable UI Code"],
+    "emoji": "🔺",
+    "colorFrom": "#7f1d1d",
+    "colorTo": "#f87171"
+  },
+  "story": {
+    "problem": "`PostPage.php` mixes SQL queries, HTML markup, and form-submission handling in one 800-line file. Changing how a post displays risks breaking how posts get saved.",
+    "solution": "The Triad splits it three ways: `Post` (Model) holds data and business rules, `PostView` (View) only renders markup, and `PostController` (Controller) handles input and coordinates the other two.",
+    "result": "A redesign only touches PostView. A new validation rule only touches Post. Each role can change without risking the others."
+  },
+  "beforeAfter": {
+    "before": [
+      "Data, display, and input logic tangled in one file",
+      "A display change risks breaking data logic",
+      "Impossible to test business logic without rendering HTML"
+    ],
+    "after": [
+      "Data, display, and input logic live in three separate roles",
+      "A display change only touches the View",
+      "Business logic in the Model is testable with no HTML involved"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "An 800-line file mixes SQL, HTML, and form-handling logic with no clear boundaries between them.",
+      "speaker": "Developer",
+      "dialogue": "I changed the post layout and somehow broke how comments get saved. Everything in this file touches everything else.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Triad appears as three distinct figures, each holding one clear responsibility.",
+      "speaker": "The Triad",
+      "dialogue": "Stop mixing three jobs into one file. Data goes in the Model. Display goes in the View. Input handling goes in the Controller.",
+      "emoji": "🔺"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Post (Model) holds data and rules. PostView renders markup. PostController handles form submissions and coordinates both.",
+      "speaker": "The Triad",
+      "dialogue": "The Controller takes input, asks the Model to update, then tells the View to re-render. Each role only knows its own job.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "A redesign of the post layout touches only PostView. Comment-saving logic is untouched.",
+      "speaker": "Developer",
+      "dialogue": "I redesigned the whole layout and didn't come close to the comment-saving logic. They're finally separate.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Everything tangled in one file/function\nasync function handlePostPage(req: Request, res: Response) {\n  const post = await db.query(\"SELECT * FROM posts WHERE id=$1\", [req.params.id]);\n  if (req.method === \"POST\") {\n    await db.query(\"UPDATE posts SET title=$1 WHERE id=$2\", [req.body.title, req.params.id]);\n  }\n  res.send(`<html><body><h1>${post.title}</h1><form>...</form></body></html>`);\n}",
+    "after": "// Model — data and business rules, no HTML or HTTP\nclass Post {\n  constructor(public id: string, public title: string) {}\n  static async find(id: string) { /* SQL lives here, not mixed with markup */ }\n  async updateTitle(title: string) { /* validation + SQL */ }\n}\n\n// View — rendering only, no business logic\nclass PostView {\n  render(post: Post): string {\n    return `<html><body><h1>${post.title}</h1><form>...</form></body></html>`;\n  }\n}\n\n// Controller — coordinates input handling, nothing else\nasync function postController(req: Request, res: Response) {\n  const post = await Post.find(req.params.id);\n  if (req.method === \"POST\") await post.updateTitle(req.body.title);\n  res.send(new PostView().render(post));\n}"
+  },
+  "explanation": {
+    "useWhen": [
+      "An application has clear data, presentation, and input-handling concerns that would benefit from separation.",
+      "Multiple views might need to display the same underlying data differently.",
+      "You want business logic (Model) to be testable independently of any UI framework."
+    ],
+    "avoidWhen": [
+      "The application is trivially small, with no meaningful separation to gain.",
+      "Your framework already provides a more specific, better-fitting pattern (like MVVM's data binding for rich client UIs).",
+      "You'd be forcing MVC's structure onto something that doesn't naturally have three distinct concerns (like a pure CLI script)."
+    ],
+    "commonMistakes": [
+      "Letting the Controller accumulate business logic that belongs in the Model — the classic 'fat controller' anti-pattern.",
+      "Letting the View reach directly into the database or business logic, bypassing the Model/Controller separation entirely.",
+      "Treating MVC as one-size-fits-all when a variant (MVP, MVVM) actually fits the UI technology better.",
+      "Conflating 'MVC' across wildly different frameworks — server-side MVC (Rails, Django) and client-side MVC (older Backbone-style) differ significantly in practice."
+    ],
+    "realWorldExample": "Ruby on Rails, Django, ASP.NET MVC, and Spring MVC are all explicitly built around this pattern for server-rendered web applications."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from MVP or MVVM?" },
+    { "speaker": "The Triad", "message": "We're a family. In classic MVC, the View can talk somewhat directly to the Model. MVP makes the View fully passive, mediated entirely by a Presenter. MVVM goes further, binding the View to a ViewModel's observable state automatically." },
+    { "speaker": "Mentor", "message": "What's the most common way I misuse you?" },
+    { "speaker": "The Triad", "message": "Fat controllers. The moment your Controller starts validating business rules or querying the database directly instead of delegating to the Model, you've broken the separation I exist to provide." }
+  ],
+  "codeBattle": {
+    "scenario": "Your server-rendered web app has HTML generation, SQL queries, and form-validation logic all mixed together in single route handler files, and every new feature makes the tangle worse.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "mvc", "label": "MVC" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "layered-architecture", "label": "Layered Architecture" },
+      { "id": "template-method", "label": "Template Method" }
+    ],
+    "correct": "mvc",
+    "explanation": "The Triad separates data (Model), rendering (View), and input handling (Controller) into distinct, independently changeable roles, exactly matching this tangled route-handler problem."
+  },
+  "quiz": [
+    {
+      "question": "What are the three roles in MVC?",
+      "options": [
+        "Model (data), View (display), Controller (input handling)",
+        "Model, Validator, Component",
+        "Manager, Viewer, Coordinator",
+        "Main, Variable, Class"
+      ],
+      "answer": "Model (data), View (display), Controller (input handling)",
+      "explanation": "These three roles, each with a distinct responsibility, are exactly what the pattern's name spells out."
+    },
+    {
+      "question": "What is the 'fat controller' anti-pattern?",
+      "options": [
+        "The Controller accumulates business logic that should live in the Model",
+        "The Controller has too many unit tests",
+        "The Controller is too small to do anything useful",
+        "The Controller directly renders HTML instead of delegating to the View"
+      ],
+      "answer": "The Controller accumulates business logic that should live in the Model",
+      "explanation": "This is the most common way MVC's separation of concerns erodes over time in real codebases."
+    },
+    {
+      "question": "What benefit does separating the Model provide?",
+      "options": [
+        "Business logic can be tested independently of any UI or HTML rendering",
+        "It makes the application run faster in every case",
+        "It removes the need for a database",
+        "It automatically generates API documentation"
+      ],
+      "answer": "Business logic can be tested independently of any UI or HTML rendering",
+      "explanation": "A Model with no UI dependencies can be unit tested directly, without rendering anything."
+    },
+    {
+      "question": "What's a well-known real-world framework built around MVC?",
+      "options": [
+        "Ruby on Rails",
+        "React (by itself)",
+        "PostgreSQL",
+        "Redis"
+      ],
+      "answer": "Ruby on Rails",
+      "explanation": "Rails is one of the most widely known frameworks explicitly structured around the Model-View-Controller pattern."
+    }
+  ]
+}

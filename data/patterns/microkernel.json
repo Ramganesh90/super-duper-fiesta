@@ -1,0 +1,158 @@
+{
+  "id": "microkernel",
+  "title": "Microkernel Pattern",
+  "category": "architectural",
+  "difficulty": "advanced",
+  "oneLiner": "Keeps a minimal, stable core system, with all extended functionality added through independent, pluggable modules.",
+  "hero": {
+    "name": "The Core",
+    "codename": "Microkernel",
+    "catchphrase": "I stay small. Everything else plugs in.",
+    "power": "Keeps the central system deliberately minimal, letting all extended functionality live in independent plugins added without modifying the core itself.",
+    "weakness": "Plugin isolation and versioning is real engineering work — a poorly-isolated plugin can still destabilize the very core it was supposed to be independent from.",
+    "origin": "The Core appeared after a code editor's single monolithic binary had grown to include a spell-checker, three linters, and a git client baked directly in, making the whole app crash whenever any one of them had a bug.",
+    "enemies": ["Monolithic Bloat", "Feature Creep", "Unstable Plugin Interference"],
+    "emoji": "🧩",
+    "colorFrom": "#1c1917",
+    "colorTo": "#d6d3d1"
+  },
+  "story": {
+    "problem": "A code editor's core binary directly includes a spell-checker, three linters, and a git client. A crash in any one of them takes down the entire editor, and nobody can add a feature without touching the core.",
+    "solution": "The Core strips the editor down to a minimal kernel: file editing, rendering, and a plugin API. The spell-checker, linters, and git client become independent plugins loaded through that API.",
+    "result": "A buggy linter plugin can crash and be disabled without affecting the rest of the editor. New features ship as new plugins — the core itself barely changes."
+  },
+  "beforeAfter": {
+    "before": [
+      "All features are baked directly into one monolithic core",
+      "A bug in any feature can crash the entire application",
+      "Adding a feature means modifying the core system"
+    ],
+    "after": [
+      "The core stays minimal; features live in independent plugins",
+      "A buggy plugin can fail without crashing the core",
+      "Adding a feature means adding a new plugin, not touching the core"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A crash report shows the entire editor going down because of a bug in a third-party spell-checker built directly into the core.",
+      "speaker": "Developer",
+      "dialogue": "The spell-checker crashed and took the whole editor down with it. Why does a spell-checker bug get to kill file editing?",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Core appears small and stable at the center, with slots around it waiting for plugins to snap in.",
+      "speaker": "The Core",
+      "dialogue": "I stay small on purpose. Everything else — spell-checking, linting, git — plugs into me. None of it lives inside me.",
+      "emoji": "🧩"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "The core exposes a stable plugin API. SpellCheckerPlugin, LinterPlugin, and GitPlugin each register independently.",
+      "speaker": "The Core",
+      "dialogue": "A plugin crashing is isolated to itself. The core — file editing, rendering — keeps running no matter what a plugin does.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The buggy spell-checker plugin now fails safely, disabled on its own, while the rest of the editor keeps working.",
+      "speaker": "Developer",
+      "dialogue": "The spell-checker crashed and got disabled automatically. Everything else in the editor kept working the whole time.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Everything baked directly into one monolithic class\nclass Editor {\n  checkSpelling() { /* spell-checking logic lives directly in the core */ }\n  runLinter() { /* linting logic lives directly in the core */ }\n  gitCommit() { /* git logic lives directly in the core */ }\n  // A bug in any of these can crash the whole editor\n}",
+    "after": "interface Plugin {\n  name: string;\n  activate(core: EditorCore): void;\n}\n\n// The core stays minimal — file editing and rendering only\nclass EditorCore {\n  private plugins: Plugin[] = [];\n\n  register(plugin: Plugin) {\n    try {\n      plugin.activate(this);\n      this.plugins.push(plugin);\n    } catch (err) {\n      console.error(`Plugin ${plugin.name} failed to load, isolated from core`, err);\n    }\n  }\n}\n\n// Every feature is a plugin — the core doesn't know they exist\nclass SpellCheckerPlugin implements Plugin {\n  name = \"spell-checker\";\n  activate(core: EditorCore) { /* hooks into core's public API only */ }\n}\n\ncore.register(new SpellCheckerPlugin());\ncore.register(new LinterPlugin());"
+  },
+  "explanation": {
+    "useWhen": [
+      "You're building a platform where third parties (or your own teams) need to add independent features without touching a shared core.",
+      "Different features have very different lifecycles, and coupling them to a monolithic release schedule is costly.",
+      "You want a failure in one feature to be isolated, not able to bring down the whole system."
+    ],
+    "avoidWhen": [
+      "The application has a small, fixed feature set with no real need for extensibility.",
+      "The overhead of designing and maintaining a stable plugin API isn't worth it for your actual extensibility needs.",
+      "Plugin isolation can't be properly enforced in your platform/language, making 'independent' plugins a false promise."
+    ],
+    "commonMistakes": [
+      "Designing a plugin API that's too narrow, forcing plugin authors to hack around it and reach into internals anyway.",
+      "Underestimating the engineering cost of true plugin isolation (sandboxing, versioning, failure containment).",
+      "Letting the 'core' quietly grow bloated over time by accreting features that should have been plugins from the start.",
+      "Not versioning the plugin API carefully, breaking third-party plugins on every core update."
+    ],
+    "realWorldExample": "VS Code's extension system, Eclipse's plugin architecture, and browser extension APIs are all real-world Microkernel implementations — a minimal, stable core with rich functionality added entirely through independent plugins."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How is this different from just having a good plugin system?" },
+    { "speaker": "The Core", "message": "A 'plugin system' bolted onto a monolith is easy to add and easy to compromise. My discipline is deeper — the CORE itself must stay genuinely minimal. If a feature isn't essential, it doesn't belong inside me at all." },
+    { "speaker": "Mentor", "message": "What's the real cost of building me properly?" },
+    { "speaker": "The Core", "message": "A stable, well-designed plugin API is hard to get right upfront, and true isolation — so a bad plugin can't crash me — takes real engineering. Skimp on either, and I'm just a monolith with extra steps." }
+  ],
+  "codeBattle": {
+    "scenario": "Your team is building a browser where third-party developers need to add extensions (ad blockers, password managers, screenshot tools) without ever being able to crash the core browsing engine.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "microkernel", "label": "Microkernel" },
+      { "id": "layered-architecture", "label": "Layered Architecture" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "soa", "label": "SOA" }
+    ],
+    "correct": "microkernel",
+    "explanation": "The Core keeps the browsing engine minimal and stable, with every extension living as an isolated plugin that can fail without taking down the core."
+  },
+  "quiz": [
+    {
+      "question": "What is the defining trait of a Microkernel architecture?",
+      "options": [
+        "A minimal, stable core with all extended functionality added through independent plugins",
+        "A single monolithic binary containing every feature",
+        "A system with no core at all, only plugins",
+        "A database schema with many small tables"
+      ],
+      "answer": "A minimal, stable core with all extended functionality added through independent plugins",
+      "explanation": "Deliberately keeping the core small, and pushing everything else out to plugins, is exactly what defines this pattern."
+    },
+    {
+      "question": "What's the key benefit of isolating features as plugins?",
+      "options": [
+        "A bug in one plugin doesn't necessarily crash the entire application",
+        "It makes the application impossible to extend further",
+        "It removes the need for any core system at all",
+        "It guarantees the application will never have bugs"
+      ],
+      "answer": "A bug in one plugin doesn't necessarily crash the entire application",
+      "explanation": "Failure isolation is one of Microkernel's biggest practical benefits over a monolithic design."
+    },
+    {
+      "question": "What's a real engineering challenge in implementing Microkernel well?",
+      "options": [
+        "Designing a stable, well-versioned plugin API and enforcing genuine plugin isolation",
+        "Writing the core's file-reading logic",
+        "Choosing a programming language",
+        "Making the application single-threaded"
+      ],
+      "answer": "Designing a stable, well-versioned plugin API and enforcing genuine plugin isolation",
+      "explanation": "Without real isolation and a stable API, the promised benefits of Microkernel don't actually materialize."
+    },
+    {
+      "question": "What's a well-known real-world Microkernel implementation?",
+      "options": [
+        "VS Code's extension system",
+        "A single Python script",
+        "A SQL SELECT statement",
+        "A CSS stylesheet"
+      ],
+      "answer": "VS Code's extension system",
+      "explanation": "VS Code's minimal core plus rich extension ecosystem is a textbook, widely-used example of Microkernel architecture."
+    }
+  ]
+}

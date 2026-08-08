@@ -37,6 +37,13 @@ import filterCriteria from "@/data/patterns/filter-criteria.json";
 import privateClassData from "@/data/patterns/private-class-data.json";
 import viewHelper from "@/data/patterns/view-helper.json";
 import dataMapper from "@/data/patterns/data-mapper.json";
+import mvc from "@/data/patterns/mvc.json";
+import mvp from "@/data/patterns/mvp.json";
+import mvvm from "@/data/patterns/mvvm.json";
+import layeredArchitecture from "@/data/patterns/layered-architecture.json";
+import microkernel from "@/data/patterns/microkernel.json";
+import soa from "@/data/patterns/soa.json";
+import cqrs from "@/data/patterns/cqrs.json";
 
 const patterns = [
   singleton,
@@ -77,6 +84,13 @@ const patterns = [
   threadPool,
   viewHelper,
   dataMapper,
+  mvc,
+  mvp,
+  mvvm,
+  layeredArchitecture,
+  microkernel,
+  soa,
+  cqrs,
 ] as unknown as Pattern[];
 
 export function getAllPatterns(): Pattern[] {

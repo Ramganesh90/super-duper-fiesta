@@ -1,0 +1,158 @@
+{
+  "id": "mvvm",
+  "title": "MVVM (Model-View-ViewModel) Pattern",
+  "category": "architectural",
+  "difficulty": "intermediate",
+  "oneLiner": "Exposes observable state and commands from a ViewModel that the View binds to declaratively, eliminating manual UI-update code.",
+  "hero": {
+    "name": "The Binder",
+    "codename": "MVVM",
+    "catchphrase": "Change the data, the view updates itself. No manual wiring.",
+    "power": "Exposes observable state from a ViewModel that the View binds to automatically, so UI updates happen without any manual synchronization code.",
+    "weakness": "Heavy two-way data binding can make data flow hard to trace — a single change can ripple through bindings in ways that are genuinely difficult to debug.",
+    "origin": "The Binder appeared after a settings screen had 40 lines of `label.text = model.value` calls scattered everywhere, one for every field, each needing manual updates whenever the underlying data changed.",
+    "enemies": ["Manual UI Synchronization", "Stale Display State", "Scattered Update Calls"],
+    "emoji": "🔗",
+    "colorFrom": "#86198f",
+    "colorTo": "#f0abfc"
+  },
+  "story": {
+    "problem": "A settings screen has 40 lines of manual `label.text = model.value` calls, one per field, each needing to be re-run any time the underlying data changes. Forgetting one leaves the UI showing stale data.",
+    "solution": "The Binder introduces a `SettingsViewModel` exposing observable properties. The View binds declaratively to those properties — when the ViewModel's data changes, the bound UI elements update themselves automatically.",
+    "result": "The 40 manual update calls disappear entirely. Changing a value in the ViewModel updates every bound UI element instantly, with zero manual wiring."
+  },
+  "beforeAfter": {
+    "before": [
+      "Every data change needs a matching manual UI update call",
+      "Forgetting an update call leaves the UI showing stale data",
+      "UI update logic is scattered across many call sites"
+    ],
+    "after": [
+      "The View binds declaratively to ViewModel state",
+      "UI elements update automatically when bound data changes",
+      "No manual update calls exist anywhere"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "Forty near-identical lines manually copy model values into UI labels, one per field.",
+      "speaker": "Developer",
+      "dialogue": "I added a new setting and forgot the manual UI update line. It's been showing the wrong value for two days.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Binder appears holding threads that connect data points directly to UI elements, glowing whenever data changes.",
+      "speaker": "The Binder",
+      "dialogue": "Stop manually copying values into the UI. Bind the view to the data directly — when the data changes, the view just knows.",
+      "emoji": "🔗"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "SettingsViewModel exposes observable properties. The View's binding declaration links each label to a property automatically.",
+      "speaker": "The Binder",
+      "dialogue": "You never write label.text = value again. Declare the binding once — every future change propagates on its own.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "A new setting binds itself to the UI in one declarative line, no manual update code required.",
+      "speaker": "Developer",
+      "dialogue": "The new setting displays correctly automatically. I didn't write a single manual update line for it.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Manual synchronization, one call per field, easy to forget\nfunction updateUI(model: Settings) {\n  themeLabel.text = model.theme;\n  volumeLabel.text = String(model.volume);\n  notificationsLabel.text = model.notificationsEnabled ? \"On\" : \"Off\";\n  // Forgetting a line here leaves that field silently stale\n}",
+    "after": "class SettingsViewModel {\n  @observable theme: string;\n  @observable volume: number;\n  @observable notificationsEnabled: boolean;\n\n  constructor(private model: Settings) {\n    this.theme = model.theme;\n    this.volume = model.volume;\n    this.notificationsEnabled = model.notificationsEnabled;\n  }\n}\n\n// Declarative binding — the framework keeps the UI in sync automatically\n// <label text=\"{{ viewModel.theme }}\" />\n// <slider value=\"{{ viewModel.volume }}\" />\n// No manual update calls exist anywhere in application code"
+  },
+  "explanation": {
+    "useWhen": [
+      "Your UI framework provides real data-binding support (React with state, Vue, Angular, WPF, SwiftUI, Compose).",
+      "You have many UI elements that need to stay synchronized with underlying data, and manual updates are error-prone.",
+      "You want the ViewModel to be independently testable, exposing state and commands without any UI framework dependency."
+    ],
+    "avoidWhen": [
+      "The UI framework has no real data-binding support — hand-rolling MVVM's binding machinery yourself is a lot of work for little gain.",
+      "The screen is simple enough that manual updates were never actually error-prone.",
+      "Complex, deeply chained bindings would make data flow harder to trace than simple, explicit update calls."
+    ],
+    "commonMistakes": [
+      "Building deeply chained or bidirectional bindings that make it genuinely hard to trace where a change originated.",
+      "Putting business logic (not just presentation state) into the ViewModel, blurring the Model/ViewModel boundary.",
+      "Over-relying on two-way binding for things that should be explicit, one-directional data flow (a common source of hard-to-debug UI state bugs).",
+      "Confusing MVVM with MVP — MVVM leans on the framework's binding system; MVP relies on explicit method calls through a View interface."
+    ],
+    "realWorldExample": "WPF and Xamarin's data binding, Vue's reactive `ref()`/`computed()`, and (in spirit) React's state-driven re-rendering are all MVVM or MVVM-adjacent — the View reacts automatically to ViewModel/state changes rather than being manually updated."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Is this basically what React does with state?" },
+    { "speaker": "The Binder", "message": "Close in spirit — React's state-driven re-rendering shares my core idea: change the data, the view updates itself. Classic MVVM usually implies more explicit two-way binding frameworks (WPF, Vue), but the philosophy is the same." },
+    { "speaker": "Mentor", "message": "What's the real danger of leaning on you too heavily?" },
+    { "speaker": "The Binder", "message": "Traceability. With enough chained, two-way bindings, a single UI interaction can ripple through several ViewModels in ways that are genuinely hard to follow when something goes wrong." }
+  ],
+  "codeBattle": {
+    "scenario": "Your desktop app built with a framework supporting real data binding has dozens of manual `updateLabel()` calls scattered throughout the codebase, and UI elements regularly show stale data because someone forgot to call the right update function.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "mvvm", "label": "MVVM" },
+      { "id": "mvp", "label": "MVP" },
+      { "id": "observer", "label": "Observer" },
+      { "id": "mediator", "label": "Mediator" }
+    ],
+    "correct": "mvvm",
+    "explanation": "The Binder replaces manual update calls with declarative bindings to observable ViewModel state, so the UI updates itself automatically whenever the data changes."
+  },
+  "quiz": [
+    {
+      "question": "What does the View do in MVVM, that it doesn't do in MVP?",
+      "options": [
+        "It binds declaratively to the ViewModel's observable state, updating automatically without explicit method calls",
+        "It contains all the business logic",
+        "It directly manages database transactions",
+        "It has no relationship to the ViewModel at all"
+      ],
+      "answer": "It binds declaratively to the ViewModel's observable state, updating automatically without explicit method calls",
+      "explanation": "Declarative, automatic binding is exactly what distinguishes MVVM's View from MVP's explicitly-instructed View."
+    },
+    {
+      "question": "What problem does MVVM's data binding eliminate?",
+      "options": [
+        "Manual, error-prone synchronization code between data and UI elements",
+        "The need for any data model at all",
+        "Network requests",
+        "The need for a View entirely"
+      ],
+      "answer": "Manual, error-prone synchronization code between data and UI elements",
+      "explanation": "Binding removes the exact class of bug where a manual UI-update call is forgotten, leaving stale data displayed."
+    },
+    {
+      "question": "What's a real risk of heavy two-way data binding in MVVM?",
+      "options": [
+        "Data flow can become genuinely hard to trace when a change ripples through chained bindings",
+        "It always makes the application faster",
+        "It removes the need for any state management",
+        "It cannot be tested at all"
+      ],
+      "answer": "Data flow can become genuinely hard to trace when a change ripples through chained bindings",
+      "explanation": "The convenience of automatic propagation comes at the cost of sometimes-opaque data flow, especially with bidirectional bindings."
+    },
+    {
+      "question": "What's a real-world framework built around MVVM-style binding?",
+      "options": [
+        "WPF (Windows Presentation Foundation)",
+        "A relational database",
+        "A REST API server",
+        "A message queue"
+      ],
+      "answer": "WPF (Windows Presentation Foundation)",
+      "explanation": "WPF's binding system is one of the most direct, well-known real-world implementations of the MVVM pattern."
+    }
+  ]
+}

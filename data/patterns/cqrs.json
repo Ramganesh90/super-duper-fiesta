@@ -1,0 +1,158 @@
+{
+  "id": "cqrs",
+  "title": "CQRS (Command Query Responsibility Segregation) Pattern",
+  "category": "architectural",
+  "difficulty": "advanced",
+  "oneLiner": "Separates the write path (commands) from the read path (queries), letting each be modeled and scaled independently.",
+  "hero": {
+    "name": "The Splitter",
+    "codename": "CQRS",
+    "catchphrase": "Reading and writing are different jobs. Stop making one model do both.",
+    "power": "Splits commands (validated, transactional writes) from queries (fast, denormalized reads), letting each be optimized entirely on its own terms.",
+    "weakness": "Introduces real complexity — most notably eventual consistency between the write and read models — that's only worth paying when read and write patterns genuinely diverge at scale.",
+    "origin": "The Splitter appeared after a single Order model tried to serve both a heavily-validated checkout write path and a dashboard needing fast, denormalized reads across millions of orders — one model, two incompatible jobs.",
+    "enemies": ["One-Model-Fits-All Bottlenecks", "Read/Write Contention", "Denormalization Hacks"],
+    "emoji": "✂️",
+    "colorFrom": "#4c1d95",
+    "colorTo": "#c4b5fd"
+  },
+  "story": {
+    "problem": "The Order model handles both checkout (heavily validated, transactional writes) and the analytics dashboard (fast reads across millions of denormalized order records). Optimizing one path keeps breaking the other.",
+    "solution": "The Splitter separates the two entirely. Commands (`PlaceOrder`) go through a validated, transactional write model. Queries (`GetOrderSummary`) read from a separate, denormalized read model optimized purely for fast lookups.",
+    "result": "The write model stays strict and transactional, focused only on correctness. The read model is denormalized and indexed purely for speed — each optimized for its own actual job."
+  },
+  "beforeAfter": {
+    "before": [
+      "One model serves both validated writes and fast reads",
+      "Optimizing reads risks weakening write correctness, and vice versa",
+      "Read and write scaling needs are forced to match each other"
+    ],
+    "after": [
+      "Commands and queries use separate, independently optimized models",
+      "The write model stays strict; the read model stays fast",
+      "Read and write paths scale independently, matching their actual load"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A dashboard query joins six tables and takes 8 seconds, while the same Order model also handles strict checkout validation.",
+      "speaker": "Developer",
+      "dialogue": "Every time I denormalize for dashboard speed, I risk breaking the strict validation checkout depends on. One model can't do both well.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Splitter appears holding two distinct tools — one precise, one broad — for two very different jobs.",
+      "speaker": "The Splitter",
+      "dialogue": "Stop forcing one model to write correctly AND read fast. Split them. Commands go one way, queries go another.",
+      "emoji": "✂️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "PlaceOrderCommand writes through a strict, transactional write model. GetOrderSummaryQuery reads from a separate, denormalized read model.",
+      "speaker": "The Splitter",
+      "dialogue": "The write model only cares about correctness. The read model only cares about speed. Neither compromises for the other anymore.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The dashboard query drops from 8 seconds to 40 milliseconds, with checkout validation untouched.",
+      "speaker": "Developer",
+      "dialogue": "Dashboard queries are 200x faster, and checkout validation didn't change at all. Both finally get what they actually need.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// One model serving two incompatible jobs\nclass Order {\n  async place(items: Item[]) {\n    validateStrict(items); // needs strong consistency\n    await db.transaction(() => saveOrder(items));\n  }\n  async getDashboardSummary() {\n    // Denormalizing here for speed risks weakening the strict write path above\n    return db.query(\"SELECT ... complex 6-table join ...\");\n  }\n}",
+    "after": "// Command side — strict, validated, transactional\nclass PlaceOrderCommandHandler {\n  async handle(cmd: PlaceOrderCommand) {\n    validateStrict(cmd.items);\n    await db.transaction(() => saveOrder(cmd.items));\n    await publishEvent(\"OrderPlaced\", cmd); // keeps the read model in sync\n  }\n}\n\n// Query side — fast, denormalized, optimized purely for reading\nclass OrderSummaryQueryHandler {\n  async handle(query: GetOrderSummaryQuery) {\n    // Reads from a separate, pre-denormalized read store — no joins needed\n    return readDb.query(\"SELECT * FROM order_summary_view WHERE id=$1\", [query.orderId]);\n  }\n}\n\n// A subscriber keeps the read model updated from write-side events\nonEvent(\"OrderPlaced\", (order) => updateReadModel(order));"
+  },
+  "explanation": {
+    "useWhen": [
+      "Read and write workloads have genuinely different performance, consistency, or scaling requirements.",
+      "A single model has become a bottleneck trying to serve both strict transactional writes and fast, flexible reads.",
+      "You're already using event-driven architecture, making it natural to keep a read model in sync via events."
+    ],
+    "avoidWhen": [
+      "Read and write patterns are similar enough that one model serves both perfectly well.",
+      "The team can't yet handle the operational complexity of eventual consistency between write and read models.",
+      "The application's scale doesn't actually justify the added architectural complexity — CQRS is a scaling pattern, not a default."
+    ],
+    "commonMistakes": [
+      "Adopting CQRS by default, before a single model has actually become a proven bottleneck — it's real complexity that should be earned, not assumed.",
+      "Underestimating eventual consistency — a write may not be immediately visible in the read model, which can surprise users and callers who don't expect a delay.",
+      "Not keeping the read model reliably synchronized with the write model, letting them silently drift out of consistency over time.",
+      "Confusing CQRS with simply 'having separate read and write database replicas' — CQRS is about separate MODELS, which is a deeper architectural split than replication alone."
+    ],
+    "realWorldExample": "Event-sourced systems that maintain separate read projections, e-commerce platforms with a strict order-processing write path and a fast, denormalized product-catalog read path, and analytics dashboards backed by materialized views are all CQRS in practice."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just having a read replica of the database?" },
+    { "speaker": "The Splitter", "message": "A read replica copies the SAME model, just for scaling reads. I go further — the read side can use a COMPLETELY DIFFERENT model, shaped purely for how it's queried, not how it's written." },
+    { "speaker": "Mentor", "message": "What's the real cost of splitting like this?" },
+    { "speaker": "The Splitter", "message": "Eventual consistency. A write might not show up in the read model instantly. That's a genuine trade-off your users and your team both need to understand and design around — not a hidden gotcha to discover in production." }
+  ],
+  "codeBattle": {
+    "scenario": "Your inventory system's write path needs strict, transactional stock validation on every update, while your analytics dashboard needs to run complex aggregate queries across millions of records without slowing down or locking the write path.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "cqrs", "label": "CQRS" },
+      { "id": "data-mapper", "label": "Data Mapper" },
+      { "id": "repository", "label": "Repository" },
+      { "id": "facade", "label": "Facade" }
+    ],
+    "correct": "cqrs",
+    "explanation": "The Splitter separates strict, transactional writes from fast, denormalized analytics reads, so neither path has to compromise for the other."
+  },
+  "quiz": [
+    {
+      "question": "What does CQRS separate?",
+      "options": [
+        "The write model (commands) from the read model (queries)",
+        "The frontend from the backend",
+        "Two incompatible interfaces",
+        "A subject from its observers"
+      ],
+      "answer": "The write model (commands) from the read model (queries)",
+      "explanation": "That's exactly what the name spells out: Command Query Responsibility Segregation."
+    },
+    {
+      "question": "What's the main trade-off CQRS introduces?",
+      "options": [
+        "Eventual consistency — a write may not be immediately reflected in the read model",
+        "It always makes writes slower",
+        "It removes the need for a database entirely",
+        "It requires the read and write models to be identical"
+      ],
+      "answer": "Eventual consistency — a write may not be immediately reflected in the read model",
+      "explanation": "Keeping two separate models in sync typically happens asynchronously, introducing a delay that must be designed around."
+    },
+    {
+      "question": "How does CQRS differ from simply using a database read replica?",
+      "options": [
+        "CQRS can use a completely different, independently shaped model for reads, not just a copy of the write model",
+        "They are identical techniques with different names",
+        "Read replicas require CQRS to function",
+        "CQRS forbids using a database at all"
+      ],
+      "answer": "CQRS can use a completely different, independently shaped model for reads, not just a copy of the write model",
+      "explanation": "A replica copies the same schema for scaling; CQRS's read model can be structured entirely differently, optimized purely for queries."
+    },
+    {
+      "question": "When should CQRS be avoided?",
+      "options": [
+        "When read and write patterns are similar enough that one model already serves both well",
+        "When a single model has become a proven scaling bottleneck",
+        "When read and write workloads have very different performance needs",
+        "When the team already uses event-driven architecture"
+      ],
+      "answer": "When read and write patterns are similar enough that one model already serves both well",
+      "explanation": "CQRS is a scaling pattern that should be earned by a real bottleneck, not adopted by default."
+    }
+  ]
+}

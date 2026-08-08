@@ -1,0 +1,158 @@
+{
+  "id": "mvp",
+  "title": "MVP (Model-View-Presenter) Pattern",
+  "category": "architectural",
+  "difficulty": "intermediate",
+  "oneLiner": "Makes the View completely passive, moving all presentation logic into a Presenter that's fully testable without any UI framework.",
+  "hero": {
+    "name": "The Go-Between",
+    "codename": "MVP",
+    "catchphrase": "The view doesn't think. I think for it, and I'm the one you test.",
+    "power": "Mediates entirely between a dumb, passive View and the Model, so all presentation logic can be unit tested without touching the UI.",
+    "weakness": "The View interface and Presenter can grow chatty with lots of small pass-through methods, feeling like boilerplate for simple screens.",
+    "origin": "The Go-Between appeared after a mobile app's login screen logic was impossible to unit test because it was baked directly into the Android Activity class, requiring a full emulator just to test a validation rule.",
+    "enemies": ["Untestable UI Logic", "Emulator-Dependent Tests", "Smart Views"],
+    "emoji": "🎙️",
+    "colorFrom": "#9f1239",
+    "colorTo": "#fda4af"
+  },
+  "story": {
+    "problem": "Login validation logic (\"email must contain @\", \"password must be 8+ characters\") lives directly inside the Android Activity class. Testing it requires spinning up a full emulator, just to check a string.",
+    "solution": "The Go-Between extracts a `LoginPresenter` that holds all the validation and coordination logic. The Activity becomes a passive `LoginView` that just displays what the Presenter tells it to.",
+    "result": "LoginPresenter's logic is now tested with plain unit tests — no emulator, no UI framework, milliseconds instead of minutes."
+  },
+  "beforeAfter": {
+    "before": [
+      "Presentation logic lives inside the UI framework's own classes",
+      "Testing logic requires running the full UI (emulator, browser)",
+      "The View makes its own decisions about what to display"
+    ],
+    "after": [
+      "Presentation logic lives in a plain, framework-free Presenter class",
+      "Testing logic requires only a unit test, no UI framework",
+      "The View is passive — it only displays what the Presenter tells it"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A test suite takes 4 minutes to check one password-validation rule, because it has to boot a full emulator.",
+      "speaker": "Developer",
+      "dialogue": "Our CI pipeline spends four minutes booting an emulator just to test that passwords need eight characters. This can't be right.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Go-Between steps in between the Activity and the validation logic, taking on all the thinking.",
+      "speaker": "The Go-Between",
+      "dialogue": "Your View shouldn't think for itself. Let me hold the logic — the View just displays whatever I decide.",
+      "emoji": "🎙️"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "LoginPresenter.onLoginClicked() validates and calls view.showError() or view.navigateToHome(). The View has no logic of its own.",
+      "speaker": "The Go-Between",
+      "dialogue": "I hold every decision. The View just implements simple methods like showError() — it never decides anything on its own.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The same validation test now runs in 4 milliseconds, no emulator involved.",
+      "speaker": "Developer",
+      "dialogue": "Four minutes down to four milliseconds. The logic is fully testable now, completely separate from the UI framework.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Validation logic baked directly into the UI class — hard to test\nclass LoginActivity {\n  onLoginClicked() {\n    if (!this.emailField.text.includes(\"@\")) {\n      this.errorLabel.text = \"Invalid email\";\n      return;\n    }\n    // ...more logic mixed with direct UI manipulation\n  }\n}",
+    "after": "interface LoginView {\n  showError(message: string): void;\n  navigateToHome(): void;\n}\n\n// All logic lives here, with zero dependency on any UI framework\nclass LoginPresenter {\n  constructor(private view: LoginView) {}\n\n  onLoginClicked(email: string, password: string) {\n    if (!email.includes(\"@\")) {\n      this.view.showError(\"Invalid email\");\n      return;\n    }\n    if (password.length < 8) {\n      this.view.showError(\"Password too short\");\n      return;\n    }\n    this.view.navigateToHome();\n  }\n}\n\n// Testable with a plain fake view — no UI framework, no emulator\nconst fakeView = { showError: jest.fn(), navigateToHome: jest.fn() };\nnew LoginPresenter(fakeView).onLoginClicked(\"bad-email\", \"short\");\nexpect(fakeView.showError).toHaveBeenCalledWith(\"Invalid email\");"
+  },
+  "explanation": {
+    "useWhen": [
+      "You need presentation logic to be unit testable without booting a UI framework, browser, or emulator.",
+      "You're building on a UI framework (older Android, WinForms, legacy desktop UIs) where the 'View' classes are heavy and hard to test directly.",
+      "You want a clean, explicit contract (an interface) between presentation logic and the actual UI rendering."
+    ],
+    "avoidWhen": [
+      "Your UI framework already supports rich, declarative data binding — MVVM often fits better and needs less boilerplate.",
+      "The screen is simple enough that a Presenter's ceremony (interface, pass-through methods) outweighs the testing benefit.",
+      "The team has no real need to unit test presentation logic in isolation."
+    ],
+    "commonMistakes": [
+      "Letting the View make its own decisions (e.g. conditionally hiding an element based on data) instead of being told exactly what to do by the Presenter.",
+      "Creating an overly chatty View interface with dozens of tiny methods, adding boilerplate without meaningfully improving testability.",
+      "Putting business logic (not just presentation logic) into the Presenter, blurring the line between Model and Presenter responsibilities.",
+      "Confusing MVP with MVC — MVP's View is deliberately passive and fully mediated; classic MVC's View can interact more directly with the Model."
+    ],
+    "realWorldExample": "Android's traditional MVP architecture (before Jetpack's ViewModel/Compose), and legacy WinForms/WPF apps using MVP for testable presentation logic, are classic real-world MVP implementations."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "How passive does the View really need to be?" },
+    { "speaker": "The Go-Between", "message": "Completely. The View should have almost no logic — no if-statements about what to show. It just implements simple methods like showError() and navigateToHome(), and I decide when to call them." },
+    { "speaker": "Mentor", "message": "When should I reach for MVVM instead of you?" },
+    { "speaker": "The Go-Between", "message": "When your framework supports real data binding. MVVM lets the View bind directly to observable state — no explicit interface, no manual method calls. I'm the right tool when that binding machinery isn't available." }
+  ],
+  "codeBattle": {
+    "scenario": "Your legacy WinForms desktop app has form-validation and business-flow logic baked directly into code-behind files, making it impossible to unit test without launching the actual application window.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "mvp", "label": "MVP" },
+      { "id": "mvvm", "label": "MVVM" },
+      { "id": "mvc", "label": "MVC" },
+      { "id": "facade", "label": "Facade" }
+    ],
+    "correct": "mvp",
+    "explanation": "The Go-Between extracts the logic into a testable Presenter behind a simple View interface, which fits WinForms' non-declarative-binding UI model well."
+  },
+  "quiz": [
+    {
+      "question": "What is the defining characteristic of the View in MVP?",
+      "options": [
+        "It's passive — it has no logic of its own and only displays what the Presenter tells it to",
+        "It directly queries the database itself",
+        "It contains all the business logic",
+        "It communicates only with other Views, never the Presenter"
+      ],
+      "answer": "It's passive — it has no logic of its own and only displays what the Presenter tells it to",
+      "explanation": "This deliberate passivity is exactly what makes the Presenter's logic fully testable in isolation."
+    },
+    {
+      "question": "What's the main testability benefit of MVP?",
+      "options": [
+        "Presenter logic can be unit tested with a fake View, without any real UI framework",
+        "It eliminates the need for any tests",
+        "It makes UI tests run inside a real browser automatically",
+        "It requires a live database connection for every test"
+      ],
+      "answer": "Presenter logic can be unit tested with a fake View, without any real UI framework",
+      "explanation": "Because the View is just an interface, a lightweight fake/mock can stand in during Presenter tests."
+    },
+    {
+      "question": "How does MVP differ from classic MVC?",
+      "options": [
+        "MVP's View is deliberately passive and fully mediated by the Presenter; classic MVC's View can interact more directly with the Model",
+        "They are identical patterns with different names",
+        "MVC requires a Presenter; MVP does not",
+        "MVP can only be used on mobile platforms"
+      ],
+      "answer": "MVP's View is deliberately passive and fully mediated by the Presenter; classic MVC's View can interact more directly with the Model",
+      "explanation": "The degree of View passivity is the key structural difference between the two related patterns."
+    },
+    {
+      "question": "When might MVVM be preferable to MVP?",
+      "options": [
+        "When the UI framework supports rich, declarative data binding, reducing manual pass-through code",
+        "When the team wants to avoid testing presentation logic entirely",
+        "When there's no need to separate the View from logic",
+        "When the application has no UI at all"
+      ],
+      "answer": "When the UI framework supports rich, declarative data binding, reducing manual pass-through code",
+      "explanation": "MVVM's binding mechanism can eliminate much of the boilerplate that MVP's explicit View interface requires."
+    }
+  ]
+}

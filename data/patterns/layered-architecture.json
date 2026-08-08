@@ -1,0 +1,158 @@
+{
+  "id": "layered-architecture",
+  "title": "Layered Architecture Pattern",
+  "category": "architectural",
+  "difficulty": "beginner",
+  "oneLiner": "Organizes a system into horizontal layers, where each layer depends only on the one directly beneath it.",
+  "hero": {
+    "name": "The Foundation",
+    "codename": "Layered Architecture",
+    "catchphrase": "Each layer stands on the one below. Nobody skips a level.",
+    "power": "Organizes code into strict horizontal layers, each depending only on the layer beneath it, keeping concerns cleanly separated top to bottom.",
+    "weakness": "Strict layering can force data through layers that don't need to touch it, adding overhead for operations that are really just simple pass-throughs.",
+    "origin": "The Foundation appeared after a codebase's presentation code was calling raw SQL directly, its business logic was formatting HTML, and every layer touched every other layer, with no order to any of it.",
+    "enemies": ["Layer-Skipping Shortcuts", "Circular Dependencies", "Tangled Responsibilities"],
+    "emoji": "🧱",
+    "colorFrom": "#422006",
+    "colorTo": "#fcd34d"
+  },
+  "story": {
+    "problem": "Presentation code calls the database directly. Business logic formats HTML. Every part of the system reaches into every other part, with no consistent direction of dependency.",
+    "solution": "The Foundation organizes the system into four strict layers: Presentation → Business Logic → Data Access → Database. Each layer only calls the layer directly below it — never sideways, never skipping levels.",
+    "result": "Dependencies now flow in one predictable direction. The database layer can be swapped without touching presentation code, because nothing above Data Access knows it exists."
+  },
+  "beforeAfter": {
+    "before": [
+      "Any part of the system can call any other part directly",
+      "No consistent direction to dependencies",
+      "Swapping the database means auditing the entire codebase"
+    ],
+    "after": [
+      "Each layer only depends on the layer directly beneath it",
+      "Dependencies flow in one predictable direction",
+      "Swapping the database only touches the Data Access layer"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A dependency graph shows arrows pointing in every direction — presentation calling the database, business logic touching HTML.",
+      "speaker": "Developer",
+      "dialogue": "I need to swap our database, and I have no idea how many places directly depend on its specific query syntax. Could be anywhere.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Foundation appears, stacking four solid layers, each resting cleanly on the one beneath it.",
+      "speaker": "The Foundation",
+      "dialogue": "Stop letting every layer touch every other layer. Stack them — Presentation, Business Logic, Data Access, Database. Each one only knows the layer directly below it.",
+      "emoji": "🧱"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "Presentation calls Business Logic. Business Logic calls Data Access. Data Access talks to the Database. Never the reverse, never sideways.",
+      "speaker": "The Foundation",
+      "dialogue": "Dependencies flow in one direction only, top to bottom. Nothing above Data Access even knows which database exists underneath.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The database gets swapped by rewriting exactly one layer. Everything above it is untouched.",
+      "speaker": "Developer",
+      "dialogue": "We swapped databases by rewriting exactly one layer. Presentation and business logic didn't change at all.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// Presentation code reaching straight into the database\napp.get(\"/users/:id\", async (req, res) => {\n  const user = await db.query(\"SELECT * FROM users WHERE id=$1\", [req.params.id]);\n  res.send(`<h1>${user.name}</h1>`); // presentation, business logic, and data access all tangled here\n});",
+    "after": "// Data Access layer — only layer that knows about the database\nclass UserRepository {\n  async findById(id: string) {\n    return db.query(\"SELECT * FROM users WHERE id=$1\", [id]);\n  }\n}\n\n// Business Logic layer — only depends on Data Access\nclass UserService {\n  constructor(private repo: UserRepository) {}\n  async getUserProfile(id: string) {\n    const user = await this.repo.findById(id);\n    return { displayName: user.name.trim() || \"Unknown User\" };\n  }\n}\n\n// Presentation layer — only depends on Business Logic, never touches the database directly\napp.get(\"/users/:id\", async (req, res) => {\n  const profile = await userService.getUserProfile(req.params.id);\n  res.send(`<h1>${profile.displayName}</h1>`);\n});"
+  },
+  "explanation": {
+    "useWhen": [
+      "You want a clear, predictable direction of dependencies across a moderately complex application.",
+      "Different concerns (presentation, business rules, persistence) genuinely need to evolve somewhat independently.",
+      "You want the option to swap out infrastructure (database, UI framework) without rewriting the whole system."
+    ],
+    "avoidWhen": [
+      "The application is small and simple enough that layering adds ceremony without meaningful benefit.",
+      "Strict layer-by-layer calls would force trivial pass-through data through several layers for no real reason.",
+      "The team needs the flexibility of a more decoupled style, like hexagonal/ports-and-adapters architecture, that this simpler layering doesn't provide."
+    ],
+    "commonMistakes": [
+      "Letting a layer skip past its immediate neighbor to call something two levels down, quietly breaking the strict dependency direction.",
+      "Creating circular dependencies between layers, which defeats the whole point of a predictable, one-directional structure.",
+      "Over-layering a genuinely simple application, adding indirection with no real payoff.",
+      "Confusing Layered Architecture with Facade — layering is a whole-system organizing principle; Facade simplifies access to one specific subsystem."
+    ],
+    "realWorldExample": "Classic 3-tier (presentation/business/data) enterprise applications, and most 'standard' backend project structures (controllers → services → repositories) are Layered Architecture in practice, whether explicitly named that way or not."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this basically just... good code organization?" },
+    { "speaker": "The Foundation", "message": "At its heart, yes — but the discipline matters. The RULE is what makes it powerful: a layer may only depend on the layer directly beneath it. Break that rule even once, and the predictability I offer starts eroding." },
+    { "speaker": "Mentor", "message": "When do I add MORE layers than the classic three or four?" },
+    { "speaker": "The Foundation", "message": "When a genuinely distinct concern emerges — like a separate integration layer for third-party APIs. But each new layer is a real cost. Don't add one just because it feels tidy." }
+  ],
+  "codeBattle": {
+    "scenario": "Your team's codebase has route handlers directly executing raw SQL queries and formatting HTML in the same function, and a recent database migration required auditing dozens of files scattered across the entire app.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "layered-architecture", "label": "Layered Architecture" },
+      { "id": "mvc", "label": "MVC" },
+      { "id": "facade", "label": "Facade" },
+      { "id": "microkernel", "label": "Microkernel" }
+    ],
+    "correct": "layered-architecture",
+    "explanation": "The Foundation establishes strict, one-directional layers so a database change is contained entirely within the Data Access layer, instead of rippling through the whole app."
+  },
+  "quiz": [
+    {
+      "question": "What is the core rule of Layered Architecture?",
+      "options": [
+        "Each layer may only depend on the layer directly beneath it",
+        "Every layer can call every other layer freely",
+        "There must be exactly three layers, no more, no fewer",
+        "Layers communicate only through a message queue"
+      ],
+      "answer": "Each layer may only depend on the layer directly beneath it",
+      "explanation": "This strict, one-directional dependency rule is what gives Layered Architecture its predictability."
+    },
+    {
+      "question": "What benefit does strict layering provide when swapping infrastructure (like a database)?",
+      "options": [
+        "The change is contained to the layer that directly depends on that infrastructure",
+        "It automatically migrates all data with zero code changes",
+        "It removes the need for any data access layer at all",
+        "It makes the swap impossible to ever perform"
+      ],
+      "answer": "The change is contained to the layer that directly depends on that infrastructure",
+      "explanation": "Because only the Data Access layer knows about the database, swapping it doesn't ripple upward through the rest of the system."
+    },
+    {
+      "question": "What's a common violation of Layered Architecture's discipline?",
+      "options": [
+        "A layer skips past its immediate neighbor to call something two levels down",
+        "A layer only calls the layer directly beneath it",
+        "The presentation layer never touches the database directly",
+        "The data access layer doesn't know about the presentation layer"
+      ],
+      "answer": "A layer skips past its immediate neighbor to call something two levels down",
+      "explanation": "Layer-skipping breaks the one-directional structure the whole pattern depends on for predictability."
+    },
+    {
+      "question": "What's a real-world example of Layered Architecture?",
+      "options": [
+        "A classic 3-tier enterprise app with presentation, business logic, and data access layers",
+        "A single-file script with no internal structure",
+        "A peer-to-peer file sharing protocol",
+        "A single Singleton class"
+      ],
+      "answer": "A classic 3-tier enterprise app with presentation, business logic, and data access layers",
+      "explanation": "This is the textbook, most widely recognized real-world instance of Layered Architecture."
+    }
+  ]
+}

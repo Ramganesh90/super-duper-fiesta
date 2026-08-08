@@ -1,0 +1,158 @@
+{
+  "id": "soa",
+  "title": "SOA (Service-Oriented Architecture) Pattern",
+  "category": "architectural",
+  "difficulty": "advanced",
+  "oneLiner": "Decomposes a large system into independent, separately-deployable services that communicate through well-defined contracts.",
+  "hero": {
+    "name": "The Federation",
+    "codename": "SOA",
+    "catchphrase": "Independent services, one contract each — talking, never tangled.",
+    "power": "Splits a monolithic system into independent services, each owning its own data and logic, communicating only through well-defined contracts.",
+    "weakness": "Trades a single deployable's simplicity for distributed-systems complexity — network failures, latency, and contract versioning across services all become real, ongoing problems.",
+    "origin": "The Federation appeared after a single e-commerce monolith grew so large that a small change to the shipping module required a full regression test and redeploy of the entire application, including billing and inventory.",
+    "enemies": ["Monolithic Deploy Coupling", "Cross-Team Bottlenecks", "All-or-Nothing Scaling"],
+    "emoji": "🌐",
+    "colorFrom": "#075985",
+    "colorTo": "#38bdf8"
+  },
+  "story": {
+    "problem": "A single e-commerce monolith bundles billing, inventory, and shipping together. A tiny shipping-label formatting fix requires redeploying — and re-testing — the entire application, including unrelated billing code.",
+    "solution": "The Federation splits the monolith into independent services: BillingService, InventoryService, ShippingService — each with its own codebase, database, and deployment pipeline, communicating over well-defined APIs.",
+    "result": "The shipping-label fix now deploys ShippingService alone, in minutes, with zero risk to billing or inventory. Each service scales and evolves on its own schedule."
+  },
+  "beforeAfter": {
+    "before": [
+      "One codebase and one deploy for the entire system",
+      "A small change requires testing and redeploying everything",
+      "All features scale together, whether they need to or not"
+    ],
+    "after": [
+      "Each business capability is its own independently deployable service",
+      "A small change only requires redeploying its own service",
+      "Each service scales independently based on its own actual load"
+    ]
+  },
+  "panels": [
+    {
+      "type": "problem",
+      "label": "The Problem",
+      "caption": "A one-line shipping-label fix triggers a 45-minute full-application test suite and redeploy.",
+      "speaker": "Developer",
+      "dialogue": "I changed one label format in shipping and now I have to wait 45 minutes for the ENTIRE application's tests to pass before I can deploy.",
+      "emoji": "💥"
+    },
+    {
+      "type": "hero",
+      "label": "The Hero Arrives",
+      "caption": "The Federation appears as three independent nations, each with its own borders, connected by clear treaties.",
+      "speaker": "The Federation",
+      "dialogue": "Stop bundling everything into one deployable. Split into independent services, each owning its own domain — connected only by well-defined contracts.",
+      "emoji": "🌐"
+    },
+    {
+      "type": "power",
+      "label": "Pattern Power",
+      "caption": "BillingService, InventoryService, and ShippingService each have their own codebase, database, and API contract.",
+      "speaker": "The Federation",
+      "dialogue": "ShippingService can deploy on its own schedule now. It calls InventoryService through a stable API — neither needs to know the other's internals.",
+      "emoji": "⚡"
+    },
+    {
+      "type": "result",
+      "label": "The Result",
+      "caption": "The same shipping-label fix now deploys alone, in three minutes, with zero risk to billing.",
+      "speaker": "Developer",
+      "dialogue": "Three minutes, ShippingService only, zero risk to billing or inventory. That's the whole deploy now.",
+      "emoji": "🏆"
+    }
+  ],
+  "code": {
+    "language": "typescript",
+    "before": "// One monolithic codebase, one deploy, for everything\nclass ECommerceApp {\n  processBilling(order: Order) { /* billing logic */ }\n  checkInventory(sku: string) { /* inventory logic, same codebase */ }\n  generateShippingLabel(order: Order) { /* shipping logic, same codebase, same deploy */ }\n}",
+    "after": "// ShippingService — its own codebase, its own deploy, its own database\nclass ShippingService {\n  async generateLabel(orderId: string) {\n    // Calls InventoryService through a stable, versioned API contract\n    const stock = await fetch(`https://inventory.internal/api/v1/stock/${orderId}`);\n    return buildLabel(orderId, await stock.json());\n  }\n}\n\n// InventoryService — a completely separate deployable, own database\n// It has no idea ShippingService's internals even exist\napp.get(\"/api/v1/stock/:orderId\", async (req, res) => {\n  res.json(await inventoryDb.getStock(req.params.orderId));\n});"
+  },
+  "explanation": {
+    "useWhen": [
+      "Different parts of the system have genuinely different scaling, deployment, or team ownership needs.",
+      "The organization is large enough that independent teams need to ship on independent schedules without blocking each other.",
+      "You need to isolate failures — one service's outage shouldn't necessarily take down unrelated services."
+    ],
+    "avoidWhen": [
+      "The team and system are small enough that a single deployable is genuinely simpler and faster to develop against.",
+      "You'd be introducing network calls, serialization, and distributed-systems complexity for problems a monolith never actually had.",
+      "The organization can't yet support the operational overhead (monitoring, versioning, service discovery) that multiple services require."
+    ],
+    "commonMistakes": [
+      "Splitting into services prematurely, before the team or system is actually large enough to need the independence, taking on distributed complexity for no real benefit.",
+      "Creating services that are too finely grained ('nano-services'), multiplying network calls and operational overhead without a matching benefit.",
+      "Letting services share a database directly, quietly recreating monolithic coupling through the back door.",
+      "Underestimating the cost of contract versioning — changing one service's API can silently break every other service that depends on it."
+    ],
+    "realWorldExample": "Large-scale systems like Amazon's and Netflix's backend architectures, and enterprise integration platforms built on SOAP/REST service contracts, are classic real-world SOA (and its close cousin, microservices)."
+  },
+  "conversation": [
+    { "speaker": "Mentor", "message": "Isn't this just microservices with a different name?" },
+    { "speaker": "The Federation", "message": "Closely related, and often used interchangeably in practice. SOA is the broader architectural principle — independent services, well-defined contracts. Microservices is a specific, typically finer-grained, lightweight-protocol flavor of that same idea." },
+    { "speaker": "Mentor", "message": "When do I know I've split things too early?" },
+    { "speaker": "The Federation", "message": "If most of your 'services' still deploy together, share a database, or get changed by the same PR every time — you've paid the distributed-systems tax without earning the actual independence." }
+  ],
+  "codeBattle": {
+    "scenario": "Your fast-growing company has three separate teams (billing, inventory, shipping) all committing to one monolithic codebase, and merge conflicts plus a single shared deploy pipeline are blocking every team from shipping independently.",
+    "question": "Which hero should you call?",
+    "options": [
+      { "id": "soa", "label": "SOA" },
+      { "id": "microkernel", "label": "Microkernel" },
+      { "id": "layered-architecture", "label": "Layered Architecture" },
+      { "id": "facade", "label": "Facade" }
+    ],
+    "correct": "soa",
+    "explanation": "The Federation splits the monolith into independently deployable services owned by each team, removing the shared-pipeline bottleneck entirely."
+  },
+  "quiz": [
+    {
+      "question": "What does SOA decompose a system into?",
+      "options": [
+        "Independent, separately-deployable services communicating through well-defined contracts",
+        "A single monolithic deployable with internal modules",
+        "A set of static HTML files",
+        "A single shared database with many tables"
+      ],
+      "answer": "Independent, separately-deployable services communicating through well-defined contracts",
+      "explanation": "Independent deployability plus a well-defined contract is the essence of service-oriented architecture."
+    },
+    {
+      "question": "What complexity does SOA trade a monolith's simplicity for?",
+      "options": [
+        "Distributed-systems complexity — network failures, latency, and contract versioning across services",
+        "No additional complexity at all",
+        "The need to write more unit tests",
+        "The need for a bigger single database"
+      ],
+      "answer": "Distributed-systems complexity — network failures, latency, and contract versioning across services",
+      "explanation": "SOA's independence comes at the real cost of everything that distributed communication introduces."
+    },
+    {
+      "question": "What's a common mistake when adopting SOA?",
+      "options": [
+        "Splitting into services prematurely, before the team or system actually needs that independence",
+        "Giving each service its own database",
+        "Defining clear API contracts between services",
+        "Allowing each service to deploy independently"
+      ],
+      "answer": "Splitting into services prematurely, before the team or system actually needs that independence",
+      "explanation": "Taking on distributed complexity before it's actually needed is one of the most common SOA/microservices pitfalls."
+    },
+    {
+      "question": "How does SOA relate to microservices?",
+      "options": [
+        "SOA is the broader architectural principle; microservices is typically a finer-grained, lightweight-protocol flavor of the same idea",
+        "They are completely unrelated concepts",
+        "Microservices requires a monolithic deployment; SOA forbids it",
+        "SOA can only be implemented using SOAP"
+      ],
+      "answer": "SOA is the broader architectural principle; microservices is typically a finer-grained, lightweight-protocol flavor of the same idea",
+      "explanation": "The two terms overlap heavily in practice, with microservices usually implying smaller services and simpler protocols (like REST) than classic enterprise SOA."
+    }
+  ]
+}
