@@ -13,7 +13,7 @@ export default function BeforeAfter({ data }: BeforeAfterProps) {
           {data.before.map((item) => (
             <li key={item} className="flex gap-2">
               <span aria-hidden="true">❌</span>
-              <span>{item}</span>
+              <span className="min-w-0 break-words">{item}</span>
             </li>
           ))}
         </ul>
@@ -24,7 +24,7 @@ export default function BeforeAfter({ data }: BeforeAfterProps) {
           {data.after.map((item) => (
             <li key={item} className="flex gap-2">
               <span aria-hidden="true">✅</span>
-              <span>{item}</span>
+              <span className="min-w-0 break-words">{item}</span>
             </li>
           ))}
         </ul>

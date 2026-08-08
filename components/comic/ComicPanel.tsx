@@ -45,7 +45,7 @@ export default function ComicPanel({ panel, index, accent }: ComicPanelProps) {
           {panel.emoji}
         </span>
       </div>
-      <p className="comic-border-sm relative bg-paper px-3 py-2 text-base leading-relaxed sm:text-lg">
+      <p className="comic-border-sm relative bg-paper px-3 py-2 text-base leading-relaxed break-words sm:text-lg">
         {panel.caption}
       </p>
       {panel.speaker && panel.dialogue && (

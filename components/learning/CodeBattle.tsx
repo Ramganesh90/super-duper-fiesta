@@ -39,7 +39,7 @@ export default function CodeBattle({ patternId, battle }: CodeBattleProps) {
               type="button"
               onClick={() => handlePick(option.id)}
               disabled={!!selected}
-              className={`comic-border-sm px-4 py-3 text-left text-sm font-semibold transition-colors sm:text-base ${
+              className={`comic-border-sm break-words px-4 py-3 text-left text-sm font-semibold transition-colors sm:text-base ${
                 showCorrect
                   ? "bg-emerald-500/20"
                   : showWrong

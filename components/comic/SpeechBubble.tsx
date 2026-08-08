@@ -16,7 +16,7 @@ export default function SpeechBubble({ speaker, message, align = "left", accent 
         {speaker}
       </span>
       <div
-        className={`speech-bubble ${isRight ? "speech-bubble-right" : ""} max-w-prose px-4 py-3 text-base leading-snug sm:text-lg`}
+        className={`speech-bubble ${isRight ? "speech-bubble-right" : ""} max-w-prose break-words px-4 py-3 text-base leading-snug sm:text-lg`}
       >
         {message}
       </div>

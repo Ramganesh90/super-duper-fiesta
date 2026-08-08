@@ -47,15 +47,15 @@ export default function PatternHeader({ pattern }: PatternHeaderProps) {
       <dl className="relative mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="comic-border-sm bg-paper p-4">
           <dt className="font-comic text-sm tracking-wide text-hero-blue">SUPERPOWER</dt>
-          <dd className="mt-1 text-sm leading-snug sm:text-base">{hero.power}</dd>
+          <dd className="mt-1 break-words text-sm leading-snug sm:text-base">{hero.power}</dd>
         </div>
         <div className="comic-border-sm bg-paper p-4">
           <dt className="font-comic text-sm tracking-wide text-action-red">WEAKNESS</dt>
-          <dd className="mt-1 text-sm leading-snug sm:text-base">{hero.weakness}</dd>
+          <dd className="mt-1 break-words text-sm leading-snug sm:text-base">{hero.weakness}</dd>
         </div>
         <div className="comic-border-sm bg-paper p-4">
           <dt className="font-comic text-sm tracking-wide text-comic-yellow-dark">TYPICAL ENEMIES</dt>
-          <dd className="mt-1 text-sm leading-snug sm:text-base">{hero.enemies.join(", ")}</dd>
+          <dd className="mt-1 break-words text-sm leading-snug sm:text-base">{hero.enemies.join(", ")}</dd>
         </div>
       </dl>
 

@@ -103,7 +103,7 @@ export default function Quiz({ patternId, heroName, questions }: QuizProps) {
                 aria-checked={isSelected}
                 onClick={() => handleSelect(option)}
                 disabled={revealed}
-                className={`comic-border-sm px-4 py-3 text-left text-sm transition-colors sm:text-base ${
+                className={`comic-border-sm break-words px-4 py-3 text-left text-sm transition-colors sm:text-base ${
                   showCorrect
                     ? "bg-emerald-500/20"
                     : showWrong
