@@ -101,6 +101,61 @@
       ],
       "answer": "Automatic, no-cost protection against common network/transport-layer DDoS attacks",
       "explanation": "Shield Standard is on by default at no extra cost for all AWS customers. Shield Advanced adds enhanced protections, 24/7 response, and cost protection for a fee."
+    },
+    {
+      "question": "Which statement correctly describes a network ACL (NACL)?",
+      "options": [
+        "It is stateful and operates at the instance level",
+        "It is stateless, operates at the subnet level, and supports allow and deny rules",
+        "It can only allow traffic, never deny",
+        "It replaces the need for route tables"
+      ],
+      "answer": "It is stateless, operates at the subnet level, and supports allow and deny rules",
+      "explanation": "NACLs are stateless subnet-level firewalls evaluated by rule number and support both allow and deny. Security groups are the stateful, instance-level, allow-only control."
+    },
+    {
+      "question": "You need instances in a private subnet to be administered without exposing them directly to the internet. What is a common secure approach?",
+      "options": [
+        "Assign each a public IP",
+        "Use a bastion host or AWS Systems Manager Session Manager",
+        "Open SSH to 0.0.0.0/0 on the security group",
+        "Move them to a public subnet"
+      ],
+      "answer": "Use a bastion host or AWS Systems Manager Session Manager",
+      "explanation": "A bastion host in a public subnet, or better, SSM Session Manager (no inbound ports at all), lets you reach private instances without exposing them directly to the internet."
+    },
+    {
+      "question": "What does KMS envelope encryption refer to?",
+      "options": [
+        "Encrypting only the network envelope of packets",
+        "Using a data key to encrypt data, and encrypting that data key with a KMS key",
+        "Encrypting data twice with the same key",
+        "A physical envelope for hardware keys"
+      ],
+      "answer": "Using a data key to encrypt data, and encrypting that data key with a KMS key",
+      "explanation": "Envelope encryption encrypts data with a data key, then encrypts (wraps) the data key with a KMS key. This is how services like S3 SSE-KMS and EBS scale encryption efficiently."
+    },
+    {
+      "question": "To which resources can you attach AWS WAF?",
+      "options": [
+        "EC2 instances directly",
+        "CloudFront distributions, Application Load Balancers, and API Gateway",
+        "EBS volumes",
+        "IAM roles"
+      ],
+      "answer": "CloudFront distributions, Application Load Balancers, and API Gateway",
+      "explanation": "AWS WAF integrates with CloudFront, ALB, API Gateway, AppSync, and Cognito user pools to filter layer-7 HTTP(S) requests."
+    },
+    {
+      "question": "How should data in transit between a client and an ALB be protected?",
+      "options": [
+        "By using a NACL",
+        "By terminating TLS/HTTPS on the load balancer with an ACM certificate",
+        "By enabling S3 versioning",
+        "By using a larger instance type"
+      ],
+      "answer": "By terminating TLS/HTTPS on the load balancer with an ACM certificate",
+      "explanation": "Encrypting data in transit uses TLS/HTTPS. You can provision a certificate with AWS Certificate Manager (ACM) and attach it to the ALB listener."
     }
   ],
   "xpReward": 120

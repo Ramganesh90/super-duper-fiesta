@@ -95,6 +95,51 @@
       ],
       "answer": "SNS fan-out to multiple SQS queues",
       "explanation": "The SNS + SQS fan-out pattern publishes one message to an SNS topic that delivers to several SQS queues, giving each consumer its own durable copy to process independently."
+    },
+    {
+      "question": "When would you choose a Network Load Balancer over an Application Load Balancer?",
+      "options": [
+        "For HTTP path-based routing",
+        "For ultra-low latency, millions of requests/sec, TCP/UDP, or a static IP requirement",
+        "For inspecting HTTP headers",
+        "For serving static websites"
+      ],
+      "answer": "For ultra-low latency, millions of requests/sec, TCP/UDP, or a static IP requirement",
+      "explanation": "The NLB operates at layer 4 for extreme performance and TCP/UDP workloads, and provides a static IP per AZ. The ALB is the layer-7 choice for HTTP content-based routing."
+    },
+    {
+      "question": "Which SQS queue type guarantees exactly-once processing and preserves message order?",
+      "options": ["Standard queue", "FIFO queue", "Dead-letter queue", "Delay queue"],
+      "answer": "FIFO queue",
+      "explanation": "FIFO queues preserve ordering and provide exactly-once processing (at reduced throughput). Standard queues offer higher throughput with at-least-once delivery and best-effort ordering."
+    },
+    {
+      "question": "What is the role of a load balancer health check in a resilient architecture?",
+      "options": [
+        "It resizes instances automatically",
+        "It routes traffic only to targets that are responding correctly, avoiding unhealthy ones",
+        "It encrypts traffic",
+        "It reduces cost"
+      ],
+      "answer": "It routes traffic only to targets that are responding correctly, avoiding unhealthy ones",
+      "explanation": "Health checks let the load balancer detect unhealthy targets and stop sending them traffic, so users aren't routed to failing instances."
+    },
+    {
+      "question": "Why should application-tier EC2 instances be kept stateless where possible?",
+      "options": [
+        "So any instance can handle any request, making scaling and instance replacement seamless",
+        "Because stateful apps are not allowed on AWS",
+        "To avoid using IAM roles",
+        "To reduce the number of AZs required to one"
+      ],
+      "answer": "So any instance can handle any request, making scaling and instance replacement seamless",
+      "explanation": "Storing session/state externally (e.g. DynamoDB or ElastiCache) keeps instances stateless, so Auto Scaling can add or replace them freely without losing user state."
+    },
+    {
+      "question": "Which service is best suited to route events from many AWS services and apps to targets based on rules?",
+      "options": ["Amazon EventBridge", "Amazon EBS", "AWS KMS", "Amazon Route 53"],
+      "answer": "Amazon EventBridge",
+      "explanation": "EventBridge is a serverless event bus that matches events against rules and routes them to targets like Lambda, SQS, and Step Functions — ideal for event-driven, decoupled architectures."
     }
   ],
   "xpReward": 120

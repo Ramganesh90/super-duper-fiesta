@@ -90,6 +90,46 @@
       "options": ["DynamoDB Accelerator (DAX)", "Amazon Redshift Spectrum", "Amazon Athena", "AWS Glue"],
       "answer": "DynamoDB Accelerator (DAX)",
       "explanation": "DAX is a fully managed in-memory cache for DynamoDB that reduces read latency from milliseconds to microseconds for read-heavy workloads."
+    },
+    {
+      "question": "What is the key difference between CloudFront and AWS Global Accelerator?",
+      "options": [
+        "They are identical services",
+        "CloudFront caches HTTP content at the edge; Global Accelerator routes TCP/UDP traffic over the AWS backbone to the nearest healthy endpoint",
+        "Global Accelerator is only for static websites",
+        "CloudFront cannot be used with S3"
+      ],
+      "answer": "CloudFront caches HTTP content at the edge; Global Accelerator routes TCP/UDP traffic over the AWS backbone to the nearest healthy endpoint",
+      "explanation": "CloudFront is a CDN that caches content. Global Accelerator doesn't cache — it provides static anycast IPs and optimally routes TCP/UDP traffic to endpoints, ideal for non-HTTP and fast failover."
+    },
+    {
+      "question": "Which database service is purpose-built for petabyte-scale analytics and complex OLAP queries?",
+      "options": ["Amazon DynamoDB", "Amazon Redshift", "Amazon ElastiCache", "Amazon RDS for MySQL"],
+      "answer": "Amazon Redshift",
+      "explanation": "Redshift is a managed columnar data warehouse optimized for analytical (OLAP) queries over large datasets. DynamoDB/RDS serve operational (OLTP) workloads."
+    },
+    {
+      "question": "You need cross-Region read access with very low replication lag for an Aurora database. Which feature helps?",
+      "options": ["Aurora Global Database", "A single-AZ instance", "DynamoDB Streams", "S3 Transfer Acceleration"],
+      "answer": "Aurora Global Database",
+      "explanation": "Aurora Global Database replicates to secondary Regions with typically sub-second lag, enabling low-latency cross-Region reads and fast disaster recovery."
+    },
+    {
+      "question": "A relational workload needs ACID transactions and complex joins. Which service fits best?",
+      "options": ["Amazon RDS or Aurora", "Amazon DynamoDB", "Amazon S3", "Amazon CloudFront"],
+      "answer": "Amazon RDS or Aurora",
+      "explanation": "Relational workloads requiring ACID transactions, joins, and SQL are best served by RDS/Aurora. DynamoDB is optimized for key-value/document access patterns at scale."
+    },
+    {
+      "question": "How does adding Amazon ElastiCache in front of a database improve performance?",
+      "options": [
+        "It permanently replaces the database",
+        "It serves frequently requested data from memory, reducing latency and database load",
+        "It encrypts the database",
+        "It provides object storage"
+      ],
+      "answer": "It serves frequently requested data from memory, reducing latency and database load",
+      "explanation": "ElastiCache (Redis/Memcached) caches hot data in memory so repeated reads are served quickly without hitting the database, improving latency and scalability."
     }
   ],
   "xpReward": 120

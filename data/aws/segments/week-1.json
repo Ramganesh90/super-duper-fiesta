@@ -100,6 +100,51 @@
       ],
       "answer": "Physical security of the data centers",
       "explanation": "AWS is responsible for 'security OF the cloud' — the physical facilities, hardware, and global infrastructure. Customers handle 'security IN the cloud' such as IAM, encryption choices, and security-group rules."
+    },
+    {
+      "question": "What are AWS edge locations used for?",
+      "options": [
+        "Running your primary databases",
+        "Caching and delivering content close to users to reduce latency",
+        "Storing long-term backups",
+        "Managing IAM permissions globally"
+      ],
+      "answer": "Caching and delivering content close to users to reduce latency",
+      "explanation": "Edge locations are part of the CloudFront/global network — they cache content and terminate connections near users, lowering latency. They are separate from Regions and AZs."
+    },
+    {
+      "question": "Multi-AZ deployments primarily protect against which type of failure?",
+      "options": [
+        "A single data center or AZ becoming unavailable",
+        "An entire Region going offline",
+        "A global DNS outage",
+        "A billing error"
+      ],
+      "answer": "A single data center or AZ becoming unavailable",
+      "explanation": "Multiple AZs give high availability within a Region — one AZ can fail without taking your app down. Surviving a whole-Region outage requires a multi-Region (DR) design."
+    },
+    {
+      "question": "Which of the following is the CUSTOMER's responsibility under the shared responsibility model?",
+      "options": [
+        "Securing the physical data centers",
+        "Maintaining the hypervisor",
+        "Configuring IAM permissions and encrypting their data",
+        "Replacing failed physical disks"
+      ],
+      "answer": "Configuring IAM permissions and encrypting their data",
+      "explanation": "Customers own 'security IN the cloud' — IAM configuration, data encryption choices, network/security-group rules, and (for EC2) the guest OS. AWS secures the underlying infrastructure."
+    },
+    {
+      "question": "How many Availability Zones does an AWS Region typically contain at minimum?",
+      "options": ["Exactly one", "Two", "Three or more", "Ten"],
+      "answer": "Three or more",
+      "explanation": "AWS Regions are designed with at least three (often more) Availability Zones so customers can build highly available, fault-tolerant architectures."
+    },
+    {
+      "question": "Which Well-Architected pillar focuses on running and monitoring systems and continuously improving processes?",
+      "options": ["Operational Excellence", "Cost Optimization", "Performance Efficiency", "Security"],
+      "answer": "Operational Excellence",
+      "explanation": "Operational Excellence covers running, monitoring, and improving workloads and procedures. The other pillars target cost, performance, security, reliability, and sustainability respectively."
     }
   ],
   "xpReward": 100

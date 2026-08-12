@@ -100,6 +100,61 @@
       ],
       "answer": "Assign the function an execution role with a least-privilege policy",
       "explanation": "Lambda uses an execution role for temporary credentials. Grant only the specific DynamoDB actions/resource it needs (least privilege)."
+    },
+    {
+      "question": "What is the key difference between an IAM user and an IAM role?",
+      "options": [
+        "A user has permanent credentials for a person/app; a role is assumed to get temporary credentials",
+        "A role can only be used by AWS support",
+        "A user cannot have any policies attached",
+        "There is no difference"
+      ],
+      "answer": "A user has permanent credentials for a person/app; a role is assumed to get temporary credentials",
+      "explanation": "IAM users represent a person or application with long-lived credentials, while roles are assumed by trusted principals (services, users, other accounts) to receive temporary credentials — the preferred approach."
+    },
+    {
+      "question": "Which is a recommended best practice for the AWS account root user?",
+      "options": [
+        "Use it for all daily administration",
+        "Share its credentials with the team",
+        "Enable MFA and avoid using it for everyday tasks",
+        "Create access keys for automation with it"
+      ],
+      "answer": "Enable MFA and avoid using it for everyday tasks",
+      "explanation": "The root user should have MFA enabled and be locked away — day-to-day work should use IAM users/roles with least privilege, not root."
+    },
+    {
+      "question": "How should you grant an application in Account A access to an S3 bucket in Account B?",
+      "options": [
+        "Share long-lived access keys from Account B",
+        "Make the bucket public",
+        "Create a role in Account B that Account A can assume (cross-account role)",
+        "Merge the two accounts"
+      ],
+      "answer": "Create a role in Account B that Account A can assume (cross-account role)",
+      "explanation": "Cross-account access is done by defining a role in the resource account with a trust policy allowing the other account to assume it — no shared long-lived keys required."
+    },
+    {
+      "question": "What does the principle of least privilege recommend?",
+      "options": [
+        "Grant admin access to everyone for convenience",
+        "Grant only the permissions required to perform a task, and no more",
+        "Deny all access at all times",
+        "Use the root user for scoped tasks"
+      ],
+      "answer": "Grant only the permissions required to perform a task, and no more",
+      "explanation": "Least privilege means starting with minimal permissions and adding only what's needed, reducing blast radius if credentials are compromised."
+    },
+    {
+      "question": "What is AWS IAM Identity Center primarily used for?",
+      "options": [
+        "Encrypting data at rest",
+        "Centralized workforce single sign-on and permission sets across multiple accounts",
+        "Distributing content globally",
+        "Running serverless functions"
+      ],
+      "answer": "Centralized workforce single sign-on and permission sets across multiple accounts",
+      "explanation": "IAM Identity Center (successor to AWS SSO) provides central SSO and assigns permission sets to users/groups across many accounts in an organization."
     }
   ],
   "xpReward": 120

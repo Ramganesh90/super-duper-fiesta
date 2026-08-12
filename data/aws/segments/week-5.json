@@ -95,6 +95,51 @@
       ],
       "answer": "A multi-Region architecture with data replication",
       "explanation": "Surviving a whole-Region outage requires replicating data and capacity to another Region (DR). Multi-AZ only protects against AZ-level failures."
+    },
+    {
+      "question": "What does RTO (Recovery Time Objective) measure?",
+      "options": [
+        "The maximum acceptable data loss",
+        "The maximum acceptable time to restore service after an outage",
+        "The number of read replicas",
+        "The storage cost of backups"
+      ],
+      "answer": "The maximum acceptable time to restore service after an outage",
+      "explanation": "RTO is how long you can be down before service must be restored. RPO is how much data (in time) you can lose. Both drive the DR strategy and its cost."
+    },
+    {
+      "question": "In the Pilot Light DR strategy, what is kept running in the recovery Region?",
+      "options": [
+        "A full-scale copy of production",
+        "Only core elements (like a replicated database) while the rest is provisioned on failover",
+        "Nothing at all",
+        "Only DNS records"
+      ],
+      "answer": "Only core elements (like a replicated database) while the rest is provisioned on failover",
+      "explanation": "Pilot Light keeps critical data/core services replicated and idle; on disaster you scale up the surrounding infrastructure. It's cheaper than Warm Standby but has a higher RTO."
+    },
+    {
+      "question": "Which Route 53 routing policy sends users to the Region that gives them the lowest latency?",
+      "options": ["Weighted routing", "Latency-based routing", "Failover routing", "Simple routing"],
+      "answer": "Latency-based routing",
+      "explanation": "Latency-based routing directs users to the AWS Region that provides the lowest latency for them. Weighted splits by proportion; failover swaps to a standby on health-check failure."
+    },
+    {
+      "question": "You need to scale READ traffic for an RDS database. Which feature should you use?",
+      "options": ["Multi-AZ standby", "Read replicas", "A larger EBS volume", "A NAT gateway"],
+      "answer": "Read replicas",
+      "explanation": "Read replicas offload read queries and scale reads horizontally. The Multi-AZ standby is for availability/failover and does not serve read traffic."
+    },
+    {
+      "question": "What is a primary benefit of AWS Backup?",
+      "options": [
+        "It provides in-memory caching",
+        "It centrally manages and automates backups across many AWS services with policy-based plans",
+        "It load balances traffic",
+        "It filters malicious HTTP requests"
+      ],
+      "answer": "It centrally manages and automates backups across many AWS services with policy-based plans",
+      "explanation": "AWS Backup centralizes backup policies across services (EBS, RDS, DynamoDB, EFS, and more) and supports cross-Region and cross-account copies for DR and compliance."
     }
   ],
   "xpReward": 120

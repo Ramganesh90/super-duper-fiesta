@@ -85,6 +85,41 @@
       ],
       "answer": "Use Auto Scaling and serverless to match capacity to demand",
       "explanation": "Matching capacity to demand with Auto Scaling and serverless (Lambda/Fargate) means you don't pay for idle resources — a core cost-optimization practice."
+    },
+    {
+      "question": "For a steady, predictable workload running 24/7 for the next year, which option gives the best discount over On-Demand?",
+      "options": ["Spot Instances", "Savings Plans or Reserved Instances", "Dedicated Hosts billed hourly", "On-Demand with a larger instance"],
+      "answer": "Savings Plans or Reserved Instances",
+      "explanation": "Committing to consistent usage with Savings Plans or Reserved Instances (1- or 3-year terms) yields significant discounts for steady workloads. Spot suits interruptible work, not always-on production."
+    },
+    {
+      "question": "Which S3 storage class offers the lowest cost for rarely accessed, long-term archival data where retrieval of hours is acceptable?",
+      "options": ["S3 Standard", "S3 Standard-IA", "S3 Glacier Deep Archive", "S3 Intelligent-Tiering"],
+      "answer": "S3 Glacier Deep Archive",
+      "explanation": "Glacier Deep Archive is the lowest-cost class for long-term archives accessed very rarely, with retrieval times measured in hours — ideal for compliance archives."
+    },
+    {
+      "question": "Which service provides recommendations to right-size EC2 instances based on utilization?",
+      "options": ["AWS Compute Optimizer", "Amazon CloudFront", "AWS KMS", "Amazon SQS"],
+      "answer": "AWS Compute Optimizer",
+      "explanation": "AWS Compute Optimizer analyzes utilization metrics and recommends right-sizing for EC2, Auto Scaling groups, EBS, and Lambda. Trusted Advisor also flags idle/underutilized resources."
+    },
+    {
+      "question": "How can you automatically move older S3 objects to cheaper storage classes without changing your application?",
+      "options": [
+        "Manually copy them each month",
+        "Configure S3 Lifecycle policies to transition and expire objects",
+        "Enable a NAT gateway",
+        "Use a larger EC2 instance"
+      ],
+      "answer": "Configure S3 Lifecycle policies to transition and expire objects",
+      "explanation": "Lifecycle rules automatically transition objects to cheaper tiers (e.g. Standard-IA, Glacier) and expire them on a schedule — cost savings with no application changes."
+    },
+    {
+      "question": "Which purchasing option is best for short-term, unpredictable workloads that cannot tolerate interruption and don't justify a commitment?",
+      "options": ["On-Demand Instances", "Spot Instances", "3-year Reserved Instances", "Savings Plans"],
+      "answer": "On-Demand Instances",
+      "explanation": "On-Demand has no commitment and no interruption risk, making it ideal for short-term, spiky, or unpredictable workloads. Spot is cheaper but interruptible; RIs/Savings Plans need commitment."
     }
   ],
   "xpReward": 150

@@ -90,6 +90,41 @@
       ],
       "answer": "It lets you provision IOPS and throughput independently of volume size",
       "explanation": "gp3 decouples performance from capacity — you can dial IOPS/throughput up without growing the volume, often at lower cost than gp2."
+    },
+    {
+      "question": "Which characteristic of EC2 instance store volumes is important to remember?",
+      "options": [
+        "Data persists after the instance stops or terminates",
+        "It is ephemeral — data is lost when the instance stops or terminates",
+        "It is shared across all instances in a Region",
+        "It is object storage"
+      ],
+      "answer": "It is ephemeral — data is lost when the instance stops or terminates",
+      "explanation": "Instance store is physically attached, high-performance, but ephemeral — data is lost on stop/terminate. Use EBS or EFS for persistence."
+    },
+    {
+      "question": "Which service should you choose to store large numbers of static objects (images, backups, static website files) durably and cheaply?",
+      "options": ["Amazon EBS", "Amazon S3", "Instance store", "Amazon EFS"],
+      "answer": "Amazon S3",
+      "explanation": "Amazon S3 is highly durable, scalable object storage ideal for static assets, backups, data lakes, and static website hosting. EBS/EFS are block/file storage for attached compute."
+    },
+    {
+      "question": "You want to run containers without managing any servers or clusters of EC2 instances. Which option fits?",
+      "options": ["EC2 launch type with self-managed hosts", "AWS Fargate", "A dedicated host", "Amazon EFS"],
+      "answer": "AWS Fargate",
+      "explanation": "Fargate is the serverless compute engine for ECS/EKS — you run containers without provisioning or managing the underlying EC2 instances."
+    },
+    {
+      "question": "A latency-sensitive transactional database needs the highest, most consistent block-storage performance. Which EBS type is most appropriate?",
+      "options": ["sc1 (cold HDD)", "st1 (throughput HDD)", "io2 Block Express (provisioned IOPS SSD)", "gp2 minimum size"],
+      "answer": "io2 Block Express (provisioned IOPS SSD)",
+      "explanation": "Provisioned IOPS SSD (io1/io2, io2 Block Express) delivers the highest, most consistent IOPS and low latency for I/O-intensive, mission-critical databases."
+    },
+    {
+      "question": "Which service provides a fully managed shared file system for Windows workloads?",
+      "options": ["Amazon EFS", "Amazon FSx for Windows File Server", "Amazon S3", "Amazon EBS"],
+      "answer": "Amazon FSx for Windows File Server",
+      "explanation": "EFS is NFS for Linux; FSx for Windows File Server provides a fully managed SMB/Windows-native shared file system (and FSx for Lustre serves high-performance computing)."
     }
   ],
   "xpReward": 120
