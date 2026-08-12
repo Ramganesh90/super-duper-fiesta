@@ -1,0 +1,96 @@
+{
+  "id": "week-7",
+  "week": 7,
+  "title": "High-Performing Networking & Databases",
+  "domain": "performance",
+  "oneLiner": "Deliver content globally and pick the right database so reads and writes stay fast at scale.",
+  "examWeightNote": "Completes Design High-Performing Architectures (24% of the exam).",
+  "objectives": [
+    "Use CloudFront and Global Accelerator to reduce global latency.",
+    "Choose the right database: RDS/Aurora, DynamoDB, ElastiCache, Redshift, based on the access pattern.",
+    "Scale reads with RDS read replicas and Aurora, and scale throughput with DynamoDB.",
+    "Understand DynamoDB DAX and Aurora Global Database for performance/global reach."
+  ],
+  "services": [
+    { "name": "Amazon CloudFront", "purpose": "CDN that caches content at edge locations for low-latency global delivery.", "emoji": "📡" },
+    { "name": "AWS Global Accelerator", "purpose": "Routes users over the AWS backbone to the nearest healthy endpoint via anycast static IPs.", "emoji": "🚀" },
+    { "name": "Amazon RDS / Aurora", "purpose": "Managed relational databases; Aurora adds high performance, storage auto-scaling, and up to 15 read replicas.", "emoji": "🐬" },
+    { "name": "Amazon DynamoDB", "purpose": "Serverless key-value/document database with single-digit-millisecond latency at any scale.", "emoji": "⚡" },
+    { "name": "Amazon Redshift", "purpose": "Managed petabyte-scale data warehouse for analytics/OLAP queries.", "emoji": "📊" }
+  ],
+  "keyConcepts": [
+    "CloudFront caches static and dynamic content at edge locations, cutting latency and offloading origins; pair it with S3 or ALB origins.",
+    "Global Accelerator improves performance for non-HTTP and TCP/UDP workloads by sending traffic over the AWS backbone to the closest healthy endpoint (great for gaming, VoIP, failover).",
+    "Use RDS read replicas (async) to scale read-heavy relational workloads; Aurora supports up to 15 low-lag replicas and an Aurora Global Database for cross-Region reads.",
+    "Choose DynamoDB for massive scale, predictable low-latency key-value access, and serverless operations; add DAX for microsecond cached reads.",
+    "Match the database to the pattern: relational/ACID → RDS/Aurora; key-value at scale → DynamoDB; analytics → Redshift; in-memory cache → ElastiCache."
+  ],
+  "resources": [
+    { "label": "CloudFront developer guide", "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html", "type": "docs" },
+    { "label": "Global Accelerator", "url": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html", "type": "docs" },
+    { "label": "Choosing an AWS database", "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/database.html", "type": "whitepaper" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A read-heavy reporting dashboard hammers a single RDS MySQL instance, and read queries are slowing down the primary that also handles writes.",
+      "question": "What is the most appropriate way to scale the read load?",
+      "options": [
+        { "id": "a", "label": "Add RDS read replicas and direct read traffic to them" },
+        { "id": "b", "label": "Enable Multi-AZ on the primary" },
+        { "id": "c", "label": "Increase the EBS volume size" },
+        { "id": "d", "label": "Migrate the database to a single larger instance only" }
+      ],
+      "correct": "a",
+      "explanation": "Read replicas offload read traffic from the primary, scaling reads horizontally. Multi-AZ is for availability (its standby doesn't serve reads). Bigger storage/instances only scale vertically to a point."
+    },
+    {
+      "scenario": "A global mobile game needs the lowest possible latency to a set of regional game servers, using TCP/UDP, with fast failover to healthy Regions and static entry-point IPs.",
+      "question": "Which service best meets this?",
+      "options": [
+        { "id": "a", "label": "Amazon CloudFront" },
+        { "id": "b", "label": "AWS Global Accelerator" },
+        { "id": "c", "label": "Amazon Route 53 weighted routing only" },
+        { "id": "d", "label": "An internet-facing ALB in one Region" }
+      ],
+      "correct": "b",
+      "explanation": "Global Accelerator provides static anycast IPs and routes TCP/UDP traffic over the AWS backbone to the nearest healthy endpoint with fast failover — ideal for latency-sensitive, non-HTTP workloads. CloudFront is optimized for cacheable HTTP content."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is Amazon CloudFront primarily used for?",
+      "options": [
+        "Running relational databases",
+        "Caching and delivering content from edge locations to reduce latency",
+        "Managing IAM permissions",
+        "Providing block storage to EC2"
+      ],
+      "answer": "Caching and delivering content from edge locations to reduce latency",
+      "explanation": "CloudFront is AWS's CDN — it caches content at global edge locations close to users, lowering latency and offloading the origin."
+    },
+    {
+      "question": "Which database is the best fit for a serverless application needing single-digit-millisecond key-value reads at massive scale?",
+      "options": ["Amazon Redshift", "Amazon DynamoDB", "Amazon RDS for PostgreSQL", "Amazon Neptune"],
+      "answer": "Amazon DynamoDB",
+      "explanation": "DynamoDB is a serverless NoSQL key-value/document store delivering consistent low-latency performance at any scale — ideal for high-throughput key-value access."
+    },
+    {
+      "question": "How do RDS read replicas help performance?",
+      "options": [
+        "They provide synchronous failover for availability",
+        "They offload read queries from the primary, scaling reads horizontally",
+        "They encrypt data at rest",
+        "They reduce storage costs"
+      ],
+      "answer": "They offload read queries from the primary, scaling reads horizontally",
+      "explanation": "Read replicas asynchronously copy data and serve read traffic, relieving the primary. (Multi-AZ standbys, by contrast, are for availability, not read scaling.)"
+    },
+    {
+      "question": "Which service accelerates DynamoDB reads to microsecond latency via an in-memory cache?",
+      "options": ["DynamoDB Accelerator (DAX)", "Amazon Redshift Spectrum", "Amazon Athena", "AWS Glue"],
+      "answer": "DynamoDB Accelerator (DAX)",
+      "explanation": "DAX is a fully managed in-memory cache for DynamoDB that reduces read latency from milliseconds to microseconds for read-heavy workloads."
+    }
+  ],
+  "xpReward": 120
+}

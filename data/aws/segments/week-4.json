@@ -1,0 +1,101 @@
+{
+  "id": "week-4",
+  "week": 4,
+  "title": "Resilient & Decoupled Architectures",
+  "domain": "resilience",
+  "oneLiner": "Build systems that bend without breaking: multi-AZ, load balancing, auto scaling, and async decoupling.",
+  "examWeightNote": "Part of Design Resilient Architectures (26% of the exam).",
+  "objectives": [
+    "Use Elastic Load Balancing and EC2 Auto Scaling to add fault tolerance and elasticity.",
+    "Decouple components with Amazon SQS, SNS, and EventBridge so failures don't cascade.",
+    "Choose between ALB, NLB, and GLB for the right layer and protocol.",
+    "Design stateless tiers so instances can be added or replaced freely."
+  ],
+  "services": [
+    { "name": "Elastic Load Balancing", "purpose": "Distributes traffic across healthy targets in multiple AZs; ALB (L7), NLB (L4), GLB (appliances).", "emoji": "⚖️" },
+    { "name": "EC2 Auto Scaling", "purpose": "Adds/removes instances to match demand and replaces unhealthy ones automatically.", "emoji": "📈" },
+    { "name": "Amazon SQS", "purpose": "Fully managed message queue that buffers work between producers and consumers.", "emoji": "📬" },
+    { "name": "Amazon SNS", "purpose": "Pub/sub fan-out to many subscribers (queues, Lambda, HTTP, email).", "emoji": "📣" },
+    { "name": "Amazon EventBridge", "purpose": "Event bus that routes events between AWS services and apps using rules.", "emoji": "🔀" }
+  ],
+  "keyConcepts": [
+    "Put an Auto Scaling group behind a load balancer spanning multiple AZs — the ASG replaces failed instances and scales on demand; the ELB routes only to healthy targets.",
+    "SQS decouples producers from consumers: if consumers slow down or fail, messages wait in the queue instead of being lost (buffering / load leveling).",
+    "SNS fans out one message to many subscribers; combine SNS + SQS (fan-out pattern) so each service gets its own durable queue.",
+    "Use an ALB for HTTP/HTTPS (path/host routing), an NLB for extreme performance / TCP-UDP / static IP, and a Gateway Load Balancer for third-party virtual appliances.",
+    "Keep application tiers stateless (store session/state in DynamoDB or ElastiCache) so any instance can handle any request and scaling is painless."
+  ],
+  "resources": [
+    { "label": "EC2 Auto Scaling", "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html", "type": "docs" },
+    { "label": "Elastic Load Balancing types", "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html", "type": "docs" },
+    { "label": "SQS vs SNS", "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "An order-processing service calls a downstream inventory service synchronously. When inventory is slow, orders time out and are lost, and traffic spikes overwhelm the downstream service.",
+      "question": "Which change best decouples the two services and prevents lost orders during spikes?",
+      "options": [
+        { "id": "a", "label": "Place an Amazon SQS queue between them so orders buffer and are processed at a steady rate" },
+        { "id": "b", "label": "Increase the timeout on the synchronous call" },
+        { "id": "c", "label": "Move both services onto one larger EC2 instance" },
+        { "id": "d", "label": "Enable Multi-AZ on the downstream service only" }
+      ],
+      "correct": "a",
+      "explanation": "An SQS queue decouples producer and consumer: orders are durably buffered and the downstream service pulls at its own pace (load leveling), so spikes don't cause lost orders or overload."
+    },
+    {
+      "scenario": "A web tier must automatically recover from instance failures and handle daily traffic peaks without manual intervention, spread across two AZs.",
+      "question": "Which combination meets the requirement?",
+      "options": [
+        { "id": "a", "label": "A single large EC2 instance with a static Elastic IP" },
+        { "id": "b", "label": "An Auto Scaling group across two AZs behind an Application Load Balancer" },
+        { "id": "c", "label": "Two instances in one AZ without a load balancer" },
+        { "id": "d", "label": "A Lambda function triggered by CloudWatch alarms" }
+      ],
+      "correct": "b",
+      "explanation": "An ASG across multiple AZs behind an ALB replaces unhealthy instances automatically and scales with demand, while the ALB routes traffic only to healthy targets — the classic resilient web-tier pattern."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the main benefit of placing an SQS queue between a producer and a consumer?",
+      "options": [
+        "It encrypts the messages with a customer key",
+        "It decouples them so the consumer can process at its own pace and messages aren't lost during spikes",
+        "It provides a public HTTP endpoint",
+        "It automatically scales the consumer's CPU"
+      ],
+      "answer": "It decouples them so the consumer can process at its own pace and messages aren't lost during spikes",
+      "explanation": "SQS buffers messages (load leveling), decoupling components so a slow or failed consumer doesn't drop work or overwhelm downstream systems."
+    },
+    {
+      "question": "Which load balancer should you use for HTTP path-based and host-based routing at layer 7?",
+      "options": ["Network Load Balancer", "Application Load Balancer", "Gateway Load Balancer", "Classic Load Balancer only"],
+      "answer": "Application Load Balancer",
+      "explanation": "The ALB operates at layer 7 and supports content-based routing (path, host, headers). The NLB is layer 4 for ultra-high performance/TCP-UDP; GLB is for virtual appliances."
+    },
+    {
+      "question": "What does EC2 Auto Scaling do when an instance fails its health check?",
+      "options": [
+        "Sends an email and waits for manual action",
+        "Terminates the unhealthy instance and launches a replacement",
+        "Reboots the load balancer",
+        "Increases the instance size"
+      ],
+      "answer": "Terminates the unhealthy instance and launches a replacement",
+      "explanation": "Auto Scaling maintains the desired capacity by replacing unhealthy instances automatically, improving resilience."
+    },
+    {
+      "question": "You need to deliver a single event to multiple independent subscribers, each with its own durable buffer. What is the recommended pattern?",
+      "options": [
+        "SNS fan-out to multiple SQS queues",
+        "A single SQS queue polled by all subscribers",
+        "Direct synchronous HTTP calls to each subscriber",
+        "Storing events in an EBS volume"
+      ],
+      "answer": "SNS fan-out to multiple SQS queues",
+      "explanation": "The SNS + SQS fan-out pattern publishes one message to an SNS topic that delivers to several SQS queues, giving each consumer its own durable copy to process independently."
+    }
+  ],
+  "xpReward": 120
+}

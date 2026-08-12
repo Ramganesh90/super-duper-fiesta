@@ -10,6 +10,9 @@
   --color-action-red-dark: #a10f24;
   --color-comic-yellow: #ffd23f;
   --color-comic-yellow-dark: #8a5a00;
+  --color-aws-orange: #ff9900;
+  --color-aws-orange-dark: #b45c00;
+  --color-aws-navy: #232f3e;
 
   --font-comic: var(--font-bangers), "Impact", "Arial Narrow Bold", sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

@@ -1,0 +1,101 @@
+{
+  "id": "week-5",
+  "week": 5,
+  "title": "High Availability & Disaster Recovery",
+  "domain": "resilience",
+  "oneLiner": "Meet your RTO and RPO with Route 53 routing, backups, and the four DR strategies.",
+  "examWeightNote": "Completes Design Resilient Architectures (26% of the exam).",
+  "objectives": [
+    "Define RTO and RPO and map them to the four DR strategies.",
+    "Use Route 53 routing policies (failover, latency, weighted, geolocation) and health checks.",
+    "Design multi-AZ (HA) vs multi-Region (DR) and know what each protects against.",
+    "Apply AWS Backup, snapshots, and cross-Region replication for durability."
+  ],
+  "services": [
+    { "name": "Amazon Route 53", "purpose": "Managed DNS with health checks and routing policies for failover and global traffic steering.", "emoji": "🌐" },
+    { "name": "AWS Backup", "purpose": "Centralized, policy-based backups across many services with cross-Region/-account copy.", "emoji": "💾" },
+    { "name": "RDS Multi-AZ", "purpose": "Synchronous standby in another AZ with automatic failover for the database tier.", "emoji": "🗄️" },
+    { "name": "S3 Cross-Region Replication", "purpose": "Asynchronously replicates objects to a bucket in another Region for DR/compliance.", "emoji": "🔁" },
+    { "name": "AWS Elastic Disaster Recovery", "purpose": "Continuously replicates servers to AWS for fast, low-RPO recovery.", "emoji": "🚑" }
+  ],
+  "keyConcepts": [
+    "RTO = how long you can be down (recovery time); RPO = how much data you can lose (recovery point). Smaller RTO/RPO costs more.",
+    "The four DR strategies, cheapest→fastest: Backup & Restore, Pilot Light, Warm Standby, Multi-Site Active/Active.",
+    "Multi-AZ = high availability within a Region (survives AZ failure). Multi-Region = disaster recovery (survives Region failure) and global low latency.",
+    "Route 53 failover routing + health checks can automatically redirect traffic to a standby Region/endpoint when the primary is unhealthy.",
+    "RDS Multi-AZ is for availability (synchronous standby, auto-failover), not for scaling reads — read replicas handle read scaling."
+  ],
+  "resources": [
+    { "label": "Disaster recovery options in the cloud", "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html", "type": "whitepaper" },
+    { "label": "Route 53 routing policies", "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html", "type": "docs" },
+    { "label": "AWS Backup", "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A business needs its app to recover in another Region within minutes (low RTO) but wants to avoid paying for a full duplicate of production running all the time.",
+      "question": "Which DR strategy best fits a low-RTO, cost-conscious requirement?",
+      "options": [
+        { "id": "a", "label": "Backup & Restore" },
+        { "id": "b", "label": "Warm Standby — a scaled-down but always-running copy that scales up on failover" },
+        { "id": "c", "label": "Multi-Site Active/Active at full scale" },
+        { "id": "d", "label": "No DR plan; rely on Multi-AZ" }
+      ],
+      "correct": "b",
+      "explanation": "Warm Standby keeps a scaled-down copy always running in the DR Region, so failover is fast (low RTO) at a fraction of the cost of full active/active. Backup & Restore is cheapest but slowest; active/active is fastest but most expensive."
+    },
+    {
+      "scenario": "You want DNS to automatically send users to a secondary Region only when the primary application endpoint becomes unhealthy.",
+      "question": "Which Route 53 configuration achieves automatic failover?",
+      "options": [
+        { "id": "a", "label": "Weighted routing with equal weights" },
+        { "id": "b", "label": "Failover routing policy with health checks on the primary" },
+        { "id": "c", "label": "Simple routing to both endpoints" },
+        { "id": "d", "label": "Geolocation routing by continent" }
+      ],
+      "correct": "b",
+      "explanation": "Failover routing with a health check monitors the primary; when it's unhealthy, Route 53 automatically answers with the secondary endpoint. Weighted/simple routing don't react to health for failover."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does RPO (Recovery Point Objective) measure?",
+      "options": [
+        "How long recovery takes",
+        "The maximum acceptable amount of data loss, measured in time",
+        "The number of Availability Zones used",
+        "The cost of the DR site"
+      ],
+      "answer": "The maximum acceptable amount of data loss, measured in time",
+      "explanation": "RPO is how much data (in time) you can afford to lose. RTO is how long you can be down. Together they drive DR strategy choice."
+    },
+    {
+      "question": "Which DR strategy is the cheapest but has the longest recovery time?",
+      "options": ["Multi-Site Active/Active", "Warm Standby", "Pilot Light", "Backup & Restore"],
+      "answer": "Backup & Restore",
+      "explanation": "Backup & Restore stores backups and rebuilds on demand — lowest cost, highest RTO/RPO. Active/active is fastest and most expensive."
+    },
+    {
+      "question": "RDS Multi-AZ primarily provides which benefit?",
+      "options": [
+        "Scaling read traffic across replicas",
+        "High availability via a synchronous standby with automatic failover",
+        "Global low-latency reads in every Region",
+        "Cheaper storage"
+      ],
+      "answer": "High availability via a synchronous standby with automatic failover",
+      "explanation": "Multi-AZ keeps a synchronous standby in another AZ and fails over automatically. To scale reads you add read replicas, which is a separate feature."
+    },
+    {
+      "question": "You need to protect against an entire AWS Region failing. What should you implement?",
+      "options": [
+        "Multiple instances in one AZ",
+        "A multi-Region architecture with data replication",
+        "A larger RDS instance",
+        "More frequent EBS snapshots in the same Region"
+      ],
+      "answer": "A multi-Region architecture with data replication",
+      "explanation": "Surviving a whole-Region outage requires replicating data and capacity to another Region (DR). Multi-AZ only protects against AZ-level failures."
+    }
+  ],
+  "xpReward": 120
+}

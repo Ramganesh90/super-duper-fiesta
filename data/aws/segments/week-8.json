@@ -1,0 +1,91 @@
+{
+  "id": "week-8",
+  "week": 8,
+  "title": "Cost-Optimized Architectures",
+  "domain": "cost",
+  "oneLiner": "Deliver the same outcome for less: right pricing models, storage tiers, and cost visibility.",
+  "examWeightNote": "Design Cost-Optimized Architectures (20% of the exam) — your final domain.",
+  "objectives": [
+    "Choose EC2 purchasing options: On-Demand, Reserved Instances, Savings Plans, and Spot.",
+    "Use S3 storage classes and lifecycle policies to cut storage cost.",
+    "Right-size and use auto scaling / serverless to avoid paying for idle capacity.",
+    "Gain cost visibility with Cost Explorer, Budgets, and the Cost and Usage Report."
+  ],
+  "services": [
+    { "name": "EC2 Pricing Models", "purpose": "On-Demand (flexible), Reserved/Savings Plans (commit for discount), Spot (deep discount, interruptible).", "emoji": "🏷️" },
+    { "name": "S3 Storage Classes", "purpose": "Standard, Standard-IA, One Zone-IA, Intelligent-Tiering, Glacier tiers — trade access speed for cost.", "emoji": "🗄️" },
+    { "name": "S3 Lifecycle Policies", "purpose": "Automatically transition or expire objects to cheaper tiers over time.", "emoji": "♻️" },
+    { "name": "AWS Cost Explorer & Budgets", "purpose": "Visualize spend and set alerts when costs or usage exceed thresholds.", "emoji": "📉" },
+    { "name": "AWS Compute Optimizer / Trusted Advisor", "purpose": "Recommend right-sizing and flag idle or underutilized resources.", "emoji": "🧮" }
+  ],
+  "keyConcepts": [
+    "Use Spot Instances for fault-tolerant, interruptible workloads (batch, CI, big data) to save up to ~90%; use Savings Plans/Reserved Instances for steady, predictable usage.",
+    "S3 Intelligent-Tiering automatically moves objects between access tiers based on usage — good when access patterns are unknown or changing.",
+    "Lifecycle rules transition infrequently accessed data to IA/Glacier and expire old data, cutting cost without app changes.",
+    "Avoid paying for idle: right-size instances, use Auto Scaling to match demand, and prefer serverless (Lambda, Fargate) for spiky workloads.",
+    "Set AWS Budgets alerts and review Cost Explorer / Cost and Usage Report and Trusted Advisor recommendations regularly."
+  ],
+  "resources": [
+    { "label": "EC2 purchasing options", "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html", "type": "docs" },
+    { "label": "S3 storage classes", "url": "https://aws.amazon.com/s3/storage-classes/", "type": "docs" },
+    { "label": "Cost Optimization pillar", "url": "https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html", "type": "whitepaper" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A nightly batch job processes large datasets and can safely restart if interrupted. The team wants the lowest possible compute cost.",
+      "question": "Which EC2 purchasing option is most cost-effective for this workload?",
+      "options": [
+        { "id": "a", "label": "On-Demand Instances" },
+        { "id": "b", "label": "Spot Instances" },
+        { "id": "c", "label": "A 3-year Reserved Instance" },
+        { "id": "d", "label": "Dedicated Hosts" }
+      ],
+      "correct": "b",
+      "explanation": "Spot Instances offer up to ~90% savings and are ideal for interruption-tolerant, restartable batch work. Reserved/On-Demand cost more; you'd reserve capacity only for steady, always-on workloads."
+    },
+    {
+      "scenario": "Log files are read frequently for 30 days, rarely after that, and must be retained for 7 years for compliance. The team wants to minimize storage cost automatically.",
+      "question": "What is the best approach?",
+      "options": [
+        { "id": "a", "label": "Keep everything in S3 Standard forever" },
+        { "id": "b", "label": "Use an S3 Lifecycle policy: Standard → Standard-IA → Glacier, expiring after 7 years" },
+        { "id": "c", "label": "Store the logs on a large EBS volume" },
+        { "id": "d", "label": "Delete logs after 30 days" }
+      ],
+      "correct": "b",
+      "explanation": "A lifecycle policy transitions objects to cheaper tiers as access drops (Standard → Standard-IA → Glacier) and expires them at 7 years, minimizing cost while meeting retention — no application changes required."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which EC2 pricing model offers the deepest discount but can be interrupted with little notice?",
+      "options": ["On-Demand", "Reserved Instances", "Spot Instances", "Dedicated Hosts"],
+      "answer": "Spot Instances",
+      "explanation": "Spot uses spare capacity for up to ~90% off but can be reclaimed by AWS, so it suits fault-tolerant, interruptible workloads."
+    },
+    {
+      "question": "You have unpredictable S3 access patterns and want automatic cost savings without manual tuning. Which storage class fits?",
+      "options": ["S3 Standard", "S3 Intelligent-Tiering", "S3 One Zone-IA", "S3 Glacier Deep Archive"],
+      "answer": "S3 Intelligent-Tiering",
+      "explanation": "Intelligent-Tiering automatically moves objects between frequent and infrequent access tiers based on usage, optimizing cost when access patterns are unknown or changing."
+    },
+    {
+      "question": "Which tool lets you set a threshold and get alerted when your AWS spend exceeds it?",
+      "options": ["AWS Budgets", "Amazon CloudFront", "AWS KMS", "Amazon Athena"],
+      "answer": "AWS Budgets",
+      "explanation": "AWS Budgets tracks cost/usage against thresholds and sends alerts. Cost Explorer visualizes trends; the Cost and Usage Report gives the most granular data."
+    },
+    {
+      "question": "Which is a recommended way to avoid paying for idle compute capacity?",
+      "options": [
+        "Run all workloads on the largest instance type",
+        "Use Auto Scaling and serverless to match capacity to demand",
+        "Keep test environments running 24/7",
+        "Provision for peak load at all times"
+      ],
+      "answer": "Use Auto Scaling and serverless to match capacity to demand",
+      "explanation": "Matching capacity to demand with Auto Scaling and serverless (Lambda/Fargate) means you don't pay for idle resources — a core cost-optimization practice."
+    }
+  ],
+  "xpReward": 150
+}

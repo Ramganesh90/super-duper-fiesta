@@ -1,0 +1,107 @@
+{
+  "id": "week-3",
+  "week": 3,
+  "title": "Data Protection & Secure Networking",
+  "domain": "security",
+  "oneLiner": "Encrypt data everywhere and lock down the network with VPC controls, KMS, and edge protection.",
+  "examWeightNote": "Completes Design Secure Architectures (30% of the exam).",
+  "objectives": [
+    "Encrypt data at rest with KMS and in transit with TLS; know the difference between SSE-S3, SSE-KMS, and SSE-C.",
+    "Contrast security groups (stateful) with network ACLs (stateless).",
+    "Secure a VPC with subnets, route tables, NAT gateways, and VPC endpoints / PrivateLink.",
+    "Choose the right edge protection: AWS WAF, Shield, and when to add them to CloudFront/ALB."
+  ],
+  "services": [
+    { "name": "AWS KMS", "purpose": "Managed keys for encrypting data at rest across S3, EBS, RDS, and more, with access controlled by IAM/key policies.", "emoji": "🔑" },
+    { "name": "Security Groups", "purpose": "Stateful, instance-level virtual firewalls; return traffic is automatically allowed.", "emoji": "🧱" },
+    { "name": "Network ACLs", "purpose": "Stateless, subnet-level allow/deny rules evaluated in order.", "emoji": "🚧" },
+    { "name": "VPC Endpoints / PrivateLink", "purpose": "Reach AWS services (e.g. S3, DynamoDB) privately without traversing the internet.", "emoji": "🔌" },
+    { "name": "AWS WAF & Shield", "purpose": "WAF filters HTTP(S) requests (SQLi, XSS, rate limits); Shield defends against DDoS.", "emoji": "🛡️" }
+  ],
+  "keyConcepts": [
+    "Security groups are stateful (allow inbound → return traffic is auto-allowed) and only support allow rules; NACLs are stateless and support both allow and deny.",
+    "SSE-S3 uses S3-managed keys; SSE-KMS uses KMS keys (adds audit trail and key policies); SSE-C means you supply the key. For compliance/audit, SSE-KMS is common.",
+    "A gateway VPC endpoint (S3, DynamoDB) is free and uses route tables; interface endpoints (PrivateLink) create ENIs for most other services.",
+    "Place resources that shouldn't be internet-reachable in private subnets; use a NAT gateway for outbound-only internet access.",
+    "Attach AWS WAF to CloudFront, ALB, or API Gateway; AWS Shield Standard is automatic and free, Shield Advanced adds enhanced DDoS protection and cost protection."
+  ],
+  "resources": [
+    { "label": "Encrypting data with KMS", "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html", "type": "docs" },
+    { "label": "Security groups vs NACLs", "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-comparison.html", "type": "docs" },
+    { "label": "VPC endpoints", "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "EC2 instances in a private subnet need to download objects from Amazon S3, but security policy forbids any route to the internet for these instances.",
+      "question": "How can the instances reach S3 privately?",
+      "options": [
+        { "id": "a", "label": "Add a NAT gateway and route 0.0.0.0/0 to it" },
+        { "id": "b", "label": "Create a gateway VPC endpoint for S3" },
+        { "id": "c", "label": "Assign the instances public IP addresses" },
+        { "id": "d", "label": "Make the S3 bucket public" }
+      ],
+      "correct": "b",
+      "explanation": "A gateway VPC endpoint for S3 keeps traffic on the AWS network with no internet route required — and it's free. A NAT gateway or public IPs would send traffic toward the internet, violating the policy."
+    },
+    {
+      "scenario": "A public web app behind an Application Load Balancer is being hit with SQL-injection attempts and layer-7 request floods.",
+      "question": "Which service should you add to filter malicious HTTP requests?",
+      "options": [
+        { "id": "a", "label": "AWS WAF with managed rule groups" },
+        { "id": "b", "label": "A larger EC2 instance type" },
+        { "id": "c", "label": "Amazon Inspector" },
+        { "id": "d", "label": "A network ACL denying all traffic" }
+      ],
+      "correct": "a",
+      "explanation": "AWS WAF inspects HTTP(S) requests and can block SQLi/XSS and rate-limit floods when attached to CloudFront, ALB, or API Gateway. Inspector assesses vulnerabilities but doesn't filter live traffic."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which statement about security groups is correct?",
+      "options": [
+        "They are stateless and evaluated by rule number",
+        "They are stateful and support only allow rules",
+        "They operate at the subnet level",
+        "They can explicitly deny traffic"
+      ],
+      "answer": "They are stateful and support only allow rules",
+      "explanation": "Security groups are stateful (return traffic is automatically allowed) and support allow rules only. NACLs are the stateless, subnet-level control that supports deny rules."
+    },
+    {
+      "question": "You need an audit trail of every use of the encryption key protecting an S3 bucket. Which option should you choose?",
+      "options": ["SSE-S3", "SSE-KMS", "No encryption", "Client-side only with no logging"],
+      "answer": "SSE-KMS",
+      "explanation": "SSE-KMS uses AWS KMS keys, whose usage is logged in CloudTrail and controlled by key policies — ideal when you need auditing and fine-grained key control."
+    },
+    {
+      "question": "Which VPC endpoint type is used to privately access Amazon S3 and DynamoDB and is free of charge?",
+      "options": ["Interface endpoint", "Gateway endpoint", "NAT gateway", "Internet gateway"],
+      "answer": "Gateway endpoint",
+      "explanation": "S3 and DynamoDB use gateway endpoints (route-table entries, no hourly charge). Most other services use interface endpoints (PrivateLink ENIs)."
+    },
+    {
+      "question": "What is the primary role of a NAT gateway?",
+      "options": [
+        "Allow inbound internet connections to private instances",
+        "Provide outbound-only internet access for instances in private subnets",
+        "Encrypt data at rest",
+        "Filter HTTP requests for SQL injection"
+      ],
+      "answer": "Provide outbound-only internet access for instances in private subnets",
+      "explanation": "A NAT gateway lets private-subnet instances initiate outbound internet traffic (e.g. updates) while blocking unsolicited inbound connections."
+    },
+    {
+      "question": "AWS Shield Standard provides which of the following?",
+      "options": [
+        "Automatic, no-cost protection against common network/transport-layer DDoS attacks",
+        "A managed relational database",
+        "Web request filtering rules you configure",
+        "Temporary IAM credentials"
+      ],
+      "answer": "Automatic, no-cost protection against common network/transport-layer DDoS attacks",
+      "explanation": "Shield Standard is on by default at no extra cost for all AWS customers. Shield Advanced adds enhanced protections, 24/7 response, and cost protection for a fee."
+    }
+  ],
+  "xpReward": 120
+}

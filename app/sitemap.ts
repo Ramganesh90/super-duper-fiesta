@@ -1,11 +1,17 @@
 import type { MetadataRoute } from "next";
 import { getAllPatternIds } from "@/lib/patterns";
+import { getAllSegmentIds } from "@/lib/aws/segments";
 
-const SITE_URL = "https://pattern-verse.example.com";
+const SITE_URL = "https://study-companion.example.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const patternRoutes = getAllPatternIds().map((id) => ({
     url: `${SITE_URL}/patterns/${id}`,
+    lastModified: new Date(),
+  }));
+
+  const awsRoutes = getAllSegmentIds().map((id) => ({
+    url: `${SITE_URL}/aws/${id}`,
     lastModified: new Date(),
   }));
 
@@ -18,6 +24,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/patterns`,
       lastModified: new Date(),
     },
+    {
+      url: `${SITE_URL}/aws`,
+      lastModified: new Date(),
+    },
     ...patternRoutes,
+    ...awsRoutes,
   ];
 }

@@ -1,98 +1,92 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import ComicPanel from "@/components/comic/ComicPanel";
-import ProgressIndicator from "@/components/learning/ProgressIndicator";
-import RandomHeroButton from "@/components/homepage/RandomHeroButton";
+import PatternHubSnapshot from "@/components/patterns/PatternHubSnapshot";
+import AwsHubSnapshot from "@/components/aws/AwsHubSnapshot";
 import { getAllPatterns } from "@/lib/patterns";
-import type { ComicPanelData } from "@/lib/types";
+import { getAllSegments } from "@/lib/aws/segments";
 
-const INTRO_PANELS: ComicPanelData[] = [
-  {
-    type: "problem",
-    label: "Bad Code Strikes",
-    caption: "A wall of tangled, tightly-coupled code towers over the codebase.",
-    speaker: "Bad Code",
-    dialogue: "HAHAHA! Your application is impossible to maintain!",
-    emoji: "🦹",
-  },
-  {
-    type: "hero",
-    label: "The Developer",
-    caption: "A lone developer stares at the wreckage, out of ideas.",
-    speaker: "Developer",
-    dialogue: "Who can save us?",
-    emoji: "🧑‍💻",
-  },
-  {
-    type: "result",
-    label: "The Pattern Heroes",
-    caption: "A team of original superheroes steps out of the shadows, ready to help.",
-    speaker: "Pattern Heroes",
-    dialogue: "We can.",
-    emoji: "🦸",
-  },
-];
+export const metadata: Metadata = {
+  title: "Study Companion — Learn by Playing",
+  description:
+    "A mini dashboard of gamified learning apps: master software design patterns through a comic universe, and study for the AWS Solutions Architect exam by playing.",
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
-  const patterns = getAllPatterns();
-  const heroSummaries = patterns.map((p) => ({ id: p.id, name: p.hero.name, emoji: p.hero.emoji }));
+  const patternCount = getAllPatterns().length;
+  const weekCount = getAllSegments().length;
 
   return (
-    <div id="top" className="flex flex-col gap-16 pb-20 sm:gap-24">
-      <section className="bg-halftone relative overflow-hidden border-b-4 border-ink bg-paper-dim px-4 py-16 text-center sm:px-6 sm:py-24">
-        <h1 className="font-comic text-5xl leading-none tracking-wide text-ink sm:text-7xl lg:text-8xl">
-          PATTERN<span className="text-action-red">-VERSE</span>
+    <div id="top" className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-4 py-14 sm:px-6 sm:py-20">
+      <section className="text-center">
+        <h1 className="font-comic text-5xl leading-none tracking-wide text-ink sm:text-6xl lg:text-7xl">
+          STUDY <span className="text-action-red">COMPANION</span>
         </h1>
         <p className="font-comic mt-4 text-xl tracking-wide text-hero-blue sm:text-2xl">
-          Where Design Patterns Come to Life
+          Learn by playing — one skill at a time
         </p>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-          Meet an original universe of superheroes — one for every Gang of Four design pattern, plus concurrency,
-          architectural, and enterprise patterns beyond. Fight bad code, learn the pattern power that beats it,
-          and walk away with real architectural intuition.
+          A little arcade of learning apps. Pick a track, rack up XP, keep your streak alive, and turn
+          studying into a game you actually want to come back to.
         </p>
-        <a
-          href="#showcase"
-          className="comic-border font-comic mt-8 inline-block bg-action-red px-8 py-4 text-lg text-paper tracking-wide transition-transform hover:-translate-y-1 sm:text-xl"
-        >
-          Enter the Pattern-Verse
-        </a>
       </section>
 
-      <section className="mx-auto w-full max-w-5xl px-4 sm:px-6" aria-labelledby="intro-comic-heading">
-        <h2 id="intro-comic-heading" className="sr-only">
-          Opening comic: the Pattern Heroes arrive
+      <section aria-labelledby="apps-heading" className="flex flex-col gap-6">
+        <h2 id="apps-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
+          🎮 YOUR APPS
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-          {INTRO_PANELS.map((panel, index) => (
-            <ComicPanel key={panel.label} panel={panel} index={index} />
-          ))}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Design Patterns — Pattern-Verse */}
+          <div className="comic-border flex flex-col bg-paper p-6 transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl" aria-hidden="true">🦸</span>
+              <div>
+                <h3 className="font-comic text-2xl tracking-wide text-hero-blue">Design Patterns</h3>
+                <p className="text-sm text-ink/70">Pattern-Verse · comic, pattern-wise</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed sm:text-base">
+              Meet {patternCount} design patterns as comic-book superheroes. Fight bad code, learn the power
+              that beats it, and pass quizzes to master each pattern.
+            </p>
+            <PatternHubSnapshot total={patternCount} />
+            <Link
+              href="/patterns"
+              className="comic-border-sm font-comic mt-6 self-start bg-hero-blue px-5 py-2.5 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+            >
+              Enter Pattern-Verse →
+            </Link>
+          </div>
+
+          {/* AWS Solutions Architect */}
+          <div className="comic-border flex flex-col bg-paper p-6 transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl" aria-hidden="true">☁️</span>
+              <div>
+                <h3 className="font-comic text-2xl tracking-wide text-aws-orange-dark">AWS Solutions Architect</h3>
+                <p className="text-sm text-ink/70">SAA-C03 · learn by playing</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed sm:text-base">
+              An {weekCount}-week gamified plan for the Solutions Architect – Associate exam. Earn XP, keep a
+              daily streak, unlock domain badges, and track your exam readiness.
+            </p>
+            <AwsHubSnapshot />
+            <Link
+              href="/aws"
+              className="comic-border-sm font-comic mt-6 self-start bg-aws-orange px-5 py-2.5 text-ink tracking-wide transition-transform hover:-translate-y-0.5"
+            >
+              Start Studying →
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-        <ProgressIndicator totalPatterns={patterns.length} />
-      </section>
-
-      <section
-        id="showcase"
-        className="bg-halftone-yellow comic-border mx-auto w-full max-w-3xl scroll-mt-20 bg-paper-dim px-4 py-12 text-center sm:px-6 sm:py-16"
-        aria-labelledby="showcase-heading"
-      >
-        <h2 id="showcase-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
-          NOT SURE WHERE TO START?
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-ink/80 sm:text-lg">
-          Let fate pick your first pattern. Summon a random hero and see who shows up.
+      <section className="comic-border-sm bg-halftone-yellow bg-paper-dim px-5 py-6 text-center">
+        <p className="text-sm leading-relaxed text-ink/80 sm:text-base">
+          Each app keeps its own progress on this device — no account needed. More tracks can join the
+          arcade over time.
         </p>
-        <div className="mt-8">
-          <RandomHeroButton patterns={heroSummaries} />
-        </div>
-        <Link
-          href="/patterns"
-          className="mt-10 inline-block underline-offset-4 hover:underline"
-        >
-          Or browse the full roster of {patterns.length} heroes →
-        </Link>
       </section>
     </div>
   );

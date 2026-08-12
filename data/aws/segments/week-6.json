@@ -1,0 +1,96 @@
+{
+  "id": "week-6",
+  "week": 6,
+  "title": "High-Performing Compute & Storage",
+  "domain": "performance",
+  "oneLiner": "Pick the right compute model and storage tier so workloads run fast and elastically.",
+  "examWeightNote": "Part of Design High-Performing Architectures (24% of the exam).",
+  "objectives": [
+    "Match workloads to EC2 instance families, Lambda, and containers (ECS/EKS/Fargate).",
+    "Choose the right storage: S3, EBS volume types, EFS, and instance store.",
+    "Use caching (ElastiCache, CloudFront) to reduce latency and offload backends.",
+    "Understand S3 performance and when to use S3 Transfer Acceleration or multipart uploads."
+  ],
+  "services": [
+    { "name": "Amazon EC2 (instance families)", "purpose": "Compute optimized for general (M), compute (C), memory (R/X), storage (I/D), or accelerated (P/G) workloads.", "emoji": "🖥️" },
+    { "name": "AWS Lambda", "purpose": "Serverless, event-driven compute that scales automatically with no servers to manage.", "emoji": "λ" },
+    { "name": "Amazon EBS", "purpose": "Network-attached block storage; gp3/gp2 (general), io1/io2 (high IOPS), st1/sc1 (throughput/cold HDD).", "emoji": "📦" },
+    { "name": "Amazon EFS / FSx", "purpose": "Shared file storage; EFS is elastic NFS for Linux, FSx offers Windows/Lustre file systems.", "emoji": "🗂️" },
+    { "name": "Amazon ElastiCache", "purpose": "In-memory Redis/Memcached cache to speed up reads and offload databases.", "emoji": "⚡" }
+  ],
+  "keyConcepts": [
+    "Choose the EC2 family by bottleneck: compute-optimized (C) for CPU-bound, memory-optimized (R/X) for large in-memory datasets, storage-optimized (I/D) for high local IOPS.",
+    "Use Lambda for short, event-driven, spiky workloads (no capacity planning); use containers/EC2 for long-running or specialized workloads.",
+    "EBS is single-AZ block storage attached to one instance (except Multi-Attach io2); EFS is multi-AZ shared file storage many instances can mount at once.",
+    "gp3 lets you provision IOPS/throughput independently of size; io2 Block Express is for the highest-performance, latency-sensitive databases.",
+    "Add ElastiCache or CloudFront to cache hot data — this lowers latency and reduces load on databases and origins."
+  ],
+  "resources": [
+    { "label": "EC2 instance types", "url": "https://aws.amazon.com/ec2/instance-types/", "type": "docs" },
+    { "label": "EBS volume types", "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html", "type": "docs" },
+    { "label": "Storage services overview", "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/storage-services.html", "type": "whitepaper" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A fleet of Linux application servers across multiple AZs must all read and write the same set of files concurrently, and the storage must scale automatically as data grows.",
+      "question": "Which storage service fits?",
+      "options": [
+        { "id": "a", "label": "An EBS volume attached to one instance" },
+        { "id": "b", "label": "Amazon EFS mounted by all instances" },
+        { "id": "c", "label": "Instance store on each server" },
+        { "id": "d", "label": "An S3 bucket mounted as a block device" }
+      ],
+      "correct": "b",
+      "explanation": "Amazon EFS is elastic, multi-AZ shared file storage that many Linux instances can mount concurrently. A standard EBS volume attaches to a single instance; instance store is ephemeral and local."
+    },
+    {
+      "scenario": "An unpredictable, bursty image-thumbnail job runs a few hundred times a day, each execution finishing in under a second. The team wants zero idle cost and no server management.",
+      "question": "Which compute option is the best fit?",
+      "options": [
+        { "id": "a", "label": "A always-on EC2 Auto Scaling group" },
+        { "id": "b", "label": "AWS Lambda triggered by the upload event" },
+        { "id": "c", "label": "A dedicated bare-metal instance" },
+        { "id": "d", "label": "An EKS cluster running 24/7" }
+      ],
+      "correct": "b",
+      "explanation": "Short, event-driven, spiky work with no idle cost is the ideal Lambda use case — it scales automatically and you pay only per invocation/duration. Always-on EC2/EKS would incur idle cost and management overhead."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which EC2 instance family is best for a workload that holds a very large dataset entirely in memory?",
+      "options": ["Compute optimized (C)", "Memory optimized (R/X)", "Storage optimized (I/D)", "General purpose (T)"],
+      "answer": "Memory optimized (R/X)",
+      "explanation": "Memory-optimized families (R, X) provide high RAM-to-vCPU ratios for in-memory databases and caches. Compute-optimized suits CPU-bound work; storage-optimized suits high local IOPS."
+    },
+    {
+      "question": "What is a key difference between Amazon EBS and Amazon EFS?",
+      "options": [
+        "EBS is object storage; EFS is block storage",
+        "EBS attaches to a single instance (generally); EFS is shared file storage multiple instances can mount",
+        "EFS is only available in one AZ; EBS spans all AZs",
+        "They are identical services"
+      ],
+      "answer": "EBS attaches to a single instance (generally); EFS is shared file storage multiple instances can mount",
+      "explanation": "EBS provides block storage for one instance (with limited Multi-Attach for io1/io2); EFS is elastic, multi-AZ NFS file storage many Linux instances can share."
+    },
+    {
+      "question": "Which service reduces database read latency by keeping frequently accessed data in memory?",
+      "options": ["Amazon ElastiCache", "Amazon S3 Glacier", "AWS Backup", "Amazon EBS st1"],
+      "answer": "Amazon ElastiCache",
+      "explanation": "ElastiCache (Redis/Memcached) stores hot data in memory, cutting read latency and offloading the database."
+    },
+    {
+      "question": "Why might you choose the gp3 EBS volume type?",
+      "options": [
+        "It is object storage for static websites",
+        "It lets you provision IOPS and throughput independently of volume size",
+        "It is ephemeral and lost on stop",
+        "It is only for Windows file shares"
+      ],
+      "answer": "It lets you provision IOPS and throughput independently of volume size",
+      "explanation": "gp3 decouples performance from capacity — you can dial IOPS/throughput up without growing the volume, often at lower cost than gp2."
+    }
+  ],
+  "xpReward": 120
+}

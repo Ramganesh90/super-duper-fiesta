@@ -1,0 +1,106 @@
+{
+  "id": "week-1",
+  "week": 1,
+  "title": "Cloud & Well-Architected Foundations",
+  "domain": "foundations",
+  "oneLiner": "Learn how AWS is laid out globally and the design principles every SAA question is graded against.",
+  "examWeightNote": "Foundational — not a scored domain, but the mental model behind every question.",
+  "objectives": [
+    "Explain Regions, Availability Zones, and edge locations, and when to use each.",
+    "Describe the AWS shared responsibility model — what AWS secures vs what you secure.",
+    "Recall the six pillars of the AWS Well-Architected Framework.",
+    "Understand the global vs regional vs zonal scope of core services."
+  ],
+  "services": [
+    { "name": "AWS Regions & AZs", "purpose": "Physically isolated geographic areas (Regions) each made of multiple data-center clusters (AZs) for fault isolation.", "emoji": "🌍" },
+    { "name": "Edge Locations / CloudFront", "purpose": "Global points of presence that cache content close to users and terminate connections.", "emoji": "📡" },
+    { "name": "AWS IAM", "purpose": "Global service controlling who can do what across your account.", "emoji": "🪪" },
+    { "name": "AWS Well-Architected Tool", "purpose": "Reviews workloads against the six-pillar framework.", "emoji": "🏛️" }
+  ],
+  "keyConcepts": [
+    "A Region is a collection of ≥3 Availability Zones; AZs are one or more discrete data centers with redundant power and networking.",
+    "Design across multiple AZs for high availability; design across multiple Regions for disaster recovery and lowest global latency.",
+    "Shared responsibility: AWS secures the cloud (hardware, global infra); you secure what's in the cloud (data, IAM, OS patching for EC2, config).",
+    "The six Well-Architected pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.",
+    "Some services are global (IAM, Route 53, CloudFront, WAF), most are regional (EC2, S3 buckets live in a Region), and a few are zonal (EC2 instances, EBS volumes)."
+  ],
+  "resources": [
+    { "label": "AWS Global Infrastructure", "url": "https://aws.amazon.com/about-aws/global-infrastructure/", "type": "docs" },
+    { "label": "Shared Responsibility Model", "url": "https://aws.amazon.com/compliance/shared-responsibility-model/", "type": "docs" },
+    { "label": "Well-Architected Framework", "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html", "type": "whitepaper" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A startup runs its entire app on EC2 instances in a single Availability Zone. During a power event in that AZ, the app went fully offline for hours.",
+      "question": "What is the simplest change to prevent a single-AZ outage from taking the whole app down?",
+      "options": [
+        { "id": "a", "label": "Move all instances to a larger instance type" },
+        { "id": "b", "label": "Deploy instances across at least two AZs behind a load balancer" },
+        { "id": "c", "label": "Enable Amazon CloudFront in front of the instances" },
+        { "id": "d", "label": "Buy Reserved Instances for cost savings" }
+      ],
+      "correct": "b",
+      "explanation": "High availability comes from spreading compute across multiple AZs behind a load balancer, so one AZ failing doesn't take the app offline. A bigger instance or CloudFront doesn't add AZ-level fault tolerance."
+    },
+    {
+      "scenario": "Your compliance team asks who is responsible for applying security patches to the guest operating system on your EC2 instances.",
+      "question": "Under the AWS shared responsibility model, who patches the guest OS on EC2?",
+      "options": [
+        { "id": "a", "label": "AWS, automatically for all instances" },
+        { "id": "b", "label": "The customer" },
+        { "id": "c", "label": "AWS Support, on request" },
+        { "id": "d", "label": "Nobody — EC2 has no OS" }
+      ],
+      "correct": "b",
+      "explanation": "With EC2 (IaaS), the customer is responsible for the guest OS, including patching, plus applications and data. AWS is responsible for the underlying hardware and hypervisor. (Managed services like Fargate/Lambda shift more of this to AWS.)"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is an AWS Availability Zone?",
+      "options": [
+        "A single physical server",
+        "One or more discrete data centers with redundant power, networking, and connectivity within a Region",
+        "A global cache of content near users",
+        "A billing boundary for an AWS account"
+      ],
+      "answer": "One or more discrete data centers with redundant power, networking, and connectivity within a Region",
+      "explanation": "An AZ is one or more discrete data centers with independent power/cooling/networking. Multiple AZs make up a Region and let you build fault-tolerant architectures."
+    },
+    {
+      "question": "Which of these is a GLOBAL AWS service (not scoped to a single Region)?",
+      "options": ["Amazon EC2", "Amazon EBS", "AWS IAM", "Amazon RDS"],
+      "answer": "AWS IAM",
+      "explanation": "IAM is global — users, roles, and policies apply account-wide. EC2, EBS, and RDS are regional/zonal resources."
+    },
+    {
+      "question": "You want to protect against an entire Region becoming unavailable. What should you design for?",
+      "options": [
+        "Multiple instances in one AZ",
+        "Multiple AZs in one Region",
+        "A multi-Region architecture",
+        "A larger EC2 instance type"
+      ],
+      "answer": "A multi-Region architecture",
+      "explanation": "Multi-AZ protects against AZ failure. To survive a whole-Region outage (disaster recovery) you replicate across Regions."
+    },
+    {
+      "question": "Which pillar is NOT one of the six AWS Well-Architected Framework pillars?",
+      "options": ["Security", "Cost Optimization", "Marketability", "Sustainability"],
+      "answer": "Marketability",
+      "explanation": "The six pillars are Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. 'Marketability' is not a pillar."
+    },
+    {
+      "question": "Under the shared responsibility model, which is AWS's responsibility?",
+      "options": [
+        "Configuring your security groups",
+        "Encrypting your S3 objects",
+        "Physical security of the data centers",
+        "Managing your IAM user permissions"
+      ],
+      "answer": "Physical security of the data centers",
+      "explanation": "AWS is responsible for 'security OF the cloud' — the physical facilities, hardware, and global infrastructure. Customers handle 'security IN the cloud' such as IAM, encryption choices, and security-group rules."
+    }
+  ],
+  "xpReward": 100
+}

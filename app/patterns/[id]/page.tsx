@@ -67,8 +67,8 @@ export default async function PatternPage({ params }: PatternPageProps) {
       <nav aria-label="Breadcrumb" className="-mb-6 text-sm font-semibold">
         <ol className="flex flex-wrap items-center gap-1.5 text-ink/70">
           <li>
-            <Link href="/" className="underline-offset-2 hover:underline">
-              Home
+            <Link href="/patterns" className="underline-offset-2 hover:underline">
+              Pattern-Verse
             </Link>
           </li>
           <li aria-hidden="true">/</li>

@@ -1,0 +1,106 @@
+{
+  "id": "week-2",
+  "week": 2,
+  "title": "Identity & Access Management",
+  "domain": "security",
+  "oneLiner": "Control who can do what: IAM users, roles, policies, temporary credentials, and multi-account guardrails.",
+  "examWeightNote": "Part of Design Secure Architectures — the largest exam domain at 30%.",
+  "objectives": [
+    "Differentiate IAM users, groups, roles, and policies, and know when to use a role over long-lived keys.",
+    "Explain how EC2 instance profiles and STS provide temporary credentials.",
+    "Use AWS Organizations and Service Control Policies (SCPs) to set account-wide guardrails.",
+    "Apply least-privilege and evaluate how policies combine (explicit deny wins)."
+  ],
+  "services": [
+    { "name": "AWS IAM", "purpose": "Users, groups, roles, and identity-/resource-based policies that authorize API actions.", "emoji": "🪪" },
+    { "name": "AWS STS", "purpose": "Issues short-lived, automatically rotated temporary credentials when a role is assumed.", "emoji": "⏳" },
+    { "name": "IAM Roles / Instance Profiles", "purpose": "Let EC2, Lambda, and cross-account principals get permissions without stored keys.", "emoji": "🎭" },
+    { "name": "AWS Organizations & SCPs", "purpose": "Central multi-account management with guardrails that cap the maximum permissions in member accounts.", "emoji": "🏢" },
+    { "name": "IAM Identity Center", "purpose": "Central workforce SSO and permission sets across many accounts.", "emoji": "🔑" }
+  ],
+  "keyConcepts": [
+    "Prefer IAM roles (temporary credentials via STS) over long-lived access keys — especially for EC2, Lambda, and cross-account access.",
+    "Policy evaluation: an explicit Deny always overrides any Allow; without an explicit allow, access is implicitly denied.",
+    "An SCP sets the maximum permissions an account can have — it never grants access on its own; you still need IAM policies inside the account.",
+    "Grant least privilege: start minimal and add permissions; use conditions (e.g. source IP, MFA) to tighten access.",
+    "Never embed access keys in code or AMIs — attach an instance profile/role instead."
+  ],
+  "resources": [
+    { "label": "IAM User Guide", "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html", "type": "docs" },
+    { "label": "IAM Roles", "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html", "type": "docs" },
+    { "label": "SCPs in AWS Organizations", "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "An application on EC2 needs to read objects from an S3 bucket. A developer hard-coded IAM access keys into the app config to make it work.",
+      "question": "What is the recommended, most secure way to give the EC2 app access to S3?",
+      "options": [
+        { "id": "a", "label": "Store the access keys in an environment variable instead" },
+        { "id": "b", "label": "Attach an IAM role (instance profile) granting S3 read access to the EC2 instance" },
+        { "id": "c", "label": "Make the S3 bucket public and remove the keys" },
+        { "id": "d", "label": "Create a new IAM user for the app and rotate keys weekly" }
+      ],
+      "correct": "b",
+      "explanation": "An instance profile lets EC2 obtain temporary, auto-rotated credentials via STS — no long-lived keys to leak. Hard-coding or env-var keys and making buckets public are all insecure."
+    },
+    {
+      "scenario": "Your company has 40 AWS accounts under Organizations. Security wants to guarantee no one in any member account can disable CloudTrail, regardless of their IAM permissions.",
+      "question": "Which control enforces this account-wide guardrail?",
+      "options": [
+        { "id": "a", "label": "A Service Control Policy (SCP) that denies cloudtrail:StopLogging" },
+        { "id": "b", "label": "An IAM policy attached to every user in every account" },
+        { "id": "c", "label": "A security group rule" },
+        { "id": "d", "label": "Enabling MFA on the root user" }
+      ],
+      "correct": "a",
+      "explanation": "SCPs set the maximum permissions for member accounts. A deny SCP on cloudtrail:StopLogging blocks the action even for admins. Attaching IAM policies to every user is error-prone and not centrally enforced."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which credential type does STS issue when a role is assumed?",
+      "options": [
+        "Permanent access keys",
+        "Temporary, automatically-expiring credentials",
+        "A username and password",
+        "An SSH key pair"
+      ],
+      "answer": "Temporary, automatically-expiring credentials",
+      "explanation": "AWS STS vends short-lived credentials that expire automatically, which is why roles are preferred over long-lived access keys."
+    },
+    {
+      "question": "In IAM policy evaluation, what happens when one policy allows an action and another explicitly denies it?",
+      "options": [
+        "The Allow wins",
+        "The Deny wins",
+        "It depends on which was created first",
+        "The action requires MFA"
+      ],
+      "answer": "The Deny wins",
+      "explanation": "An explicit Deny always overrides any Allow. This is a core rule of IAM policy evaluation."
+    },
+    {
+      "question": "What does an AWS Organizations Service Control Policy (SCP) do?",
+      "options": [
+        "Grants permissions to users directly",
+        "Sets the maximum permissions available in member accounts",
+        "Encrypts data at rest",
+        "Creates temporary credentials"
+      ],
+      "answer": "Sets the maximum permissions available in member accounts",
+      "explanation": "SCPs are guardrails — they cap what identities in an account can do but never grant permissions themselves; IAM policies still grant the actual access."
+    },
+    {
+      "question": "What is the best practice for giving a Lambda function access to a DynamoDB table?",
+      "options": [
+        "Embed access keys in the function code",
+        "Assign the function an execution role with a least-privilege policy",
+        "Make the table publicly accessible",
+        "Use the account root credentials"
+      ],
+      "answer": "Assign the function an execution role with a least-privilege policy",
+      "explanation": "Lambda uses an execution role for temporary credentials. Grant only the specific DynamoDB actions/resource it needs (least privilege)."
+    }
+  ],
+  "xpReward": 120
+}
