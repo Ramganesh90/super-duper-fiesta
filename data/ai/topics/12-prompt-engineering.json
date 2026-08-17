@@ -1,0 +1,123 @@
+{
+  "id": "12-prompt-engineering",
+  "order": 12,
+  "title": "Prompt Engineering",
+  "track": "genai",
+  "character": {
+    "name": "The Prompt Whisperer",
+    "emoji": "🗣️",
+    "tagline": "Ask sloppy, get sloppy. Ask like a pro, get magic."
+  },
+  "oneLiner": "The craft of asking LLMs well: clear instructions, examples, roles, and reasoning cues that steer outputs.",
+  "analogy": "An LLM is a brilliant, eager intern with amnesia and zero context about your company. If you say 'write something,' you get generic mush. If you say 'You are a senior tax accountant. Using these three examples, draft a client email under 150 words, friendly tone, no jargon,' you get gold. Prompt engineering is just learning to brief that intern precisely: give it a role, show examples (few-shot), ask it to think step by step (chain-of-thought), and tell it the exact format you want back.",
+  "objectives": [
+    "Write clear, specific instructions with the desired role, tone, and format.",
+    "Use zero-shot vs few-shot prompting (examples in the prompt).",
+    "Apply chain-of-thought / 'think step by step' for reasoning tasks.",
+    "Use system prompts and output constraints to control behavior."
+  ],
+  "keyConcepts": [
+    "Specificity wins: state the role, task, constraints, and exact output format you want.",
+    "Zero-shot = just ask; few-shot = include a few worked examples to demonstrate the pattern you want.",
+    "Chain-of-thought prompting ('reason step by step') can improve accuracy on multi-step/logic tasks.",
+    "System prompts set persistent behavior/persona; user prompts carry the specific request.",
+    "Constrain outputs (length, JSON schema, allowed values) to make responses reliable and parseable.",
+    "Iterate: prompting is empirical — test, observe failures, and refine."
+  ],
+  "keyTerms": [
+    { "term": "Zero-shot", "plain": "Asking with no examples — just the instruction." },
+    { "term": "Few-shot", "plain": "Showing a few examples so the model copies the pattern." },
+    { "term": "Chain-of-thought", "plain": "Asking the model to reason step by step before answering." },
+    { "term": "System prompt", "plain": "The standing instructions that set the model's role/behavior." },
+    { "term": "Output constraint", "plain": "Telling it exactly how to format the answer (e.g. JSON)." }
+  ],
+  "resources": [
+    { "label": "Anthropic: Prompt engineering overview", "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview", "type": "docs" },
+    { "label": "OpenAI: Prompt engineering guide", "url": "https://platform.openai.com/docs/guides/prompt-engineering", "type": "docs" },
+    { "label": "Learn Prompting", "url": "https://learnprompting.org/", "type": "course" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "An LLM keeps returning answers in inconsistent formats, breaking your downstream parser that expects strict JSON.",
+      "question": "What's the most effective prompting fix?",
+      "options": [
+        { "id": "a", "label": "Explicitly specify the exact JSON schema and instruct it to return only valid JSON, ideally with an example" },
+        { "id": "b", "label": "Ask it to 'be more consistent' with no specifics" },
+        { "id": "c", "label": "Raise the temperature" },
+        { "id": "d", "label": "Send the request twice" }
+      ],
+      "correct": "a",
+      "explanation": "Constraining the output format precisely (schema + 'return only JSON' + an example) reliably improves parseability. Vague requests and high temperature make it worse."
+    },
+    {
+      "scenario": "A model gives wrong answers to multi-step word problems, jumping straight to a final number.",
+      "question": "Which technique most likely helps?",
+      "options": [
+        { "id": "a", "label": "Chain-of-thought — ask it to reason step by step before giving the final answer" },
+        { "id": "b", "label": "Tell it to answer faster" },
+        { "id": "c", "label": "Remove all context" },
+        { "id": "d", "label": "Ask in all capital letters" }
+      ],
+      "correct": "a",
+      "explanation": "Prompting the model to show its reasoning step by step often improves accuracy on multi-step and logical problems."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is few-shot prompting?",
+      "options": [
+        "Asking with no examples",
+        "Including a few worked examples in the prompt to demonstrate the desired pattern",
+        "Limiting the model to a few tokens",
+        "Firing the model a few times"
+      ],
+      "answer": "Including a few worked examples in the prompt to demonstrate the desired pattern",
+      "explanation": "Few-shot prompting provides example input/output pairs so the model imitates the pattern; zero-shot gives none."
+    },
+    {
+      "question": "Chain-of-thought prompting means:",
+      "options": [
+        "Encrypting the prompt",
+        "Asking the model to reason through steps before the final answer",
+        "Chaining multiple GPUs",
+        "Sending prompts in a loop"
+      ],
+      "answer": "Asking the model to reason through steps before the final answer",
+      "explanation": "Encouraging step-by-step reasoning can improve performance on tasks requiring multiple logical steps."
+    },
+    {
+      "question": "The role of a system prompt is to:",
+      "options": [
+        "Set persistent behavior, persona, and rules for the model",
+        "Store the model weights",
+        "Encrypt the conversation",
+        "Increase the context window size"
+      ],
+      "answer": "Set persistent behavior, persona, and rules for the model",
+      "explanation": "System prompts establish standing instructions (role, tone, constraints) that shape all responses in the conversation."
+    },
+    {
+      "question": "Which prompt is likely to produce the most reliable result?",
+      "options": [
+        "'Write something about our product.'",
+        "'You are a product marketer. Write 3 bullet benefits (<12 words each) for busy parents, friendly tone.'",
+        "'Do the thing.'",
+        "'Answer.'"
+      ],
+      "answer": "'You are a product marketer. Write 3 bullet benefits (<12 words each) for busy parents, friendly tone.'",
+      "explanation": "Specifying role, audience, format, length, and tone gives the model the constraints it needs to produce a useful, consistent answer."
+    },
+    {
+      "question": "Prompt engineering is best described as:",
+      "options": [
+        "A one-time magic incantation",
+        "An empirical, iterative craft — test, observe failures, and refine",
+        "Editing the model's weights",
+        "A type of GPU"
+      ],
+      "answer": "An empirical, iterative craft — test, observe failures, and refine",
+      "explanation": "Effective prompting is developed through iteration: try, inspect failures, and adjust instructions/examples/format."
+    }
+  ],
+  "xpReward": 130
+}

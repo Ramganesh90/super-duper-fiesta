@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PatternHubSnapshot from "@/components/patterns/PatternHubSnapshot";
 import AwsHubSnapshot from "@/components/aws/AwsHubSnapshot";
+import AiHubSnapshot from "@/components/ai/AiHubSnapshot";
 import { getAllPatterns } from "@/lib/patterns";
 import { getAllSegments } from "@/lib/aws/segments";
+import { getAllTopics } from "@/lib/ai/topics";
 
 export const metadata: Metadata = {
   title: "Study Companion — Learn by Playing",
@@ -15,6 +17,7 @@ export const metadata: Metadata = {
 export default function Home() {
   const patternCount = getAllPatterns().length;
   const weekCount = getAllSegments().length;
+  const topicCount = getAllTopics().length;
 
   return (
     <div id="top" className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-4 py-14 sm:px-6 sm:py-20">
@@ -35,7 +38,7 @@ export default function Home() {
         <h2 id="apps-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
           🎮 YOUR APPS
         </h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Design Patterns — Pattern-Verse */}
           <div className="comic-border flex flex-col bg-paper p-6 transition-transform hover:-translate-y-1">
             <div className="flex items-center gap-3">
@@ -77,6 +80,28 @@ export default function Home() {
               className="comic-border-sm font-comic mt-6 self-start bg-aws-orange px-5 py-2.5 text-ink tracking-wide transition-transform hover:-translate-y-0.5"
             >
               Start Studying →
+            </Link>
+          </div>
+
+          {/* AI Academy */}
+          <div className="comic-border flex flex-col bg-paper p-6 transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl" aria-hidden="true">🤖</span>
+              <div>
+                <h3 className="font-comic text-2xl tracking-wide text-ai-violet-dark">AI Academy</h3>
+                <p className="text-sm text-ink/70">AI engineering · learn by playing</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed sm:text-base">
+              A comical roadmap of {topicCount} topics — from math foundations to LLMs, RAG, and agents —
+              taught by a cast of characters. Earn XP, keep a streak, and unlock track badges.
+            </p>
+            <AiHubSnapshot />
+            <Link
+              href="/ai"
+              className="comic-border-sm font-comic mt-6 self-start bg-ai-violet px-5 py-2.5 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+            >
+              Enter AI Academy →
             </Link>
           </div>
         </div>

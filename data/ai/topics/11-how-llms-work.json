@@ -1,0 +1,118 @@
+{
+  "id": "11-how-llms-work",
+  "order": 11,
+  "title": "How LLMs Actually Work",
+  "track": "genai",
+  "character": {
+    "name": "The Wordsmith",
+    "emoji": "✍️",
+    "tagline": "I'm just guessing the next word. Extremely well. Billions of times."
+  },
+  "oneLiner": "Under the hood of ChatGPT & friends: tokens, embeddings, next-token prediction, and the context window.",
+  "analogy": "An LLM is the world's most well-read autocomplete. It chops your text into puzzle pieces called tokens, turns each into a bundle of numbers (an embedding) that captures meaning, then predicts the next most likely token — over and over — to build a reply. It has no live memory between chats; each turn it re-reads the whole conversation that fits inside its context window (its short-term desk space). 'Temperature' is how adventurous its guesses are: low = safe and repetitive, high = creative and occasionally unhinged.",
+  "objectives": [
+    "Understand tokenization and why models see tokens, not letters or words.",
+    "Grasp next-token prediction as the core mechanism.",
+    "Understand the context window and its limits.",
+    "Know what temperature and sampling do to outputs, and why hallucinations happen."
+  ],
+  "keyConcepts": [
+    "Text is split into tokens (word-pieces); the model reads and generates token by token.",
+    "An LLM predicts the probability of the next token given all previous tokens, then samples one and repeats.",
+    "The context window is the maximum amount of text (tokens) the model can consider at once — its working memory for that request.",
+    "LLMs are stateless between calls: they only 'remember' what you resend in the prompt/context.",
+    "Temperature and top-p control randomness: low is focused/deterministic, high is more creative/varied.",
+    "Hallucinations occur because the model predicts plausible-sounding text, not verified facts — it optimizes for likely, not true."
+  ],
+  "keyTerms": [
+    { "term": "Token", "plain": "A chunk of text (often a word-piece). The model's Lego brick." },
+    { "term": "Next-token prediction", "plain": "Guess the next brick, again and again, to build a sentence." },
+    { "term": "Context window", "plain": "How much text the model can hold on its desk at once." },
+    { "term": "Temperature", "plain": "The creativity dial: low = safe, high = wild." },
+    { "term": "Hallucination", "plain": "Confidently making stuff up that sounds right but isn't." }
+  ],
+  "resources": [
+    { "label": "The Illustrated GPT-2", "url": "https://jalammar.github.io/illustrated-gpt2/", "type": "docs" },
+    { "label": "What is a token? (OpenAI help)", "url": "https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them", "type": "docs" },
+    { "label": "Anthropic: Introduction to Claude", "url": "https://docs.anthropic.com/en/docs/intro-to-claude", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A user complains that the chatbot 'forgot' something they said 50 messages ago in a very long conversation.",
+      "question": "What's the most likely technical explanation?",
+      "options": [
+        { "id": "a", "label": "Older messages fell outside the model's context window, so it no longer sees them" },
+        { "id": "b", "label": "The model has a personal grudge" },
+        { "id": "c", "label": "The GPU deleted the memory to save power" },
+        { "id": "d", "label": "LLMs permanently store every conversation by default" }
+      ],
+      "correct": "a",
+      "explanation": "LLMs only consider what fits in the context window. In long chats, earlier content can be truncated/summarized out, so the model effectively 'forgets' it unless it's resupplied."
+    },
+    {
+      "scenario": "You need highly consistent, repeatable output from an LLM for a data-extraction task.",
+      "question": "Which setting helps most?",
+      "options": [
+        { "id": "a", "label": "A low temperature (near 0) for focused, deterministic responses" },
+        { "id": "b", "label": "A very high temperature for creativity" },
+        { "id": "c", "label": "Increasing the token price" },
+        { "id": "d", "label": "Turning off the context window" }
+      ],
+      "correct": "a",
+      "explanation": "Low temperature makes the model pick high-probability tokens consistently, yielding more repeatable, deterministic output — ideal for extraction/formatting tasks."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "At its core, an LLM generates text by:",
+      "options": [
+        "Looking up answers in a database",
+        "Repeatedly predicting the next token given the preceding tokens",
+        "Running SQL queries",
+        "Rendering images"
+      ],
+      "answer": "Repeatedly predicting the next token given the preceding tokens",
+      "explanation": "LLMs are next-token predictors: they estimate the probability of the next token and sample one, again and again, to produce text."
+    },
+    {
+      "question": "What is the 'context window'?",
+      "options": [
+        "The model's permanent long-term memory",
+        "The maximum amount of text (tokens) the model can consider in a single request",
+        "A pop-up in the UI",
+        "The GPU's VRAM size"
+      ],
+      "answer": "The maximum amount of text (tokens) the model can consider in a single request",
+      "explanation": "The context window bounds how much input+output the model can handle at once; content beyond it isn't seen."
+    },
+    {
+      "question": "Why do LLMs hallucinate?",
+      "options": [
+        "They are connected to a lie database",
+        "They generate statistically plausible text, which isn't always factually correct",
+        "They run out of GPU memory",
+        "They only work offline"
+      ],
+      "answer": "They generate statistically plausible text, which isn't always factually correct",
+      "explanation": "LLMs optimize for likely-sounding continuations, not verified truth, so they can produce confident but false statements."
+    },
+    {
+      "question": "Increasing 'temperature' generally makes outputs:",
+      "options": ["More random/creative", "Completely deterministic", "Shorter always", "Encrypted"],
+      "answer": "More random/creative",
+      "explanation": "Higher temperature flattens the probability distribution, increasing variety and creativity (and risk of incoherence); lower temperature is more focused."
+    },
+    {
+      "question": "Between separate API calls, a standard LLM:",
+      "options": [
+        "Remembers everything automatically forever",
+        "Is stateless — it only 'knows' what you include in the prompt/context",
+        "Stores your data in its weights instantly",
+        "Requires no input"
+      ],
+      "answer": "Is stateless — it only 'knows' what you include in the prompt/context",
+      "explanation": "Models don't retain memory across calls by default; conversation history must be resent within the context window."
+    }
+  ],
+  "xpReward": 130
+}

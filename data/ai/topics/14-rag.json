@@ -1,0 +1,118 @@
+{
+  "id": "14-rag",
+  "order": 14,
+  "title": "RAG: Retrieval-Augmented Generation",
+  "track": "genai",
+  "character": {
+    "name": "The Memory Keeper",
+    "emoji": "🗄️",
+    "tagline": "Why memorize the library when you can look it up and cite it?"
+  },
+  "oneLiner": "Give an LLM your private, up-to-date knowledge by retrieving relevant text and feeding it into the prompt.",
+  "analogy": "An LLM is a brilliant expert who read the internet two years ago and knows nothing about YOUR company. RAG is handing that expert the exact three pages they need right before they answer — 'here are the relevant docs, now respond using these.' Instead of expensively retraining the expert's brain, you just improve their reading materials at question time. The result: answers grounded in your real, current data, with citations — and far fewer confident fabrications.",
+  "objectives": [
+    "Explain the RAG pipeline: chunk → embed → store → retrieve → augment prompt → generate.",
+    "Understand why RAG reduces hallucination and adds fresh/private knowledge.",
+    "Know when RAG is preferable to fine-tuning.",
+    "Recognize the levers that affect RAG quality (chunking, retrieval, grounding)."
+  ],
+  "keyConcepts": [
+    "RAG retrieves relevant documents (usually via embeddings/vector search) and inserts them into the prompt so the LLM answers from that context.",
+    "It grounds responses in real, current, private data without retraining the model.",
+    "Typical pipeline: split docs into chunks, embed them, store in a vector DB; at query time embed the question, retrieve top matches, add them to the prompt, then generate.",
+    "RAG reduces (not eliminates) hallucination by giving the model source material and can supply citations.",
+    "Choose RAG when knowledge changes often or is proprietary; choose fine-tuning to teach style/format or specialized behavior.",
+    "Quality depends on chunk size, retrieval relevance, the embedding model, and how well the prompt instructs the model to use (and cite) the context."
+  ],
+  "keyTerms": [
+    { "term": "RAG", "plain": "Look it up, then answer using what you found." },
+    { "term": "Chunking", "plain": "Cutting documents into bite-sized pieces to embed and retrieve." },
+    { "term": "Retrieval", "plain": "Fetching the most relevant chunks for the question." },
+    { "term": "Grounding", "plain": "Basing the answer on provided sources, not vibes." },
+    { "term": "Context augmentation", "plain": "Stuffing the retrieved facts into the prompt before generating." }
+  ],
+  "resources": [
+    { "label": "Original RAG paper", "url": "https://arxiv.org/abs/2005.11401", "type": "paper" },
+    { "label": "Anthropic: Retrieval-augmented generation / contextual retrieval", "url": "https://www.anthropic.com/news/contextual-retrieval", "type": "docs" },
+    { "label": "LangChain: RAG concepts", "url": "https://python.langchain.com/docs/concepts/rag/", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A company wants a chatbot that answers questions about its constantly-changing internal policies, with citations, and must not invent policies.",
+      "question": "What's the most appropriate approach?",
+      "options": [
+        { "id": "a", "label": "RAG — retrieve the relevant policy docs at query time and have the model answer from them with citations" },
+        { "id": "b", "label": "Fine-tune the base model nightly on all policies" },
+        { "id": "c", "label": "Just raise the temperature" },
+        { "id": "d", "label": "Rely on the model's pretraining knowledge" }
+      ],
+      "correct": "a",
+      "explanation": "RAG grounds answers in current, private documents and supports citations without costly retraining — ideal for frequently changing, proprietary knowledge. Fine-tuning is poor for rapidly changing facts."
+    },
+    {
+      "scenario": "A RAG system returns irrelevant passages, so the LLM's answers are off. Chunks are currently entire 20-page documents.",
+      "question": "Which change most directly improves retrieval relevance?",
+      "options": [
+        { "id": "a", "label": "Use smaller, semantically coherent chunks so retrieval can pinpoint relevant passages" },
+        { "id": "b", "label": "Embed the whole corpus as one giant vector" },
+        { "id": "c", "label": "Remove the vector database entirely" },
+        { "id": "d", "label": "Increase the model temperature" }
+      ],
+      "correct": "a",
+      "explanation": "Overly large chunks dilute relevance. Smaller, coherent chunks let retrieval surface the precise passages that answer the question, improving grounding."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does RAG do?",
+      "options": [
+        "Retrains the model on every query",
+        "Retrieves relevant text and adds it to the prompt so the LLM answers from that context",
+        "Compresses the model weights",
+        "Replaces the need for any LLM"
+      ],
+      "answer": "Retrieves relevant text and adds it to the prompt so the LLM answers from that context",
+      "explanation": "RAG augments generation with retrieved documents, grounding answers in external/current/private knowledge."
+    },
+    {
+      "question": "A primary benefit of RAG is that it:",
+      "options": [
+        "Guarantees zero hallucinations",
+        "Grounds answers in real, current, or private data without retraining the model",
+        "Eliminates the need for prompts",
+        "Makes the model smaller"
+      ],
+      "answer": "Grounds answers in real, current, or private data without retraining the model",
+      "explanation": "RAG supplies fresh/proprietary context at query time, reducing hallucination and avoiding expensive retraining (though it doesn't fully eliminate errors)."
+    },
+    {
+      "question": "In a typical RAG pipeline, documents are first:",
+      "options": [
+        "Chunked and embedded, then stored in a vector database",
+        "Deleted",
+        "Converted to images",
+        "Fine-tuned into the model weights"
+      ],
+      "answer": "Chunked and embedded, then stored in a vector database",
+      "explanation": "Docs are split into chunks, embedded, and indexed so that relevant pieces can be retrieved by similarity at query time."
+    },
+    {
+      "question": "You should generally prefer RAG over fine-tuning when:",
+      "options": [
+        "You need to teach a fixed writing style",
+        "The knowledge changes frequently or is proprietary and must be cited",
+        "You want to shrink the model",
+        "You have no documents at all"
+      ],
+      "answer": "The knowledge changes frequently or is proprietary and must be cited",
+      "explanation": "RAG excels at dynamic/private knowledge with citations; fine-tuning is better for teaching consistent style, format, or specialized behavior."
+    },
+    {
+      "question": "Which factor does NOT typically affect RAG answer quality?",
+      "options": ["Chunk size", "Retrieval relevance", "The embedding model", "The monitor's refresh rate"],
+      "answer": "The monitor's refresh rate",
+      "explanation": "RAG quality hinges on chunking, retrieval relevance, embedding model, and prompt/grounding — not on display hardware."
+    }
+  ],
+  "xpReward": 140
+}

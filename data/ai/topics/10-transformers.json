@@ -1,0 +1,106 @@
+{
+  "id": "10-transformers",
+  "order": 10,
+  "title": "Transformers & Attention",
+  "track": "deep-learning",
+  "character": {
+    "name": "The Attention Seeker",
+    "emoji": "👀",
+    "tagline": "I look at everything at once and decide what actually matters. Very healthy, I know."
+  },
+  "oneLiner": "The architecture behind every modern LLM: self-attention that weighs how words relate, all at once.",
+  "analogy": "Reading a sentence, your brain doesn't treat every word equally. In 'The trophy didn't fit in the suitcase because it was too big,' you instantly know 'it' means the trophy. Attention is that skill mechanized: for each word, the model asks 'which other words should I pay attention to?' and weighs them. Unlike the RNN note-taker reading one word at a time, the Transformer spreads the whole sentence on the table and studies every relationship simultaneously — which is why it's fast to train and great at context.",
+  "objectives": [
+    "Understand self-attention as weighing the relevance of other tokens to each token.",
+    "See why parallel processing makes Transformers scale better than RNNs.",
+    "Know the roles of embeddings, positional encoding, and multi-head attention.",
+    "Connect Transformers to the LLMs you use daily."
+  ],
+  "keyConcepts": [
+    "Self-attention lets each token 'look at' all other tokens and decide how much each matters for its meaning.",
+    "Transformers process the whole sequence in parallel (not step by step), enabling efficient training on huge datasets.",
+    "Positional encodings inject word-order information, since attention itself is order-agnostic.",
+    "Multi-head attention runs several attention patterns at once, capturing different types of relationships.",
+    "The Transformer (from 'Attention Is All You Need', 2017) underlies GPT, Claude, BERT, and virtually all modern LLMs.",
+    "Scaling Transformers with more data and parameters produced the leap to today's large language models."
+  ],
+  "keyTerms": [
+    { "term": "Self-attention", "plain": "Each word deciding which other words to focus on." },
+    { "term": "Transformer", "plain": "The parallel, attention-based architecture powering modern AI." },
+    { "term": "Positional encoding", "plain": "A way to tell the model the order of the words." },
+    { "term": "Multi-head attention", "plain": "Several attention 'viewpoints' running in parallel." },
+    { "term": "Token", "plain": "A chunk of text (word or word-piece) the model actually processes." }
+  ],
+  "resources": [
+    { "label": "The Illustrated Transformer", "url": "https://jalammar.github.io/illustrated-transformer/", "type": "docs" },
+    { "label": "Attention Is All You Need (paper)", "url": "https://arxiv.org/abs/1706.03762", "type": "paper" },
+    { "label": "3Blue1Brown: Transformers/attention", "url": "https://www.3blue1brown.com/topics/neural-networks", "type": "video" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A team needs to train a large language model on massive text data quickly, capturing relationships between words far apart in a document.",
+      "question": "Which architecture is the modern standard for this?",
+      "options": [
+        { "id": "a", "label": "The Transformer, using self-attention and parallel processing" },
+        { "id": "b", "label": "A vanilla RNN processing one word at a time" },
+        { "id": "c", "label": "A CNN designed for images" },
+        { "id": "d", "label": "k-nearest-neighbors" }
+      ],
+      "correct": "a",
+      "explanation": "Transformers process sequences in parallel and use attention to capture long-range relationships, making them the backbone of modern LLMs and far more scalable than RNNs for this."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does self-attention allow a model to do?",
+      "options": [
+        "Compress images",
+        "Weigh how relevant each token is to every other token when building meaning",
+        "Encrypt the sequence",
+        "Avoid using any parameters"
+      ],
+      "answer": "Weigh how relevant each token is to every other token when building meaning",
+      "explanation": "Self-attention computes, for each token, how much to attend to all other tokens — capturing context and relationships."
+    },
+    {
+      "question": "A major advantage of Transformers over RNNs is that they:",
+      "options": [
+        "Process sequences in parallel, improving scalability and long-range context",
+        "Require no data",
+        "Only work on images",
+        "Cannot be trained on GPUs"
+      ],
+      "answer": "Process sequences in parallel, improving scalability and long-range context",
+      "explanation": "Parallel processing plus attention lets Transformers train efficiently on huge corpora and handle long-range dependencies better than sequential RNNs."
+    },
+    {
+      "question": "Why do Transformers need positional encodings?",
+      "options": [
+        "To compress the model",
+        "Because attention alone is order-agnostic, so word order must be added explicitly",
+        "To encrypt tokens",
+        "To reduce the vocabulary size"
+      ],
+      "answer": "Because attention alone is order-agnostic, so word order must be added explicitly",
+      "explanation": "Self-attention doesn't inherently know sequence order, so positional encodings inject information about token positions."
+    },
+    {
+      "question": "The Transformer architecture underlies which of these?",
+      "options": ["Only spreadsheet software", "Modern LLMs like GPT and Claude", "Only image filters", "Classic decision trees"],
+      "answer": "Modern LLMs like GPT and Claude",
+      "explanation": "Introduced in 2017, the Transformer is the foundation of essentially all modern large language models."
+    },
+    {
+      "question": "What is 'multi-head' attention?",
+      "options": [
+        "Running several attention mechanisms in parallel to capture different relationship types",
+        "Using multiple GPUs only",
+        "A model with many output heads for images",
+        "Attention that ignores context"
+      ],
+      "answer": "Running several attention mechanisms in parallel to capture different relationship types",
+      "explanation": "Multiple attention heads let the model focus on different aspects of the relationships between tokens simultaneously."
+    }
+  ],
+  "xpReward": 130
+}

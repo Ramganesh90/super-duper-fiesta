@@ -1,0 +1,111 @@
+{
+  "id": "08-neural-networks",
+  "order": 8,
+  "title": "Neural Networks & Backprop",
+  "track": "deep-learning",
+  "character": {
+    "name": "The Brain Builder",
+    "emoji": "🧠",
+    "tagline": "Stack enough simple neurons and — poof — something clever emerges."
+  },
+  "oneLiner": "How layers of simple 'neurons' learn complex patterns by adjusting weights via backpropagation.",
+  "analogy": "A neural network is a giant office of interns passing notes. Each intern (neuron) takes some numbers, weighs them by importance, adds them up, and decides whether to shout the result forward. Stack many rooms of interns (layers) and the office can recognize cats, translate French, or write poems. When the final answer is wrong, the boss sends blame backward through every room — 'you contributed 3% to this mistake, adjust!' — that blame-assignment is backpropagation, and nudging each weight by its share is gradient descent.",
+  "objectives": [
+    "Understand neurons, weights, biases, and activation functions.",
+    "See how stacking layers builds representational power (deep learning).",
+    "Grasp forward pass vs backpropagation intuitively.",
+    "Know what an epoch, batch, and learning rate control."
+  ],
+  "keyConcepts": [
+    "A neuron computes a weighted sum of inputs plus a bias, then applies a non-linear activation (like ReLU).",
+    "Non-linear activations let networks model complex, curvy relationships — without them, deep nets collapse to a single linear layer.",
+    "The forward pass computes a prediction; the loss measures error; backpropagation computes each weight's contribution to that error.",
+    "Gradient descent updates weights in the direction that reduces loss, scaled by the learning rate.",
+    "'Deep' just means many layers; more depth can capture more abstract features but needs more data/compute.",
+    "Training loops over the data in batches for many epochs, gradually improving the weights."
+  ],
+  "keyTerms": [
+    { "term": "Neuron", "plain": "A tiny function: weigh inputs, add them up, decide how loud to shout." },
+    { "term": "Activation function", "plain": "The 'should I fire?' switch that adds non-linearity (e.g. ReLU)." },
+    { "term": "Backpropagation", "plain": "Sending blame backward so each weight knows how to improve." },
+    { "term": "Learning rate", "plain": "Step size when walking downhill — too big overshoots, too small crawls." },
+    { "term": "Epoch", "plain": "One full pass through all the training data." }
+  ],
+  "resources": [
+    { "label": "3Blue1Brown: Neural networks", "url": "https://www.3blue1brown.com/topics/neural-networks", "type": "video" },
+    { "label": "TensorFlow Playground (interactive)", "url": "https://playground.tensorflow.org/", "type": "interactive" },
+    { "label": "PyTorch: Build the neural network", "url": "https://pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A colleague builds a deep network but uses no activation functions between the layers, and it performs no better than a single straight-line model.",
+      "question": "Why?",
+      "options": [
+        { "id": "a", "label": "Without non-linear activations, stacked linear layers collapse into one linear function" },
+        { "id": "b", "label": "Deep networks always equal linear models" },
+        { "id": "c", "label": "The learning rate is irrelevant" },
+        { "id": "d", "label": "Activations only affect speed, not capability" }
+      ],
+      "correct": "a",
+      "explanation": "Chaining linear layers is still linear. Non-linear activations (ReLU, etc.) are what give deep networks the ability to model complex, non-linear patterns."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does backpropagation do?",
+      "options": [
+        "Loads the dataset",
+        "Computes how much each weight contributed to the error so weights can be updated",
+        "Encrypts the model",
+        "Renders the output image"
+      ],
+      "answer": "Computes how much each weight contributed to the error so weights can be updated",
+      "explanation": "Backprop propagates the error gradient backward through the network, assigning each parameter its share of blame for the update step."
+    },
+    {
+      "question": "Why are non-linear activation functions essential?",
+      "options": [
+        "They make training slower on purpose",
+        "They let the network model complex, non-linear relationships instead of collapsing to a single linear layer",
+        "They encrypt gradients",
+        "They reduce the number of layers needed to zero"
+      ],
+      "answer": "They let the network model complex, non-linear relationships instead of collapsing to a single linear layer",
+      "explanation": "Without non-linearity, any stack of layers is equivalent to one linear layer. Activations unlock representational power."
+    },
+    {
+      "question": "The learning rate controls:",
+      "options": [
+        "How many layers the network has",
+        "The step size of each weight update during gradient descent",
+        "The image resolution",
+        "The batch file format"
+      ],
+      "answer": "The step size of each weight update during gradient descent",
+      "explanation": "Too high overshoots or diverges; too low trains painfully slowly. It's a key hyperparameter."
+    },
+    {
+      "question": "In deep learning, 'deep' primarily refers to:",
+      "options": [
+        "Deeply encrypted models",
+        "Networks with many layers",
+        "Models that use the most RAM",
+        "Very old algorithms"
+      ],
+      "answer": "Networks with many layers",
+      "explanation": "Depth = many stacked layers, enabling the network to learn increasingly abstract features."
+    },
+    {
+      "question": "One epoch means:",
+      "options": [
+        "One weight update",
+        "One complete pass through the entire training dataset",
+        "One neuron firing",
+        "One GPU"
+      ],
+      "answer": "One complete pass through the entire training dataset",
+      "explanation": "Training typically runs many epochs, each a full pass over the data (usually processed in batches)."
+    }
+  ],
+  "xpReward": 120
+}

@@ -1,0 +1,101 @@
+{
+  "id": "07-metrics",
+  "order": 7,
+  "title": "Measuring Success",
+  "track": "classical-ml",
+  "character": {
+    "name": "The Scorekeeper",
+    "emoji": "🎯",
+    "tagline": "Pick the wrong metric and you'll celebrate the wrong victory."
+  },
+  "oneLiner": "The metrics that tell you if a model is actually good — precision, recall, F1, ROC-AUC, and friends.",
+  "analogy": "Imagine a fishing net. Precision asks: 'Of everything I caught, how much was actually fish (not boots)?' Recall asks: 'Of all the fish in the sea, how many did I catch?' A huge net catches every fish (high recall) but also tons of junk (low precision). A tiny net catches only obvious fish (high precision) but misses many (low recall). F1 is the referee that balances the two. The Scorekeeper's rule: choose the metric that matches what costs you — missing cancer (recall) vs annoying healthy patients (precision).",
+  "objectives": [
+    "Understand precision, recall, and F1 and when each matters.",
+    "Read a confusion matrix (true/false positives and negatives).",
+    "Interpret ROC-AUC for classifiers and RMSE/MAE for regression.",
+    "Pick metrics aligned to the real-world cost of errors."
+  ],
+  "keyConcepts": [
+    "A confusion matrix breaks predictions into true positives, false positives, true negatives, and false negatives.",
+    "Precision = of predicted positives, how many were correct (avoids false alarms).",
+    "Recall = of actual positives, how many were found (avoids misses).",
+    "F1 is the harmonic mean of precision and recall — useful when you need balance, especially on imbalanced data.",
+    "ROC-AUC summarizes classifier performance across thresholds (1.0 = perfect, 0.5 = random).",
+    "For regression, RMSE and MAE measure average prediction error (RMSE punishes big misses more).",
+    "The 'best' metric depends on which error is costlier for your use case."
+  ],
+  "keyTerms": [
+    { "term": "Precision", "plain": "When it says yes, how often is it right?" },
+    { "term": "Recall", "plain": "Of all the real yeses, how many did it catch?" },
+    { "term": "F1 score", "plain": "One number balancing precision and recall." },
+    { "term": "Confusion matrix", "plain": "A 2x2 scoreboard of hits and misses." },
+    { "term": "ROC-AUC", "plain": "How well the model ranks positives above negatives (0.5 = coin flip)." }
+  ],
+  "resources": [
+    { "label": "Google ML: Classification metrics", "url": "https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall", "type": "course" },
+    { "label": "scikit-learn: Model evaluation", "url": "https://scikit-learn.org/stable/modules/model_evaluation.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A cancer-screening model must avoid missing sick patients, even if it means some false alarms that get double-checked later.",
+      "question": "Which metric should you prioritize?",
+      "options": [
+        { "id": "a", "label": "Recall — catching as many true positives as possible" },
+        { "id": "b", "label": "Precision above all else" },
+        { "id": "c", "label": "Raw accuracy only" },
+        { "id": "d", "label": "Training speed" }
+      ],
+      "correct": "a",
+      "explanation": "Missing a sick patient (a false negative) is the costly error here, so you prioritize recall — even at the expense of some false positives that follow-up tests can catch."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Precision answers which question?",
+      "options": [
+        "Of all actual positives, how many did we find?",
+        "Of everything we predicted positive, how many were actually positive?",
+        "How fast is the model?",
+        "How many layers does the model have?"
+      ],
+      "answer": "Of everything we predicted positive, how many were actually positive?",
+      "explanation": "Precision = TP / (TP + FP): among predicted positives, the fraction that were correct. It penalizes false alarms."
+    },
+    {
+      "question": "Recall answers which question?",
+      "options": [
+        "Of all actual positives, how many did the model correctly identify?",
+        "How many predictions were fast?",
+        "Of predicted positives, how many were right?",
+        "What is the model's memory usage?"
+      ],
+      "answer": "Of all actual positives, how many did the model correctly identify?",
+      "explanation": "Recall = TP / (TP + FN): among real positives, the fraction the model caught. It penalizes misses."
+    },
+    {
+      "question": "The F1 score is:",
+      "options": [
+        "The average speed of predictions",
+        "The harmonic mean of precision and recall, balancing the two",
+        "The number of true negatives",
+        "Always equal to accuracy"
+      ],
+      "answer": "The harmonic mean of precision and recall, balancing the two",
+      "explanation": "F1 combines precision and recall into one number, useful when you care about both and especially under class imbalance."
+    },
+    {
+      "question": "An ROC-AUC of 0.5 indicates a classifier that is:",
+      "options": ["Perfect", "No better than random guessing", "Overfit", "Underfit but accurate"],
+      "answer": "No better than random guessing",
+      "explanation": "AUC ranges 0.5 (random) to 1.0 (perfect ranking). 0.5 means the model can't distinguish positives from negatives."
+    },
+    {
+      "question": "For a regression model, which metric measures average prediction error and punishes large errors more?",
+      "options": ["Precision", "RMSE (root mean squared error)", "Recall", "F1"],
+      "answer": "RMSE (root mean squared error)",
+      "explanation": "RMSE squares errors before averaging, so big misses weigh more. MAE (mean absolute error) treats all errors linearly."
+    }
+  ],
+  "xpReward": 110
+}

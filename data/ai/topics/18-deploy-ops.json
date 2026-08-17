@@ -1,0 +1,123 @@
+{
+  "id": "18-deploy-ops",
+  "order": 18,
+  "title": "Ship It: Deploy, Cost & Monitor",
+  "track": "ai-engineering",
+  "character": {
+    "name": "The Ops Ranger",
+    "emoji": "🚀",
+    "tagline": "A model in a notebook helps no one. Let's get it into the wild — and keep it alive."
+  },
+  "oneLiner": "The engineering around the model: serving via APIs, managing latency and cost, caching, and monitoring in production.",
+  "analogy": "Training a model is baking a great cake at home; deploying it is opening a bakery that serves thousands daily without running out or going bankrupt. Now you care about: how fast each slice comes out (latency), how much each slice costs in ingredients (tokens = money), keeping popular slices pre-made (caching), and cameras in the kitchen (monitoring/observability) so you notice when quality drops or costs spike at 2am. The model is maybe 10% of the work; the bakery around it is the other 90%.",
+  "objectives": [
+    "Serve models/LLMs behind APIs and understand latency vs cost tradeoffs.",
+    "Reduce cost with caching, smaller models, and prompt/token efficiency.",
+    "Monitor quality, latency, cost, and failures (observability) in production.",
+    "Understand streaming, rate limits, retries, and fallbacks for robust apps."
+  ],
+  "keyConcepts": [
+    "LLM apps typically call a model API; you manage latency, throughput, rate limits, retries, and fallbacks around it.",
+    "Token usage drives cost: shorter prompts/outputs, smaller/cheaper models where adequate, and batching reduce spend.",
+    "Caching repeated or similar requests (and prompt caching) cuts both latency and cost.",
+    "Streaming tokens to the user improves perceived latency even when total time is unchanged.",
+    "Observability means logging inputs/outputs, latency, cost, and errors, plus tracking quality metrics and user feedback over time.",
+    "Right-size the model: use a smaller/cheaper model when it passes your evals, and reserve the biggest model for hard cases."
+  ],
+  "keyTerms": [
+    { "term": "Latency", "plain": "How long the user waits for a response." },
+    { "term": "Token cost", "plain": "You pay per token in and out — words literally cost money." },
+    { "term": "Caching", "plain": "Reusing past results so you don't pay/wait twice." },
+    { "term": "Streaming", "plain": "Showing the answer as it's typed, so it feels faster." },
+    { "term": "Observability", "plain": "Cameras in the kitchen: logs and metrics for what your AI is doing." }
+  ],
+  "resources": [
+    { "label": "Anthropic: Prompt caching", "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching", "type": "docs" },
+    { "label": "Anthropic: Streaming messages", "url": "https://docs.anthropic.com/en/docs/build-with-claude/streaming", "type": "docs" },
+    { "label": "Google: MLOps overview", "url": "https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "Your LLM app works but users complain it feels slow, even though total generation time is acceptable. Costs are also creeping up from repeated identical questions.",
+      "question": "Which two changes address these directly?",
+      "options": [
+        { "id": "a", "label": "Stream tokens for perceived speed, and cache repeated requests to cut latency and cost" },
+        { "id": "b", "label": "Raise temperature and prompt length" },
+        { "id": "c", "label": "Switch to the largest model for everything" },
+        { "id": "d", "label": "Remove monitoring to save resources" }
+      ],
+      "correct": "a",
+      "explanation": "Streaming improves perceived latency; caching repeated/similar requests reduces both latency and token cost. Bigger models and longer prompts would raise cost."
+    },
+    {
+      "scenario": "A simple classification step in your pipeline currently uses your most expensive model and dominates the bill. It passes your evals easily.",
+      "question": "What's a sound cost optimization?",
+      "options": [
+        { "id": "a", "label": "Right-size: use a smaller/cheaper model for that step since it already passes evals" },
+        { "id": "b", "label": "Add more steps with the expensive model" },
+        { "id": "c", "label": "Disable evals to save time" },
+        { "id": "d", "label": "Increase max tokens" }
+      ],
+      "correct": "a",
+      "explanation": "Match the model to the task: if a cheaper/smaller model passes your evals for a step, use it and reserve the expensive model for genuinely hard cases."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "In LLM applications, what primarily drives cost?",
+      "options": [
+        "The number of CSS files",
+        "Token usage (input and output tokens)",
+        "The monitor resolution",
+        "The number of code comments"
+      ],
+      "answer": "Token usage (input and output tokens)",
+      "explanation": "You're billed per token processed, so prompt/output length and model choice directly affect cost."
+    },
+    {
+      "question": "Streaming tokens to the user primarily improves:",
+      "options": [
+        "Total generation time",
+        "Perceived latency (it feels faster because output appears incrementally)",
+        "Model accuracy",
+        "Token price"
+      ],
+      "answer": "Perceived latency (it feels faster because output appears incrementally)",
+      "explanation": "Streaming shows text as it's produced, improving the felt responsiveness even when the total time is the same."
+    },
+    {
+      "question": "Caching in an LLM app helps by:",
+      "options": [
+        "Increasing hallucinations",
+        "Reducing latency and cost for repeated or similar requests",
+        "Encrypting outputs",
+        "Enlarging the model"
+      ],
+      "answer": "Reducing latency and cost for repeated or similar requests",
+      "explanation": "Reusing prior results (and prompt caching) avoids recomputing the same work, saving time and money."
+    },
+    {
+      "question": "Observability for an AI system means:",
+      "options": [
+        "Making the UI prettier",
+        "Logging inputs/outputs, latency, cost, errors, and tracking quality over time",
+        "Only measuring GPU temperature",
+        "Turning off logs in production"
+      ],
+      "answer": "Logging inputs/outputs, latency, cost, errors, and tracking quality over time",
+      "explanation": "Observability lets you detect quality drops, cost spikes, and failures in production so you can respond quickly."
+    },
+    {
+      "question": "'Right-sizing the model' means:",
+      "options": [
+        "Always using the biggest model",
+        "Choosing the smallest/cheapest model that still passes your evals for a given task",
+        "Resizing images",
+        "Shrinking the context window to zero"
+      ],
+      "answer": "Choosing the smallest/cheapest model that still passes your evals for a given task",
+      "explanation": "Match the model to the difficulty of the task: use cheaper models where they suffice and reserve premium models for hard cases."
+    }
+  ],
+  "xpReward": 140
+}

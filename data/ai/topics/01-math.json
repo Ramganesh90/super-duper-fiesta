@@ -1,0 +1,105 @@
+{
+  "id": "01-math",
+  "order": 1,
+  "title": "Math You Actually Need",
+  "track": "foundations",
+  "character": {
+    "name": "The Number Sage",
+    "emoji": "🧙",
+    "tagline": "Fear not the Greek letters — they're just fancy hats on simple ideas."
+  },
+  "oneLiner": "The small, useful slice of linear algebra, calculus, and probability that AI actually runs on.",
+  "analogy": "Imagine AI math as a kitchen. Linear algebra is the countertop where you lay out all your ingredients (numbers) in neat trays called vectors and matrices. Calculus is the taste-test: you take a sip, decide 'needs more salt,' and nudge the recipe in the right direction — that nudge is a gradient. Probability is you shrugging and saying 'it's PROBABLY chicken' when the dish is ambiguous. You don't need to be a Michelin chef; you need to know which knob to turn and which way.",
+  "objectives": [
+    "Recognize vectors and matrices as the containers AI uses for data and parameters.",
+    "Understand a gradient as 'which direction reduces the error' — the heart of learning.",
+    "Read basic probability (likelihood, distributions) without panic.",
+    "Know just enough notation to follow tutorials and papers."
+  ],
+  "keyConcepts": [
+    "A vector is an ordered list of numbers; a matrix is a grid of them. Nearly all AI data (an image, a sentence, a user) becomes a vector.",
+    "The dot product measures how aligned two vectors are — it quietly powers similarity, attention, and recommendations.",
+    "A derivative/gradient tells you the slope of the error surface; gradient descent walks downhill to reduce error.",
+    "Probability describes uncertainty; models often output a probability distribution over possible answers rather than one certain answer.",
+    "You optimize a 'loss function' — a single number saying how wrong the model is — by nudging parameters to make it smaller."
+  ],
+  "keyTerms": [
+    { "term": "Vector", "plain": "A row of numbers. Think of it as coordinates describing a thing." },
+    { "term": "Matrix", "plain": "A spreadsheet of numbers the model multiplies things by." },
+    { "term": "Gradient", "plain": "An arrow pointing toward 'less wrong.' Follow it downhill." },
+    { "term": "Loss function", "plain": "The model's report card: one number for how badly it messed up." },
+    { "term": "Distribution", "plain": "A map of how likely each outcome is." }
+  ],
+  "resources": [
+    { "label": "3Blue1Brown: Essence of Linear Algebra", "url": "https://www.3blue1brown.com/topics/linear-algebra", "type": "video" },
+    { "label": "Khan Academy: Multivariable calculus", "url": "https://www.khanacademy.org/math/multivariable-calculus", "type": "course" },
+    { "label": "Seeing Theory (probability, visual)", "url": "https://seeing-theory.brown.edu/", "type": "interactive" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You're building a feature that finds 'similar' movies. Each movie is represented as a vector of numbers.",
+      "question": "Which operation most directly measures how similar two movie vectors are?",
+      "options": [
+        { "id": "a", "label": "The dot product / cosine similarity between the vectors" },
+        { "id": "b", "label": "Adding the two vectors together" },
+        { "id": "c", "label": "Counting the letters in the movie titles" },
+        { "id": "d", "label": "Taking the derivative of one vector" }
+      ],
+      "correct": "a",
+      "explanation": "Similarity between vectors is measured with the dot product (or cosine similarity, its length-normalized cousin). This same idea underlies embeddings, search, and attention."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "In machine learning, what is a 'gradient' used for?",
+      "options": [
+        "Coloring charts with a smooth fade",
+        "Telling the model which direction to adjust its parameters to reduce error",
+        "Storing images in memory",
+        "Encrypting the training data"
+      ],
+      "answer": "Telling the model which direction to adjust its parameters to reduce error",
+      "explanation": "A gradient is the slope of the loss with respect to the parameters. Gradient descent nudges parameters 'downhill' to reduce error — the core of how models learn."
+    },
+    {
+      "question": "What is a loss function?",
+      "options": [
+        "A function that deletes data",
+        "A single number measuring how wrong the model's predictions are",
+        "The model's memory limit",
+        "A type of neural network layer"
+      ],
+      "answer": "A single number measuring how wrong the model's predictions are",
+      "explanation": "The loss summarizes error as one number. Training = minimizing the loss by adjusting parameters."
+    },
+    {
+      "question": "How is most real-world data (an image, a word, a user) represented for AI?",
+      "options": ["As a vector of numbers", "As a JPEG only", "As plain English", "As a single integer"],
+      "answer": "As a vector of numbers",
+      "explanation": "Almost everything is turned into vectors (lists of numbers) so math can operate on it — pixels, tokens, and user features all become vectors."
+    },
+    {
+      "question": "What does a probability distribution describe?",
+      "options": [
+        "The exact single correct answer, always",
+        "How likely each possible outcome is",
+        "The speed of the GPU",
+        "The number of layers in a model"
+      ],
+      "answer": "How likely each possible outcome is",
+      "explanation": "Distributions capture uncertainty — models often output probabilities across many options rather than one certain answer."
+    },
+    {
+      "question": "Do you need advanced, proof-heavy math to START building with AI?",
+      "options": [
+        "Yes, a PhD is required before touching any tool",
+        "No — a working intuition for vectors, gradients, and probability is enough to begin",
+        "No math is ever involved",
+        "Only geometry matters"
+      ],
+      "answer": "No — a working intuition for vectors, gradients, and probability is enough to begin",
+      "explanation": "You can be productive with intuition for the core ideas and deepen the math over time. Understanding beats memorizing notation."
+    }
+  ],
+  "xpReward": 100
+}

@@ -73,6 +73,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 AWS SA
               </Link>
+              <Link
+                href="/ai"
+                className="comic-border-sm font-comic bg-ai-violet px-3 py-1.5 text-sm text-paper transition-transform hover:-translate-y-0.5 sm:text-base"
+              >
+                AI
+              </Link>
             </nav>
           </div>
         </header>

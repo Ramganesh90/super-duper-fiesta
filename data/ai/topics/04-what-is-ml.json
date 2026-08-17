@@ -1,0 +1,122 @@
+{
+  "id": "04-what-is-ml",
+  "order": 4,
+  "title": "What Even Is Machine Learning?",
+  "track": "classical-ml",
+  "character": {
+    "name": "The Pattern Seer",
+    "emoji": "🔮",
+    "tagline": "I don't write the rules. I let the data whisper them to me."
+  },
+  "oneLiner": "The big idea: instead of coding rules by hand, you let a model learn patterns from examples.",
+  "analogy": "Traditional programming is a strict recipe: 'IF tomato AND basil THEN pizza.' Machine learning is raising a toddler on a thousand photos of pizza until they just KNOW it's pizza — even a weird one they've never seen. You never wrote the rule 'melted cheese + round'; the toddler inferred it. Supervised learning is showing labeled flashcards ('this is a cat'), unsupervised is dumping toys on the floor and letting them sort into piles, and reinforcement is training a puppy with treats for good moves.",
+  "objectives": [
+    "Contrast rule-based programming with learning from data.",
+    "Distinguish supervised, unsupervised, and reinforcement learning.",
+    "Understand training vs inference.",
+    "Know when ML is the right tool (and when a plain rule is better)."
+  ],
+  "keyConcepts": [
+    "ML learns patterns from examples instead of relying on hand-written rules — great when rules are too complex or unknown.",
+    "Supervised learning uses labeled data (inputs + correct answers) to predict labels for new inputs.",
+    "Unsupervised learning finds structure in unlabeled data (e.g. clustering, dimensionality reduction).",
+    "Reinforcement learning learns by trial and error, maximizing a reward signal over time.",
+    "Training is the learning phase; inference is using the trained model to make predictions.",
+    "If a simple deterministic rule solves the problem reliably, you often don't need ML at all."
+  ],
+  "keyTerms": [
+    { "term": "Supervised learning", "plain": "Learning from flashcards with the answers on the back." },
+    { "term": "Unsupervised learning", "plain": "Sorting a pile of stuff into groups with no labels given." },
+    { "term": "Reinforcement learning", "plain": "Learning by trial, error, and treats (rewards)." },
+    { "term": "Training", "plain": "The practice phase where the model learns from data." },
+    { "term": "Inference", "plain": "Game time — using the trained model to make predictions." }
+  ],
+  "resources": [
+    { "label": "Google ML Crash Course: Framing", "url": "https://developers.google.com/machine-learning/crash-course/ml-intro", "type": "course" },
+    { "label": "elements of AI (free course)", "url": "https://www.elementsofai.com/", "type": "course" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You have thousands of customer reviews and want to automatically group them into themes, but you have no predefined categories or labels.",
+      "question": "Which type of learning fits best?",
+      "options": [
+        { "id": "a", "label": "Unsupervised learning (clustering)" },
+        { "id": "b", "label": "Supervised learning" },
+        { "id": "c", "label": "Reinforcement learning" },
+        { "id": "d", "label": "No learning — write IF/ELSE rules for every theme" }
+      ],
+      "correct": "a",
+      "explanation": "With no labels and a goal of discovering structure/groups, unsupervised clustering is the natural fit. Supervised learning would require labeled examples up front."
+    },
+    {
+      "scenario": "A task needs to decide whether a number is even or odd.",
+      "question": "Should you train an ML model for this?",
+      "options": [
+        { "id": "a", "label": "No — a trivial deterministic rule (check the last bit) is simpler and perfect" },
+        { "id": "b", "label": "Yes, train a deep neural network on millions of examples" },
+        { "id": "c", "label": "Yes, use reinforcement learning" },
+        { "id": "d", "label": "Yes, but only with a GPU cluster" }
+      ],
+      "correct": "a",
+      "explanation": "When a simple exact rule exists, use it. ML shines for problems too complex or fuzzy to hand-code, not for things a one-line rule already nails."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What fundamentally distinguishes machine learning from traditional programming?",
+      "options": [
+        "ML runs only on GPUs",
+        "ML learns patterns from data instead of following explicitly hand-coded rules",
+        "ML never makes mistakes",
+        "ML doesn't use code"
+      ],
+      "answer": "ML learns patterns from data instead of following explicitly hand-coded rules",
+      "explanation": "Instead of a human specifying every rule, ML infers patterns from examples — useful when rules are unknown or too complex."
+    },
+    {
+      "question": "Supervised learning requires:",
+      "options": [
+        "Unlabeled data only",
+        "Labeled examples (inputs paired with correct outputs)",
+        "A reward signal",
+        "No data at all"
+      ],
+      "answer": "Labeled examples (inputs paired with correct outputs)",
+      "explanation": "Supervised learning trains on inputs with known correct answers so it can predict labels for new inputs."
+    },
+    {
+      "question": "Which is an example of reinforcement learning?",
+      "options": [
+        "Grouping photos with no labels",
+        "An agent learning to play a game by earning rewards for good moves",
+        "Predicting house prices from labeled sales",
+        "Cleaning a CSV file"
+      ],
+      "answer": "An agent learning to play a game by earning rewards for good moves",
+      "explanation": "RL learns through trial and error guided by a reward signal, improving its policy over time."
+    },
+    {
+      "question": "What is 'inference'?",
+      "options": [
+        "The phase where the model learns from data",
+        "Using a trained model to make predictions on new inputs",
+        "Deleting the training set",
+        "Labeling data by hand"
+      ],
+      "answer": "Using a trained model to make predictions on new inputs",
+      "explanation": "Training is learning; inference is applying the trained model to produce predictions."
+    },
+    {
+      "question": "When is ML often NOT the right tool?",
+      "options": [
+        "When a reliable simple rule already solves the problem exactly",
+        "When the problem is fuzzy and hard to specify",
+        "When you have lots of labeled examples",
+        "When patterns are too complex to hand-code"
+      ],
+      "answer": "When a reliable simple rule already solves the problem exactly",
+      "explanation": "If a deterministic rule works, it's simpler, cheaper, and more reliable than ML. Save ML for genuinely complex or fuzzy problems."
+    }
+  ],
+  "xpReward": 110
+}

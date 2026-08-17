@@ -1,0 +1,123 @@
+{
+  "id": "19-responsible-ai",
+  "order": 19,
+  "title": "Responsible AI",
+  "track": "responsible-ai",
+  "character": {
+    "name": "The Ethics Guardian",
+    "emoji": "⚔️",
+    "tagline": "With great model weights comes great responsibility."
+  },
+  "oneLiner": "Building AI that's fair, private, transparent, and safe — because 'it works' isn't the same as 'it's right.'",
+  "analogy": "An AI model is a mirror that learned from humanity's photo album — and that album is full of our biases, blind spots, and bad days. If you train a hiring model on a company's past decisions, it can faithfully learn to repeat past discrimination while looking 'objective' because 'the math said so.' The Ethics Guardian's job is to remember that a model is not neutral just because it's a machine: check who it helps and who it harms, protect people's data, be honest about what it can't do, and keep a human in the loop for high-stakes calls.",
+  "objectives": [
+    "Understand how bias enters models via data and design, and its real-world harms.",
+    "Apply privacy principles (data minimization, consent, PII protection).",
+    "Value transparency, explainability, and honest capability claims.",
+    "Know when human oversight is required and what AI safety means in practice."
+  ],
+  "keyConcepts": [
+    "Models learn from data, so biased or unrepresentative data produces biased models — sometimes amplifying existing discrimination.",
+    "Fairness requires checking outcomes across groups, not assuming a model is neutral because it's automated.",
+    "Privacy matters: minimize collected data, protect PII, respect consent, and be careful not to leak training data.",
+    "Transparency/explainability help users and regulators understand and trust decisions, especially in high-stakes domains.",
+    "Keep a human in the loop for consequential decisions (hiring, lending, medical, legal).",
+    "AI safety spans avoiding harmful outputs, misuse, and unintended consequences — and being honest about limitations rather than overclaiming."
+  ],
+  "keyTerms": [
+    { "term": "Bias", "plain": "Systematic unfairness the model soaked up from data or design." },
+    { "term": "Fairness", "plain": "Checking the model doesn't quietly harm some groups more than others." },
+    { "term": "PII", "plain": "Personally identifiable information — handle like it's radioactive." },
+    { "term": "Explainability", "plain": "Being able to say WHY the model decided what it did." },
+    { "term": "Human-in-the-loop", "plain": "A person reviewing high-stakes AI decisions before they count." }
+  ],
+  "resources": [
+    { "label": "Google: Responsible AI practices", "url": "https://ai.google/responsibility/responsible-ai-practices/", "type": "docs" },
+    { "label": "NIST AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs" },
+    { "label": "Anthropic: Core Views on AI Safety", "url": "https://www.anthropic.com/news/core-views-on-ai-safety", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A hiring model is trained on a decade of the company's past hiring decisions, which historically favored one demographic. The model now scores that demographic higher.",
+      "question": "What's the core problem and a responsible response?",
+      "options": [
+        { "id": "a", "label": "The model learned historical bias from the data; audit for fairness, fix the data/approach, and keep humans in the loop" },
+        { "id": "b", "label": "The model is objective because it's math; ship it" },
+        { "id": "c", "label": "Increase the temperature to add fairness" },
+        { "id": "d", "label": "Nothing — bias is impossible in software" }
+      ],
+      "correct": "a",
+      "explanation": "Models trained on biased history can perpetuate discrimination while appearing 'neutral.' The responsible path is auditing outcomes across groups, addressing the data/design, and retaining human oversight for high-stakes decisions."
+    },
+    {
+      "scenario": "A team wants to log full user conversations, including names and payment details, indefinitely, to 'maybe use for training later.'",
+      "question": "Which principle should guide them?",
+      "options": [
+        { "id": "a", "label": "Data minimization and privacy — collect only what's needed, protect PII, and respect consent/retention limits" },
+        { "id": "b", "label": "Store everything forever; more data is always better" },
+        { "id": "c", "label": "Privacy doesn't apply to AI" },
+        { "id": "d", "label": "Only latency matters" }
+      ],
+      "correct": "a",
+      "explanation": "Responsible data handling means minimizing collection, protecting PII, honoring consent, and setting retention limits — not hoarding sensitive data indefinitely without a clear, lawful basis."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "How does bias most commonly enter machine learning models?",
+      "options": [
+        "Through biased or unrepresentative training data (and design choices)",
+        "Only through hardware faults",
+        "It cannot enter models",
+        "Through high temperature settings"
+      ],
+      "answer": "Through biased or unrepresentative training data (and design choices)",
+      "explanation": "Models learn from data; if the data reflects historical or sampling biases, the model can absorb and even amplify them."
+    },
+    {
+      "question": "Why is 'the model is objective because it's math' a dangerous assumption?",
+      "options": [
+        "Math is always wrong",
+        "Models can encode and amplify human bias present in their data while appearing neutral",
+        "Models never use math",
+        "It makes them slower"
+      ],
+      "answer": "Models can encode and amplify human bias present in their data while appearing neutral",
+      "explanation": "Automation can lend false credibility to biased outcomes. Fairness must be actively checked, not assumed."
+    },
+    {
+      "question": "Which is a core data-privacy principle?",
+      "options": [
+        "Collect as much data as possible forever",
+        "Data minimization — collect only what's needed and protect PII",
+        "Share PII publicly for transparency",
+        "Ignore consent"
+      ],
+      "answer": "Data minimization — collect only what's needed and protect PII",
+      "explanation": "Responsible AI collects the minimum necessary data, protects personal information, and respects consent and retention limits."
+    },
+    {
+      "question": "For high-stakes decisions (hiring, lending, medical), a key safeguard is:",
+      "options": [
+        "Removing all human involvement for speed",
+        "Keeping a human in the loop to review consequential decisions",
+        "Maximizing model size only",
+        "Disabling explainability"
+      ],
+      "answer": "Keeping a human in the loop to review consequential decisions",
+      "explanation": "Human oversight helps catch errors and unfair outcomes before they cause real harm in consequential domains."
+    },
+    {
+      "question": "Transparency/explainability in AI helps primarily by:",
+      "options": [
+        "Making models run faster",
+        "Helping people understand and appropriately trust or challenge AI decisions",
+        "Reducing token cost",
+        "Encrypting the model"
+      ],
+      "answer": "Helping people understand and appropriately trust or challenge AI decisions",
+      "explanation": "Being able to explain why a model decided something supports trust, accountability, and the ability to contest decisions — vital in high-stakes settings."
+    }
+  ],
+  "xpReward": 150
+}

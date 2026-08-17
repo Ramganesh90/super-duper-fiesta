@@ -13,6 +13,8 @@
   --color-aws-orange: #ff9900;
   --color-aws-orange-dark: #b45c00;
   --color-aws-navy: #232f3e;
+  --color-ai-violet: #7c3aed;
+  --color-ai-violet-dark: #5b21b6;
 
   --font-comic: var(--font-bangers), "Impact", "Arial Narrow Bold", sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

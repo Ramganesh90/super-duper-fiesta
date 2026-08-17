@@ -1,0 +1,118 @@
+{
+  "id": "15-fine-tuning",
+  "order": 15,
+  "title": "Fine-Tuning & Adaptation",
+  "track": "genai",
+  "character": {
+    "name": "The Sculptor",
+    "emoji": "🗿",
+    "tagline": "The model is the marble. I just chip it toward your masterpiece."
+  },
+  "oneLiner": "When and how to adapt a base model — and why prompting or RAG is often the smarter first move.",
+  "analogy": "A base LLM is a wildly talented generalist actor. Prompting is handing them a script for tonight's scene. RAG is giving them cue cards with the latest facts. Fine-tuning is sending them to months of method-acting school so they permanently nail a specific accent or character. School is powerful but expensive, and it doesn't teach them today's news — for facts you still want cue cards (RAG). The pro move: try prompting first, add RAG for knowledge, and fine-tune only when you need consistent style, format, or specialized behavior at scale.",
+  "objectives": [
+    "Understand fine-tuning as updating a model's weights on task-specific examples.",
+    "Compare prompting vs RAG vs fine-tuning and when each fits.",
+    "Know parameter-efficient fine-tuning (LoRA/PEFT) and why it's popular.",
+    "Recognize the data, cost, and maintenance implications of fine-tuning."
+  ],
+  "keyConcepts": [
+    "Fine-tuning continues training a base model on curated examples to specialize its behavior, style, or format.",
+    "It's best for teaching consistent tone/format or narrow tasks — not for injecting frequently changing facts (use RAG for that).",
+    "The usual escalation: start with prompting, add RAG for knowledge, then fine-tune if you still need more consistency or specialization.",
+    "LoRA/PEFT (parameter-efficient fine-tuning) trains small adapter weights instead of the whole model, cutting cost and storage.",
+    "Fine-tuning needs quality labeled examples; poor data bakes in bad behavior.",
+    "Fine-tuned models require versioning and re-tuning as needs change — an ongoing maintenance cost."
+  ],
+  "keyTerms": [
+    { "term": "Fine-tuning", "plain": "Extra training to specialize a model's behavior/style." },
+    { "term": "Base/foundation model", "plain": "The big pretrained generalist you start from." },
+    { "term": "LoRA / PEFT", "plain": "Cheap fine-tuning that trains tiny add-on weights, not the whole model." },
+    { "term": "Adapter", "plain": "A small trained module bolted onto a frozen base model." },
+    { "term": "Catastrophic forgetting", "plain": "When over-tuning makes a model lose skills it used to have." }
+  ],
+  "resources": [
+    { "label": "Hugging Face: PEFT", "url": "https://huggingface.co/docs/peft/index", "type": "docs" },
+    { "label": "LoRA (paper)", "url": "https://arxiv.org/abs/2106.09685", "type": "paper" },
+    { "label": "OpenAI: Fine-tuning guide", "url": "https://platform.openai.com/docs/guides/fine-tuning", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A team wants the model to ALWAYS respond in their brand's very specific voice and a fixed template, across millions of requests.",
+      "question": "Which approach is the best long-term fit?",
+      "options": [
+        { "id": "a", "label": "Fine-tuning on many brand-voice examples to bake in the consistent style/format" },
+        { "id": "b", "label": "RAG over a facts database" },
+        { "id": "c", "label": "Raising the temperature" },
+        { "id": "d", "label": "Nothing can control style" }
+      ],
+      "correct": "a",
+      "explanation": "Consistent style/format at scale is a classic fine-tuning use case. RAG is for knowledge, not tone; prompting alone can drift across many requests."
+    },
+    {
+      "scenario": "A startup wants to fine-tune a large model but has a limited GPU budget and storage.",
+      "question": "Which technique reduces the cost of fine-tuning?",
+      "options": [
+        { "id": "a", "label": "LoRA/PEFT — train small adapter weights instead of the full model" },
+        { "id": "b", "label": "Train the entire model from scratch" },
+        { "id": "c", "label": "Increase the context window instead" },
+        { "id": "d", "label": "Use keyword search" }
+      ],
+      "correct": "a",
+      "explanation": "Parameter-efficient fine-tuning (LoRA/PEFT) updates a small number of adapter parameters, dramatically lowering compute and storage versus full fine-tuning."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Fine-tuning primarily involves:",
+      "options": [
+        "Adding documents to the prompt at query time",
+        "Updating a model's weights by training on task-specific examples",
+        "Searching a vector database",
+        "Increasing the temperature"
+      ],
+      "answer": "Updating a model's weights by training on task-specific examples",
+      "explanation": "Fine-tuning continues training on curated data to specialize the model, changing its weights (unlike prompting or RAG)."
+    },
+    {
+      "question": "For injecting frequently changing facts, you should generally use:",
+      "options": ["Fine-tuning", "RAG", "A bigger monitor", "Lower temperature only"],
+      "answer": "RAG",
+      "explanation": "RAG supplies current facts at query time; fine-tuning bakes in behavior/style and is poorly suited to rapidly changing knowledge."
+    },
+    {
+      "question": "What is LoRA / PEFT?",
+      "options": [
+        "A prompting style",
+        "Parameter-efficient fine-tuning that trains small adapter weights instead of the whole model",
+        "A vector database",
+        "A metric for classification"
+      ],
+      "answer": "Parameter-efficient fine-tuning that trains small adapter weights instead of the whole model",
+      "explanation": "PEFT methods like LoRA train a small set of additional parameters, making fine-tuning far cheaper and lighter to store."
+    },
+    {
+      "question": "A sensible default escalation order for building with LLMs is:",
+      "options": [
+        "Fine-tune first, then maybe prompt",
+        "Prompting → RAG → fine-tuning, escalating only as needed",
+        "Always fine-tune from scratch",
+        "Only ever use keyword search"
+      ],
+      "answer": "Prompting → RAG → fine-tuning, escalating only as needed",
+      "explanation": "Start cheap and simple (prompting), add RAG for knowledge, and fine-tune only when consistency/specialization demands it."
+    },
+    {
+      "question": "A downside of fine-tuning to keep in mind is:",
+      "options": [
+        "It requires quality data and ongoing maintenance/versioning",
+        "It instantly updates with world news",
+        "It never needs data",
+        "It removes the need for evaluation"
+      ],
+      "answer": "It requires quality data and ongoing maintenance/versioning",
+      "explanation": "Fine-tuning needs good labeled examples and must be re-done as requirements change; poor data can bake in bad behavior."
+    }
+  ],
+  "xpReward": 140
+}

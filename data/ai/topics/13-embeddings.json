@@ -1,0 +1,106 @@
+{
+  "id": "13-embeddings",
+  "order": 13,
+  "title": "Embeddings & Vector Search",
+  "track": "genai",
+  "character": {
+    "name": "The Librarian",
+    "emoji": "📚",
+    "tagline": "I don't file books by title. I file them by what they're ABOUT."
+  },
+  "oneLiner": "Turning meaning into numbers so machines can find things by concept, not just keywords.",
+  "analogy": "Imagine a magical library where every book floats in space, and books about similar ideas drift close together — cookbooks huddle in one corner, space operas in another. That's an embedding space: each piece of text becomes a point (a vector), and nearness means similar meaning. To find relevant books you don't scan titles for exact words; you drop your question into the space and grab whatever's floating nearby. A vector database is the shelving system that makes finding those nearest neighbors fast, even among millions of books.",
+  "objectives": [
+    "Understand embeddings as vectors capturing semantic meaning.",
+    "See how similarity (cosine distance) enables semantic search.",
+    "Know what a vector database does and when you need one.",
+    "Contrast semantic search with keyword search."
+  ],
+  "keyConcepts": [
+    "An embedding maps text (or images, etc.) to a vector so that similar meanings are close together in vector space.",
+    "Semantic search compares embedding vectors (via cosine similarity) to find conceptually related items, even without shared keywords.",
+    "Vector databases (e.g. Pinecone, pgvector, FAISS) store embeddings and perform fast nearest-neighbor search at scale.",
+    "Embeddings power search, recommendations, clustering, deduplication, and the retrieval step in RAG.",
+    "Keyword search matches exact words; semantic search matches meaning — often you combine both (hybrid search).",
+    "Chunk size and the embedding model choice significantly affect retrieval quality."
+  ],
+  "keyTerms": [
+    { "term": "Embedding", "plain": "Meaning turned into a list of numbers (a point in concept-space)." },
+    { "term": "Vector space", "plain": "A map where similar things sit close together." },
+    { "term": "Cosine similarity", "plain": "A score for how close two meanings are." },
+    { "term": "Vector database", "plain": "A search engine for 'find me the nearest meanings, fast.'" },
+    { "term": "Semantic search", "plain": "Searching by idea, not exact words." }
+  ],
+  "resources": [
+    { "label": "The Illustrated Word2vec", "url": "https://jalammar.github.io/illustrated-word2vec/", "type": "docs" },
+    { "label": "Pinecone: What is a vector database?", "url": "https://www.pinecone.io/learn/vector-database/", "type": "docs" },
+    { "label": "pgvector", "url": "https://github.com/pgvector/pgvector", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A help center search fails when users phrase questions differently from the article titles (e.g. 'my card was declined' vs 'payment failure').",
+      "question": "Which approach best fixes this?",
+      "options": [
+        { "id": "a", "label": "Semantic search over embeddings, so conceptually similar phrasings match" },
+        { "id": "b", "label": "Stricter exact-keyword matching" },
+        { "id": "c", "label": "Raising the LLM temperature" },
+        { "id": "d", "label": "Deleting the articles" }
+      ],
+      "correct": "a",
+      "explanation": "Embeddings capture meaning, so 'card declined' and 'payment failure' land near each other in vector space and match — something exact-keyword search misses."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "An embedding is:",
+      "options": [
+        "A compressed image file",
+        "A vector of numbers representing the meaning of text (or other data)",
+        "A type of database index only",
+        "The model's loss function"
+      ],
+      "answer": "A vector of numbers representing the meaning of text (or other data)",
+      "explanation": "Embeddings encode semantic meaning as vectors so that similar items are close together in vector space."
+    },
+    {
+      "question": "How does semantic search decide what's relevant?",
+      "options": [
+        "By exact keyword overlap only",
+        "By measuring vector similarity (e.g. cosine) between query and item embeddings",
+        "By file size",
+        "By alphabetical order"
+      ],
+      "answer": "By measuring vector similarity (e.g. cosine) between query and item embeddings",
+      "explanation": "It embeds the query and compares it to stored embeddings, returning the nearest (most similar in meaning) items."
+    },
+    {
+      "question": "What does a vector database specialize in?",
+      "options": [
+        "Storing relational tables with SQL joins",
+        "Fast nearest-neighbor search over many embedding vectors",
+        "Rendering 3D graphics",
+        "Compiling code"
+      ],
+      "answer": "Fast nearest-neighbor search over many embedding vectors",
+      "explanation": "Vector DBs index embeddings for efficient similarity search at scale — the retrieval backbone for semantic search and RAG."
+    },
+    {
+      "question": "A key difference between keyword and semantic search is:",
+      "options": [
+        "Keyword search understands meaning; semantic doesn't",
+        "Semantic search matches meaning even without shared exact words",
+        "They are identical",
+        "Semantic search only works on numbers"
+      ],
+      "answer": "Semantic search matches meaning even without shared exact words",
+      "explanation": "Keyword search needs matching terms; semantic search matches concepts. Hybrid approaches often combine both."
+    },
+    {
+      "question": "Embeddings are commonly used for all of these EXCEPT:",
+      "options": ["Semantic search", "Recommendations", "The retrieval step in RAG", "Encrypting network traffic"],
+      "answer": "Encrypting network traffic",
+      "explanation": "Embeddings enable search, recommendations, clustering, and RAG retrieval — they are not an encryption mechanism."
+    }
+  ],
+  "xpReward": 130
+}

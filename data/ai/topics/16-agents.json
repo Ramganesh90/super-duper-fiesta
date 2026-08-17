@@ -1,0 +1,123 @@
+{
+  "id": "16-agents",
+  "order": 16,
+  "title": "Agents & Tool Use",
+  "track": "genai",
+  "character": {
+    "name": "The Puppeteer",
+    "emoji": "🎭",
+    "tagline": "Give the model hands, and it stops just talking — it starts DOING."
+  },
+  "oneLiner": "Turning an LLM from a chatterbox into a doer: calling tools, taking multi-step actions, and using external systems.",
+  "analogy": "A plain LLM is a genius locked in a room with no phone — it can only talk. An agent hands it a phone, a calculator, a web browser, and your calendar, plus the judgment to decide when to use each. Ask 'what's the weather where my next meeting is?' and the agent looks up your calendar (tool 1), geocodes the city (tool 2), calls a weather API (tool 3), and then answers. It loops: think → pick a tool → see the result → think again — until the job's done. Powerful, but you must fence it in so it doesn't 'helpfully' email your whole contact list.",
+  "objectives": [
+    "Understand tool/function calling: how an LLM invokes external functions.",
+    "Grasp the agent loop (reason → act → observe → repeat), e.g. ReAct.",
+    "Know what multi-step and multi-agent systems can and can't do reliably.",
+    "Recognize the role of protocols like MCP for connecting tools/data, and the need for guardrails."
+  ],
+  "keyConcepts": [
+    "Tool (function) calling lets an LLM output a structured request to run a function/API, then use the result in its answer.",
+    "Agents loop: they reason about the goal, choose an action/tool, observe the outcome, and repeat until done (the ReAct pattern).",
+    "Agents can chain steps and use memory/scratchpads to tackle tasks a single response can't.",
+    "The Model Context Protocol (MCP) is an open standard for connecting models to external tools and data sources in a consistent way.",
+    "Reliability drops as steps multiply (errors compound); good design adds checks, limits, and clear tool definitions.",
+    "Guardrails and permissions are essential — agents that take real actions can cause real harm if unconstrained."
+  ],
+  "keyTerms": [
+    { "term": "Tool / function calling", "plain": "The model asking to run a function and getting the result back." },
+    { "term": "Agent", "plain": "An LLM that plans and takes actions in a loop, not just chats." },
+    { "term": "ReAct loop", "plain": "Reason → act → observe → repeat until the task is done." },
+    { "term": "MCP", "plain": "A standard plug so models can connect to tools and data consistently." },
+    { "term": "Guardrails", "plain": "The fences and permissions that stop an agent from doing something dumb or dangerous." }
+  ],
+  "resources": [
+    { "label": "Anthropic: Building effective agents", "url": "https://www.anthropic.com/research/building-effective-agents", "type": "docs" },
+    { "label": "Model Context Protocol", "url": "https://modelcontextprotocol.io/", "type": "docs" },
+    { "label": "ReAct (paper)", "url": "https://arxiv.org/abs/2210.03629", "type": "paper" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You want an LLM feature that can look up live order status from your database and issue refunds when appropriate.",
+      "question": "What capability does the LLM need, and what must you add?",
+      "options": [
+        { "id": "a", "label": "Tool/function calling to query orders and issue refunds — plus strict guardrails/permissions on the refund action" },
+        { "id": "b", "label": "Only a higher temperature" },
+        { "id": "c", "label": "Fine-tuning on refund policies alone, no tools" },
+        { "id": "d", "label": "A larger context window and nothing else" }
+      ],
+      "correct": "a",
+      "explanation": "Live lookups and actions require tool/function calling. Because a refund is a real, irreversible action, you must add guardrails, permissions, and checks around it."
+    },
+    {
+      "scenario": "A 12-step autonomous agent frequently fails partway through, and each failure cascades into a wrong final result.",
+      "question": "Which is a sound design response?",
+      "options": [
+        { "id": "a", "label": "Add validation/checks between steps, limit scope, and simplify the workflow to reduce compounding errors" },
+        { "id": "b", "label": "Add 20 more steps" },
+        { "id": "c", "label": "Remove all tools" },
+        { "id": "d", "label": "Increase temperature to be more creative" }
+      ],
+      "correct": "a",
+      "explanation": "Errors compound across steps, so reliability improves by validating intermediate results, constraining scope, and simplifying — not by adding more unchecked steps."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is tool (function) calling?",
+      "options": [
+        "The model rendering a UI",
+        "The LLM producing a structured request to run an external function/API and using the result",
+        "Encrypting the prompt",
+        "A way to shrink the model"
+      ],
+      "answer": "The LLM producing a structured request to run an external function/API and using the result",
+      "explanation": "Tool calling lets the model invoke external capabilities (search, DB, APIs) and incorporate the returned data into its response."
+    },
+    {
+      "question": "The agent 'ReAct' loop is best summarized as:",
+      "options": [
+        "Reason → act → observe → repeat until the goal is met",
+        "React to user emotions only",
+        "Render and cache",
+        "Retrain after every message"
+      ],
+      "answer": "Reason → act → observe → repeat until the goal is met",
+      "explanation": "Agents interleave reasoning and actions: decide, use a tool, observe the result, and continue until the task is complete."
+    },
+    {
+      "question": "What is the Model Context Protocol (MCP)?",
+      "options": [
+        "A GPU driver",
+        "An open standard for connecting models to external tools and data sources consistently",
+        "A prompting trick",
+        "A type of loss function"
+      ],
+      "answer": "An open standard for connecting models to external tools and data sources consistently",
+      "explanation": "MCP standardizes how AI applications expose and consume tools/data, making integrations more consistent and reusable."
+    },
+    {
+      "question": "Why does reliability tend to drop as an agent uses more steps?",
+      "options": [
+        "GPUs overheat linearly",
+        "Errors at each step can compound, making the final result more likely to go wrong",
+        "More steps always means less compute",
+        "Tokens become free"
+      ],
+      "answer": "Errors at each step can compound, making the final result more likely to go wrong",
+      "explanation": "Each step can introduce error; across many steps these compound, so validation, limits, and simpler workflows improve reliability."
+    },
+    {
+      "question": "For an agent that can take real, irreversible actions, what is essential?",
+      "options": [
+        "Guardrails, permissions, and checks around sensitive actions",
+        "Maximum temperature",
+        "Removing all logging",
+        "Letting it act with no constraints for speed"
+      ],
+      "answer": "Guardrails, permissions, and checks around sensitive actions",
+      "explanation": "Agents that act in the real world need constraints, approvals, and validation to prevent harmful or unintended actions."
+    }
+  ],
+  "xpReward": 140
+}

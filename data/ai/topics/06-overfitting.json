@@ -1,0 +1,100 @@
+{
+  "id": "06-overfitting",
+  "order": 6,
+  "title": "The Overfitting Menace",
+  "track": "classical-ml",
+  "character": {
+    "name": "The Balance Keeper",
+    "emoji": "⚖️",
+    "tagline": "Memorize the textbook and you'll still flunk the surprise quiz."
+  },
+  "oneLiner": "Why models that ace training data can flop in the real world — and how to keep them honest.",
+  "analogy": "Overfitting is the student who memorizes every answer in last year's exam word-for-word, then panics when this year's questions are reworded. They learned the noise, not the lesson. Underfitting is the student who barely skimmed the chapter and shrugs at everything. The Balance Keeper wants the sweet spot: learn the real patterns, ignore the trivia. Tricks of the trade: hold out a validation set, add regularization (a penalty for over-complexity), and get more/better data.",
+  "objectives": [
+    "Define overfitting and underfitting and recognize their symptoms.",
+    "Understand the bias–variance tradeoff intuitively.",
+    "Use validation and cross-validation to detect overfitting.",
+    "Apply remedies: more data, regularization, simpler models, early stopping."
+  ],
+  "keyConcepts": [
+    "Overfitting: great on training data, poor on new data — the model memorized noise instead of the signal.",
+    "Underfitting: poor on both training and new data — the model is too simple to capture the pattern.",
+    "Bias–variance tradeoff: too-simple models have high bias (underfit); too-complex models have high variance (overfit).",
+    "A large train-vs-validation performance gap is the classic overfitting signal.",
+    "Regularization (e.g. L1/L2, dropout) penalizes complexity to improve generalization.",
+    "More and cleaner data, cross-validation, and early stopping all help models generalize."
+  ],
+  "keyTerms": [
+    { "term": "Overfitting", "plain": "Memorizing the training set, flopping on anything new." },
+    { "term": "Underfitting", "plain": "Too lazy/simple to even learn the training set." },
+    { "term": "Generalization", "plain": "Performing well on data it never saw — the whole point." },
+    { "term": "Regularization", "plain": "A nudge that punishes needless complexity." },
+    { "term": "Cross-validation", "plain": "Rotating which slice is the test slice to grade more fairly." }
+  ],
+  "resources": [
+    { "label": "Google ML: Generalization & overfitting", "url": "https://developers.google.com/machine-learning/crash-course/overfitting/overfitting", "type": "course" },
+    { "label": "scikit-learn: Cross-validation", "url": "https://scikit-learn.org/stable/modules/cross_validation.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "Your model scores 99% on training data but only 68% on the validation set.",
+      "question": "What is most likely happening, and a reasonable fix?",
+      "options": [
+        { "id": "a", "label": "Overfitting — add regularization, get more data, or simplify the model" },
+        { "id": "b", "label": "Underfitting — make the model far more complex" },
+        { "id": "c", "label": "The data is perfect; ship it" },
+        { "id": "d", "label": "The GPU is broken" }
+      ],
+      "correct": "a",
+      "explanation": "A big gap between high training and lower validation scores signals overfitting. Regularization, more/cleaner data, simpler models, or early stopping typically help."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "A model with 99% training accuracy but 65% test accuracy is likely:",
+      "options": ["Underfitting", "Overfitting", "Perfectly generalized", "Too simple"],
+      "answer": "Overfitting",
+      "explanation": "High training but low test performance means it memorized the training data (including noise) and fails to generalize."
+    },
+    {
+      "question": "Underfitting means the model:",
+      "options": [
+        "Is too complex and memorizes noise",
+        "Is too simple to capture the underlying pattern, performing poorly even on training data",
+        "Has perfect accuracy",
+        "Only works on GPUs"
+      ],
+      "answer": "Is too simple to capture the underlying pattern, performing poorly even on training data",
+      "explanation": "Underfitting = high bias: the model can't represent the pattern, so it's poor on both training and new data."
+    },
+    {
+      "question": "What is the main goal captured by 'generalization'?",
+      "options": [
+        "Performing well on data the model has never seen",
+        "Running fast",
+        "Using less memory",
+        "Having many layers"
+      ],
+      "answer": "Performing well on data the model has never seen",
+      "explanation": "Generalization is the ability to perform on new, unseen data — the real measure of a useful model."
+    },
+    {
+      "question": "Regularization helps by:",
+      "options": [
+        "Increasing model complexity",
+        "Penalizing complexity to discourage overfitting and improve generalization",
+        "Deleting the validation set",
+        "Speeding up the GPU"
+      ],
+      "answer": "Penalizing complexity to discourage overfitting and improve generalization",
+      "explanation": "Techniques like L1/L2 penalties and dropout constrain the model so it learns robust patterns rather than memorizing noise."
+    },
+    {
+      "question": "In the bias–variance tradeoff, an overly complex model tends to have:",
+      "options": ["High bias", "High variance", "No error", "Low capacity"],
+      "answer": "High variance",
+      "explanation": "Complex models fit training data closely (low bias) but are sensitive to noise (high variance), leading to overfitting."
+    }
+  ],
+  "xpReward": 110
+}

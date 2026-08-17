@@ -1,0 +1,100 @@
+{
+  "id": "09-cnn-rnn",
+  "order": 9,
+  "title": "Seeing & Sequencing (CNNs & RNNs)",
+  "track": "deep-learning",
+  "character": {
+    "name": "The Vision-and-Voice Duo",
+    "emoji": "👁️",
+    "tagline": "One of us reads pictures, the other remembers what you said. Together? Unstoppable."
+  },
+  "oneLiner": "Specialized architectures: CNNs that understand images and RNNs that handle sequences like text and audio.",
+  "analogy": "A CNN is a detective with a magnifying glass, sliding it across a photo looking for small clues — edges, then shapes, then 'that's an ear,' then 'that's a cat.' Each layer spots bigger patterns built from smaller ones. An RNN is a note-taker reading a sentence word by word, keeping a little memory of what came before so 'bank' means something different after 'river' vs after 'money.' RNNs struggle to remember long ago (goldfish memory), which is exactly the itch Transformers came to scratch.",
+  "objectives": [
+    "Understand convolution as sliding filters that detect local patterns in images.",
+    "See how CNN layers build hierarchical features (edges → shapes → objects).",
+    "Understand RNNs/LSTMs as sequence models with memory of previous steps.",
+    "Know the limitation (long-range memory) that motivated Transformers."
+  ],
+  "keyConcepts": [
+    "CNNs (Convolutional Neural Networks) apply small filters across an image to detect local features regardless of position.",
+    "Stacked convolutional layers learn a hierarchy: early layers find edges, later layers find shapes and objects.",
+    "CNNs dominate computer vision tasks like image classification and object detection.",
+    "RNNs (Recurrent Neural Networks) process sequences step by step, carrying a hidden state as memory.",
+    "LSTMs/GRUs are RNN variants that better retain information over longer sequences.",
+    "RNNs process sequentially and struggle with very long-range dependencies — a key reason Transformers took over language."
+  ],
+  "keyTerms": [
+    { "term": "Convolution", "plain": "Sliding a small pattern-detector across an image." },
+    { "term": "CNN", "plain": "The image specialist — great at seeing." },
+    { "term": "RNN", "plain": "The sequence reader with a short-term memory." },
+    { "term": "LSTM", "plain": "An RNN with a better memory for what happened a while ago." },
+    { "term": "Hidden state", "plain": "The running memory an RNN carries as it reads." }
+  ],
+  "resources": [
+    { "label": "CS231n: Convolutional Neural Networks", "url": "https://cs231n.github.io/convolutional-networks/", "type": "course" },
+    { "label": "Understanding LSTMs (colah's blog)", "url": "https://colah.github.io/posts/2015-08-Understanding-LSTMs/", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You need to classify whether a photo contains a dog, and the dog might appear anywhere in the frame.",
+      "question": "Which architecture is best suited?",
+      "options": [
+        { "id": "a", "label": "A CNN — convolution detects features regardless of their position in the image" },
+        { "id": "b", "label": "A plain RNN reading pixels left to right" },
+        { "id": "c", "label": "Logistic regression on raw pixels only" },
+        { "id": "d", "label": "A vector database" }
+      ],
+      "correct": "a",
+      "explanation": "CNNs are designed for images: sliding filters detect patterns anywhere in the frame (translation invariance), making them the standard for vision tasks."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "CNNs are most associated with which domain?",
+      "options": ["Tabular finance data", "Computer vision / images", "Database indexing", "Compilers"],
+      "answer": "Computer vision / images",
+      "explanation": "Convolutional networks excel at image tasks by detecting local features hierarchically, from edges to whole objects."
+    },
+    {
+      "question": "What does a convolutional filter do?",
+      "options": [
+        "Encrypts the image",
+        "Slides across the input detecting a local pattern wherever it appears",
+        "Sorts pixels by color",
+        "Deletes noise permanently"
+      ],
+      "answer": "Slides across the input detecting a local pattern wherever it appears",
+      "explanation": "Filters detect features (edges, textures) regardless of position, which is why CNNs handle objects appearing anywhere in an image."
+    },
+    {
+      "question": "RNNs are designed to process:",
+      "options": ["Single static images only", "Sequential data like text or time series, step by step", "Only numbers between 0 and 1", "Compiled binaries"],
+      "answer": "Sequential data like text or time series, step by step",
+      "explanation": "RNNs carry a hidden state across steps, making them suited to ordered/sequential data."
+    },
+    {
+      "question": "Why were LSTMs introduced over vanilla RNNs?",
+      "options": [
+        "To run without any data",
+        "To better retain information over longer sequences (mitigating short memory)",
+        "To remove the need for training",
+        "To only work on images"
+      ],
+      "answer": "To better retain information over longer sequences (mitigating short memory)",
+      "explanation": "LSTMs (and GRUs) use gating to preserve relevant information longer, addressing vanilla RNNs' difficulty with long-range dependencies."
+    },
+    {
+      "question": "A key limitation of RNNs that motivated Transformers is:",
+      "options": [
+        "They can't use GPUs",
+        "Sequential processing and difficulty with long-range dependencies",
+        "They only work on French text",
+        "They require no data"
+      ],
+      "answer": "Sequential processing and difficulty with long-range dependencies",
+      "explanation": "RNNs process one step at a time and lose distant context; Transformers process sequences in parallel with attention, capturing long-range relationships better."
+    }
+  ],
+  "xpReward": 120
+}

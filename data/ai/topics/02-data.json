@@ -1,0 +1,122 @@
+{
+  "id": "02-data",
+  "order": 2,
+  "title": "Data Literacy & Wrangling",
+  "track": "foundations",
+  "character": {
+    "name": "The Data Janitor",
+    "emoji": "🧹",
+    "tagline": "80% of AI is mopping up messy data. I brought two mops."
+  },
+  "oneLiner": "Garbage in, garbage out: how to clean, split, and respect your data before modeling.",
+  "analogy": "Data is like ingredients delivered to a restaurant in a chaotic pile — some rotten, some mislabeled, some in the wrong units (is that grams or pounds?!). Before you cook (train), you sort, wash, and taste. And crucially, you hide a portion of the ingredients in a locked fridge (the test set) so you can honestly check whether tonight's dish works on food the chef has never seen. Sneaking a peek at that fridge while cooking is cheating — it's called data leakage.",
+  "objectives": [
+    "Understand why data quality matters more than model choice for most projects.",
+    "Split data into train / validation / test and know what each is for.",
+    "Spot common data problems: missing values, imbalance, leakage, and bias.",
+    "Grasp what 'features' are and why feature quality drives results."
+  ],
+  "keyConcepts": [
+    "Garbage in, garbage out: models learn whatever patterns (and mistakes) live in the data.",
+    "Split data into training (learn), validation (tune), and test (final honest check) sets — never train on the test set.",
+    "Data leakage is when information from the test set (or the future) sneaks into training, giving fake-good results.",
+    "Class imbalance (e.g. 99% 'not fraud') can make accuracy misleading; you may need resampling or better metrics.",
+    "Features are the input columns the model sees; good feature engineering often beats a fancier model."
+  ],
+  "keyTerms": [
+    { "term": "Feature", "plain": "An input column — a measurable property the model learns from." },
+    { "term": "Train/val/test split", "plain": "Three data piles: learn, tune, and a locked fridge for honest grading." },
+    { "term": "Data leakage", "plain": "Accidentally letting the model peek at the answers. Fake-good scores." },
+    { "term": "Class imbalance", "plain": "When one outcome is way rarer than another, skewing naive accuracy." },
+    { "term": "Label", "plain": "The correct answer attached to a training example." }
+  ],
+  "resources": [
+    { "label": "Google: Data preparation & feature engineering", "url": "https://developers.google.com/machine-learning/data-prep", "type": "course" },
+    { "label": "pandas Getting Started", "url": "https://pandas.pydata.org/docs/getting_started/index.html", "type": "docs" },
+    { "label": "Kaggle: Data Cleaning course", "url": "https://www.kaggle.com/learn/data-cleaning", "type": "interactive" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A fraud model reports 99.4% accuracy and everyone celebrates. Then you notice only 0.6% of transactions are actually fraud, and the model flags almost nothing.",
+      "question": "What's really going on?",
+      "options": [
+        { "id": "a", "label": "Class imbalance — the model 'wins' by always predicting 'not fraud,' so accuracy is misleading" },
+        { "id": "b", "label": "The model is perfect and should ship immediately" },
+        { "id": "c", "label": "The GPU is too slow" },
+        { "id": "d", "label": "There is too little math in the model" }
+      ],
+      "correct": "a",
+      "explanation": "With heavy imbalance, predicting the majority class gives high accuracy while catching zero fraud. Use precision/recall/F1 and techniques for imbalance instead of raw accuracy."
+    },
+    {
+      "scenario": "A teammate scaled and imputed missing values using statistics computed over the ENTIRE dataset, then split into train and test.",
+      "question": "Why is this a problem?",
+      "options": [
+        { "id": "a", "label": "It causes data leakage — test-set information influenced preprocessing, inflating results" },
+        { "id": "b", "label": "It's fine; order never matters" },
+        { "id": "c", "label": "It uses too much memory" },
+        { "id": "d", "label": "Imputation is never allowed" }
+      ],
+      "correct": "a",
+      "explanation": "Preprocessing statistics must be learned on the training set only, then applied to validation/test. Fitting on all data leaks test information and overstates performance."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the purpose of the test set?",
+      "options": [
+        "To train the model faster",
+        "To give an honest final estimate of performance on unseen data",
+        "To tune hyperparameters repeatedly",
+        "To store backups"
+      ],
+      "answer": "To give an honest final estimate of performance on unseen data",
+      "explanation": "The test set is the locked fridge — used once at the end for an unbiased performance estimate. Tuning happens on the validation set."
+    },
+    {
+      "question": "'Garbage in, garbage out' means:",
+      "options": [
+        "Bigger models fix any data",
+        "Model quality is limited by the quality of the training data",
+        "You should delete all data",
+        "GPUs produce garbage"
+      ],
+      "answer": "Model quality is limited by the quality of the training data",
+      "explanation": "Models learn from data; flawed, biased, or noisy data produces flawed models regardless of architecture."
+    },
+    {
+      "question": "What is data leakage?",
+      "options": [
+        "A memory bug",
+        "When information not legitimately available at prediction time sneaks into training",
+        "Encrypting the dataset",
+        "Losing data to disk failure"
+      ],
+      "answer": "When information not legitimately available at prediction time sneaks into training",
+      "explanation": "Leakage (e.g. using future data or test statistics during training) produces impressive scores that collapse in production."
+    },
+    {
+      "question": "Why can accuracy be misleading on an imbalanced dataset?",
+      "options": [
+        "Because accuracy is always wrong",
+        "A model can score high by always predicting the majority class while missing the rare, important cases",
+        "Because imbalance speeds up training",
+        "Because accuracy requires a GPU"
+      ],
+      "answer": "A model can score high by always predicting the majority class while missing the rare, important cases",
+      "explanation": "On a 99/1 split, predicting the majority yields 99% accuracy yet catches none of the 1% you care about. Use precision/recall/F1."
+    },
+    {
+      "question": "In ML, a 'feature' is:",
+      "options": [
+        "A bug that becomes useful",
+        "An input variable/column the model uses to make predictions",
+        "The final prediction",
+        "The loss function"
+      ],
+      "answer": "An input variable/column the model uses to make predictions",
+      "explanation": "Features are the inputs. Thoughtful feature engineering frequently improves results more than swapping models."
+    }
+  ],
+  "xpReward": 100
+}

@@ -1,0 +1,123 @@
+{
+  "id": "17-eval-guardrails",
+  "order": 17,
+  "title": "Evaluation & Guardrails",
+  "track": "ai-engineering",
+  "character": {
+    "name": "The Gatekeeper",
+    "emoji": "🛡️",
+    "tagline": "Nothing ships past me without proof it actually works."
+  },
+  "oneLiner": "How do you know your AI is good — and keep it safe? Evals, LLM-as-judge, and guardrails.",
+  "analogy": "Shipping an AI feature without evals is like launching a restaurant without ever tasting the food — you'll find out it's bad from the reviews (angry users). Evals are your tasting menu: a fixed set of test cases you run every time you change a prompt or model, scoring whether outputs are correct, safe, and on-format. Since grading thousands of free-text answers by hand is brutal, you often enlist another LLM as a judge. Guardrails are the bouncers at the door and exit: blocking toxic inputs, filtering unsafe outputs, and catching hallucinations before users see them.",
+  "objectives": [
+    "Understand why systematic evaluation is essential for AI features.",
+    "Build eval sets and use metrics/rubrics (incl. LLM-as-judge).",
+    "Apply guardrails for input/output safety and format validation.",
+    "Detect and mitigate hallucinations in production."
+  ],
+  "keyConcepts": [
+    "Evals are repeatable test suites (inputs + expected qualities) you run whenever prompts, models, or pipelines change — your regression tests for AI.",
+    "Because outputs are open-ended, you evaluate with rubrics, reference answers, or an 'LLM-as-judge' scoring responses against criteria.",
+    "Guardrails validate and filter: block unsafe/off-topic inputs, check outputs for safety, PII, or policy violations, and enforce output formats.",
+    "Hallucination mitigation includes grounding (RAG), asking for citations, and verification/second-pass checks.",
+    "Track quality with real metrics (accuracy on evals, pass rates, user feedback) rather than vibes.",
+    "'Offline' evals (before release) and 'online' monitoring (in production) are both needed."
+  ],
+  "keyTerms": [
+    { "term": "Eval", "plain": "A test suite for your AI — run it every time you change something." },
+    { "term": "LLM-as-judge", "plain": "Using another model to grade open-ended answers against a rubric." },
+    { "term": "Guardrail", "plain": "A safety filter on what goes in and what comes out." },
+    { "term": "Regression (AI)", "plain": "When a 'small' prompt tweak quietly breaks other cases." },
+    { "term": "Golden set", "plain": "A trusted set of examples with known-good answers for testing." }
+  ],
+  "resources": [
+    { "label": "Anthropic: Creating evals / test & evaluate", "url": "https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests", "type": "docs" },
+    { "label": "OpenAI Evals", "url": "https://github.com/openai/evals", "type": "docs" },
+    { "label": "Hugging Face: Evaluate", "url": "https://huggingface.co/docs/evaluate/index", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You tweak a prompt to fix one bad case. It works — but you're worried the change quietly broke other cases you can't check by hand.",
+      "question": "What practice prevents this?",
+      "options": [
+        { "id": "a", "label": "Maintain an eval set and run it on every change to catch regressions" },
+        { "id": "b", "label": "Ship and wait for user complaints" },
+        { "id": "c", "label": "Raise the temperature" },
+        { "id": "d", "label": "Only test the one case you just fixed" }
+      ],
+      "correct": "a",
+      "explanation": "An eval suite acts like regression tests: running it on every prompt/model change reveals whether a fix broke other cases, before users do."
+    },
+    {
+      "scenario": "You must grade 5,000 open-ended summaries for quality, and manual review is infeasible.",
+      "question": "Which scalable evaluation approach is appropriate?",
+      "options": [
+        { "id": "a", "label": "LLM-as-judge with a clear rubric, spot-checked against human ratings" },
+        { "id": "b", "label": "Only exact string matching to a single reference" },
+        { "id": "c", "label": "Skip evaluation entirely" },
+        { "id": "d", "label": "Measure response length only" }
+      ],
+      "correct": "a",
+      "explanation": "For open-ended outputs at scale, an LLM-as-judge with a well-defined rubric (validated against some human labels) is a practical way to evaluate quality."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What are 'evals' in AI engineering?",
+      "options": [
+        "Marketing surveys",
+        "Repeatable test suites that measure output quality when prompts/models/pipelines change",
+        "GPU benchmarks only",
+        "A type of embedding"
+      ],
+      "answer": "Repeatable test suites that measure output quality when prompts/models/pipelines change",
+      "explanation": "Evals are like regression tests for AI: run them on every change to ensure quality doesn't silently degrade."
+    },
+    {
+      "question": "'LLM-as-judge' refers to:",
+      "options": [
+        "A courtroom app",
+        "Using an LLM to score open-ended outputs against defined criteria/rubrics",
+        "A way to train the base model",
+        "A guardrail against PII"
+      ],
+      "answer": "Using an LLM to score open-ended outputs against defined criteria/rubrics",
+      "explanation": "When outputs are free-form and manual grading doesn't scale, an LLM can evaluate responses against a rubric (ideally validated against human judgments)."
+    },
+    {
+      "question": "Guardrails are used to:",
+      "options": [
+        "Speed up the GPU",
+        "Validate/filter inputs and outputs for safety, policy, PII, and format",
+        "Increase the context window",
+        "Replace evaluation entirely"
+      ],
+      "answer": "Validate/filter inputs and outputs for safety, policy, PII, and format",
+      "explanation": "Guardrails check what goes in and comes out — blocking unsafe content, protecting sensitive data, and enforcing required formats."
+    },
+    {
+      "question": "Which technique helps reduce hallucinations in production?",
+      "options": [
+        "Grounding answers with RAG and requesting citations/verification",
+        "Raising temperature",
+        "Removing all context",
+        "Disabling evals"
+      ],
+      "answer": "Grounding answers with RAG and requesting citations/verification",
+      "explanation": "Grounding in retrieved sources, asking for citations, and adding verification steps all reduce (not eliminate) hallucinations."
+    },
+    {
+      "question": "Why isn't 'it looked good in a demo' enough to ship an AI feature?",
+      "options": [
+        "Demos are illegal",
+        "A few good examples don't prove consistent quality/safety across many real inputs; systematic evals do",
+        "Demos always use more compute",
+        "Because temperature must be zero"
+      ],
+      "answer": "A few good examples don't prove consistent quality/safety across many real inputs; systematic evals do",
+      "explanation": "Anecdotes aren't evidence of reliability. Evals and monitoring provide measurable confidence across the range of real inputs."
+    }
+  ],
+  "xpReward": 140
+}

@@ -1,0 +1,100 @@
+{
+  "id": "05-regression-classification",
+  "order": 5,
+  "title": "Regression & Classification",
+  "track": "classical-ml",
+  "character": {
+    "name": "The Line Bender",
+    "emoji": "📈",
+    "tagline": "Give me points, I'll give you a line. Give me classes, I'll draw a border."
+  },
+  "oneLiner": "The two bread-and-butter supervised tasks: predicting numbers (regression) and predicting categories (classification).",
+  "analogy": "Regression is the fortune teller who predicts a NUMBER: 'This house will sell for $412,000.' Classification is the bouncer who predicts a CATEGORY: 'You're on the list' vs 'not tonight.' The Line Bender's simplest trick is drawing a straight line through data (linear regression) or drawing a boundary that separates groups (logistic regression / decision trees). Fancy models exist, but many real wins come from these humble tools done well.",
+  "objectives": [
+    "Tell regression (predict a quantity) apart from classification (predict a category).",
+    "Understand linear and logistic regression at an intuitive level.",
+    "Know decision trees and k-nearest-neighbors as approachable classifiers.",
+    "Match a business problem to the right task type."
+  ],
+  "keyConcepts": [
+    "Regression predicts continuous numbers (price, temperature, demand).",
+    "Classification predicts discrete categories (spam/not-spam, disease/no-disease).",
+    "Linear regression fits a straight-line relationship; logistic regression outputs a probability for a class despite the name.",
+    "Decision trees split data with yes/no questions; they're interpretable but can overfit.",
+    "k-Nearest-Neighbors classifies a point by the majority vote of its closest neighbors.",
+    "Start simple: a well-tuned simple model is often competitive and easier to trust."
+  ],
+  "keyTerms": [
+    { "term": "Regression", "plain": "Predicting a number on a sliding scale." },
+    { "term": "Classification", "plain": "Sorting things into labeled buckets." },
+    { "term": "Logistic regression", "plain": "A classifier that outputs a probability (the name is a historical prank)." },
+    { "term": "Decision tree", "plain": "A flowchart of yes/no questions that ends in an answer." },
+    { "term": "kNN", "plain": "You are who your nearest neighbors are — majority vote wins." }
+  ],
+  "resources": [
+    { "label": "scikit-learn: Supervised learning", "url": "https://scikit-learn.org/stable/supervised_learning.html", "type": "docs" },
+    { "label": "StatQuest: ML playlist", "url": "https://www.youtube.com/@statquest", "type": "video" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A team wants to predict the exact number of units a product will sell next month.",
+      "question": "Which task type is this?",
+      "options": [
+        { "id": "a", "label": "Regression — predicting a continuous quantity" },
+        { "id": "b", "label": "Classification — predicting a category" },
+        { "id": "c", "label": "Clustering" },
+        { "id": "d", "label": "Reinforcement learning" }
+      ],
+      "correct": "a",
+      "explanation": "Predicting a numeric amount (units sold) is regression. If instead they wanted 'will it sell out: yes/no,' that would be classification."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Predicting whether an email is spam or not spam is an example of:",
+      "options": ["Regression", "Classification", "Clustering", "Dimensionality reduction"],
+      "answer": "Classification",
+      "explanation": "Spam vs not-spam is a discrete category, so it's classification. Predicting a number would be regression."
+    },
+    {
+      "question": "Despite its name, logistic regression is used for:",
+      "options": [
+        "Predicting continuous numbers",
+        "Classification — it outputs a probability for a class",
+        "Clustering unlabeled data",
+        "Compressing images"
+      ],
+      "answer": "Classification — it outputs a probability for a class",
+      "explanation": "Logistic regression outputs a probability between 0 and 1 for class membership, making it a classifier."
+    },
+    {
+      "question": "A key weakness of a single deep decision tree is that it:",
+      "options": [
+        "Cannot handle categories",
+        "Tends to overfit, memorizing the training data",
+        "Requires a GPU",
+        "Can only do regression"
+      ],
+      "answer": "Tends to overfit, memorizing the training data",
+      "explanation": "Deep trees can fit noise. Ensembles like random forests and gradient boosting reduce this while keeping much of the power."
+    },
+    {
+      "question": "How does k-Nearest-Neighbors classify a new point?",
+      "options": [
+        "By fitting a straight line",
+        "By majority vote of its nearest labeled neighbors",
+        "By reinforcement rewards",
+        "By clustering all data first"
+      ],
+      "answer": "By majority vote of its nearest labeled neighbors",
+      "explanation": "kNN looks at the k closest training points and takes the majority label — simple and intuitive, though slower at prediction time on large datasets."
+    },
+    {
+      "question": "Which task predicts a continuous value?",
+      "options": ["Classification", "Regression", "Clustering", "Tokenization"],
+      "answer": "Regression",
+      "explanation": "Regression outputs continuous numbers (e.g. price, temperature), while classification outputs discrete categories."
+    }
+  ],
+  "xpReward": 110
+}

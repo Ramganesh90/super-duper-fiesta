@@ -1,0 +1,101 @@
+{
+  "id": "03-python",
+  "order": 3,
+  "title": "Python & the AI Toolbelt",
+  "track": "foundations",
+  "character": {
+    "name": "The Toolsmith",
+    "emoji": "🔧",
+    "tagline": "A wizard is only as good as their wand. Here's your wand kit."
+  },
+  "oneLiner": "The practical stack — Python, NumPy, pandas, notebooks, and PyTorch — that turns ideas into working AI.",
+  "analogy": "If AI were woodworking, Python is your workbench, NumPy is the power drill (fast number crunching), pandas is the label-maker and sorting trays (tables of data), Jupyter notebooks are the sketch pad where you try a cut, see it instantly, and adjust, and PyTorch is the CNC machine that builds and trains the actual neural nets. You don't hand-carve every screw; you learn which tool does which job.",
+  "objectives": [
+    "Know why Python dominates AI and what each core library does.",
+    "Use NumPy arrays and pandas DataFrames as the workhorses for data.",
+    "Understand notebooks for fast, iterative experimentation.",
+    "Recognize PyTorch/TensorFlow as the frameworks for building/training models."
+  ],
+  "keyConcepts": [
+    "Python is the lingua franca of AI thanks to its readable syntax and enormous ecosystem of libraries.",
+    "NumPy provides fast n-dimensional arrays and vectorized math — the numerical foundation under almost everything.",
+    "pandas gives you DataFrames (labeled tables) for loading, cleaning, and slicing data.",
+    "Jupyter/Colab notebooks let you run code in cells and see results immediately — ideal for exploration.",
+    "PyTorch and TensorFlow are the deep-learning frameworks; PyTorch is especially common in research and modern LLM work.",
+    "'Vectorized' operations (whole-array math) are far faster than Python for-loops."
+  ],
+  "keyTerms": [
+    { "term": "NumPy", "plain": "Fast math on big arrays of numbers, without slow loops." },
+    { "term": "pandas DataFrame", "plain": "A spreadsheet you can boss around with code." },
+    { "term": "Notebook", "plain": "A code sketchpad: run a cell, see the result, tweak, repeat." },
+    { "term": "PyTorch", "plain": "The toolkit for building and training neural networks." },
+    { "term": "Vectorization", "plain": "Doing math on whole arrays at once — much faster than looping." }
+  ],
+  "resources": [
+    { "label": "Official Python tutorial", "url": "https://docs.python.org/3/tutorial/", "type": "docs" },
+    { "label": "NumPy: the absolute basics", "url": "https://numpy.org/doc/stable/user/absolute_beginners.html", "type": "docs" },
+    { "label": "PyTorch: Learn the Basics", "url": "https://pytorch.org/tutorials/beginner/basics/intro.html", "type": "course" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "You need to add two columns of a million-row table and your pure-Python for-loop takes ages.",
+      "question": "What's the idiomatic fix?",
+      "options": [
+        { "id": "a", "label": "Use vectorized NumPy/pandas operations to compute on the whole column at once" },
+        { "id": "b", "label": "Buy a faster keyboard" },
+        { "id": "c", "label": "Rewrite it as more nested Python loops" },
+        { "id": "d", "label": "Convert everything to strings first" }
+      ],
+      "correct": "a",
+      "explanation": "Vectorized operations push the loop into optimized C under the hood, running dramatically faster than element-by-element Python loops."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which library is the standard workhorse for fast numerical array math in Python?",
+      "options": ["NumPy", "Flask", "Requests", "Pillow"],
+      "answer": "NumPy",
+      "explanation": "NumPy provides fast n-dimensional arrays and vectorized operations that underpin pandas, scikit-learn, and the deep-learning frameworks."
+    },
+    {
+      "question": "What does pandas primarily give you?",
+      "options": [
+        "3D game rendering",
+        "Labeled tabular data structures (DataFrames) for loading and manipulating data",
+        "A web server",
+        "A database engine"
+      ],
+      "answer": "Labeled tabular data structures (DataFrames) for loading and manipulating data",
+      "explanation": "pandas DataFrames are the go-to for reading, cleaning, filtering, and transforming tabular data."
+    },
+    {
+      "question": "Why are Jupyter/Colab notebooks popular for AI experimentation?",
+      "options": [
+        "They compile to machine code",
+        "They run code in cells and show results immediately, enabling fast iteration",
+        "They are required to deploy models",
+        "They replace version control"
+      ],
+      "answer": "They run code in cells and show results immediately, enabling fast iteration",
+      "explanation": "Notebooks interleave code, output, and notes, making exploratory data work and quick experiments easy."
+    },
+    {
+      "question": "Which is a widely used deep-learning framework, especially in research and LLM work?",
+      "options": ["PyTorch", "jQuery", "Bootstrap", "Nginx"],
+      "answer": "PyTorch",
+      "explanation": "PyTorch (and TensorFlow) are the major deep-learning frameworks; PyTorch is especially prevalent in modern research and LLM tooling."
+    },
+    {
+      "question": "What does 'vectorization' mean in this context?",
+      "options": [
+        "Drawing SVG graphics",
+        "Performing operations on entire arrays at once instead of looping element by element",
+        "Encrypting vectors",
+        "Converting code to C++ manually"
+      ],
+      "answer": "Performing operations on entire arrays at once instead of looping element by element",
+      "explanation": "Vectorized array operations are far faster than Python loops because the heavy lifting runs in optimized native code."
+    }
+  ],
+  "xpReward": 100
+}
