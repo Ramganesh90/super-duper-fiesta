@@ -109,6 +109,38 @@
     "correct": "private-class-data",
     "explanation": "The Vault seals Money's core amount in an immutable data holder set once at construction, making accidental mid-method mutation structurally impossible."
   },
+  "diagram": {
+    "caption": "Restrict write access to state by hiding it behind a data holder.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Class",
+            "emoji": "🧱",
+            "sub": "exposes behavior"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "DataClass",
+            "emoji": "🔒",
+            "sub": "private fields, set once"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Read-only accessors",
+            "emoji": "👓"
+          }
+        ]
+      }
+    ],
+    "note": "Locks down mutable state after construction to prevent accidental changes."
+  },
   "quiz": [
     {
       "question": "What does Private Class Data protect against?",

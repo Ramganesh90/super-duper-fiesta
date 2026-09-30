@@ -109,6 +109,39 @@
     "correct": "flyweight",
     "explanation": "Featherweight shares the identical mesh/texture (intrinsic) across all 500,000 trees, storing only position/rotation (extrinsic) per tree — cutting memory dramatically."
   },
+  "diagram": {
+    "caption": "Share common (intrinsic) state to support huge numbers of objects.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "passes extrinsic state"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "FlyweightFactory",
+            "emoji": "🏭",
+            "sub": "get(key) — cache & reuse"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Flyweight",
+            "emoji": "🪶",
+            "sub": "shared intrinsic state"
+          }
+        ]
+      }
+    ],
+    "note": "Keep the state that varies (extrinsic) outside; reuse the shared part."
+  },
   "quiz": [
     {
       "question": "What is 'intrinsic state' in the Flyweight pattern?",

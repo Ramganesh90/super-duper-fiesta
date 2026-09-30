@@ -109,6 +109,43 @@
     "correct": "thread-pool",
     "explanation": "The Crew pre-creates a fixed set of worker threads once, so resize requests queue and get processed without ever paying thread-creation cost per request."
   },
+  "diagram": {
+    "caption": "Reuse a fixed set of worker threads to run many tasks.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Clients",
+            "emoji": "🧑‍💻",
+            "sub": "submit tasks"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Task queue",
+            "emoji": "📥"
+          }
+        ]
+      },
+      {
+        "group": "Worker threads",
+        "nodes": [
+          {
+            "label": "worker 1"
+          },
+          {
+            "label": "worker 2"
+          },
+          {
+            "label": "worker 3"
+          }
+        ]
+      }
+    ],
+    "note": "Bounds concurrency and avoids the cost of spawning a thread per task."
+  },
   "quiz": [
     {
       "question": "What does Thread Pool primarily save?",

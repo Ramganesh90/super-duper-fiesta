@@ -109,6 +109,42 @@
     "correct": "composite",
     "explanation": "Nestor gives every widget the same render() interface, so a single Button and a deeply nested Form both render through the identical recursive call."
   },
+  "diagram": {
+    "caption": "Treat individual objects and groups of objects uniformly (a tree).",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Component",
+            "emoji": "🌳",
+            "sub": "«interface» operation()"
+          }
+        ]
+      },
+      {
+        "group": "Implementations",
+        "nodes": [
+          {
+            "label": "Leaf",
+            "sub": "no children"
+          },
+          {
+            "label": "Composite",
+            "sub": "holds children"
+          }
+        ]
+      }
+    ],
+    "note": "A Composite forwards operations to its children recursively."
+  },
   "quiz": [
     {
       "question": "What structural problem does Composite solve?",

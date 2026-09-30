@@ -109,6 +109,43 @@
     "correct": "filter-criteria",
     "explanation": "The Sieve lets each filter type be its own composable criteria object, so users can combine any subset freely without a hardcoded function for every combination."
   },
+  "diagram": {
+    "caption": "Filter a set of objects using criteria you can combine.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Criteria",
+            "emoji": "🔎",
+            "sub": "meetCriteria(list)"
+          }
+        ]
+      },
+      {
+        "group": "Combinable criteria",
+        "nodes": [
+          {
+            "label": "ByAge"
+          },
+          {
+            "label": "ByRole"
+          },
+          {
+            "label": "And / Or"
+          }
+        ]
+      }
+    ],
+    "note": "Compose small predicates with AND/OR into complex filters."
+  },
   "quiz": [
     {
       "question": "What problem does Filter/Criteria solve?",

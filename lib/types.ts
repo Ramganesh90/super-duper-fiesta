@@ -79,6 +79,27 @@ export interface PatternExplanation {
   realWorldExample: string;
 }
 
+// A single box in a structure diagram.
+export interface DiagramNode {
+  label: string;
+  emoji?: string;
+  sub?: string; // small caption under the label
+}
+
+// A horizontal band of nodes, optionally wrapped in a labeled group (e.g. the
+// set of concrete implementations). Rows stack top-to-bottom with an arrow between.
+export interface DiagramRow {
+  group?: string;
+  nodes: DiagramNode[];
+}
+
+// A simple, data-driven structure diagram rendered in the comic style.
+export interface Diagram {
+  caption: string;
+  rows: DiagramRow[];
+  note?: string;
+}
+
 export interface Pattern {
   id: string;
   title: string;
@@ -94,6 +115,7 @@ export interface Pattern {
   conversation: ConversationLine[];
   codeBattle: CodeBattle;
   quiz: QuizQuestion[];
+  diagram?: Diagram;
 }
 
 export const CATEGORY_LABELS: Record<PatternCategory, string> = {

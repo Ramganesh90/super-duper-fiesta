@@ -109,6 +109,43 @@
     "correct": "facade",
     "explanation": "Simplifier bundles the four already-compatible classes behind one convertVideo() call for the common case, while still allowing direct access to each class for advanced needs."
   },
+  "diagram": {
+    "caption": "Offer one simple interface over a complicated subsystem.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Facade",
+            "emoji": "🚪",
+            "sub": "simple, high-level API"
+          }
+        ]
+      },
+      {
+        "group": "Subsystem",
+        "nodes": [
+          {
+            "label": "ClassA"
+          },
+          {
+            "label": "ClassB"
+          },
+          {
+            "label": "ClassC"
+          }
+        ]
+      }
+    ],
+    "note": "Hides complexity and reduces coupling to the subsystem's internals."
+  },
   "quiz": [
     {
       "question": "What is Facade's primary purpose?",

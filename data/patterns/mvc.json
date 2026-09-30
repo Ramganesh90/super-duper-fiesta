@@ -109,6 +109,47 @@
     "correct": "mvc",
     "explanation": "The Triad separates data (Model), rendering (View), and input handling (Controller) into distinct, independently changeable roles, exactly matching this tangled route-handler problem."
   },
+  "diagram": {
+    "caption": "Split a UI into Model (data), View (display), and Controller (input).",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "User",
+            "emoji": "🧑"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Controller",
+            "emoji": "🎛️",
+            "sub": "handles input"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Model",
+            "emoji": "🗄️",
+            "sub": "state + rules"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "View",
+            "emoji": "🖼️",
+            "sub": "renders the model"
+          }
+        ]
+      }
+    ],
+    "note": "The controller updates the model; the view reflects it back to the user — closing the loop."
+  },
   "quiz": [
     {
       "question": "What are the three roles in MVC?",

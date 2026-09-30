@@ -137,6 +137,52 @@
     "correct": "factory",
     "explanation": "Forge Master lets you add a new Exporter subclass per format without ever touching the code that decides which exporter to construct."
   },
+  "diagram": {
+    "caption": "A creator declares a factory method; subclasses decide which product to build.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Creator",
+            "emoji": "🏭",
+            "sub": "factoryMethod()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete creators",
+        "nodes": [
+          {
+            "label": "CreatorA"
+          },
+          {
+            "label": "CreatorB"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Product",
+            "emoji": "📦",
+            "sub": "«interface»"
+          }
+        ]
+      },
+      {
+        "group": "Concrete products",
+        "nodes": [
+          {
+            "label": "ProductA"
+          },
+          {
+            "label": "ProductB"
+          }
+        ]
+      }
+    ],
+    "note": "Subclasses choose the concrete class to instantiate — no new/switch in the caller."
+  },
   "quiz": [
     {
       "question": "What problem does Factory Method primarily solve?",

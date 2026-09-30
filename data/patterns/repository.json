@@ -109,6 +109,45 @@
     "correct": "repository",
     "explanation": "The Archivist gives cart, search, and recommendations one shared, collection-like interface for product lookups, so future changes touch one repository instead of six call sites."
   },
+  "diagram": {
+    "caption": "A collection-like interface over data access for the domain.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Domain / Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Repository",
+            "emoji": "📚",
+            "sub": "add() · findById() · remove()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "ORM / data source",
+            "emoji": "🔀"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Database",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "The domain works with an in-memory-style collection, not raw queries."
+  },
   "quiz": [
     {
       "question": "What kind of interface does a Repository typically expose?",

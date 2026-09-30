@@ -137,6 +137,38 @@
     "correct": "singleton",
     "explanation": "The One guarantees the connection pool is created exactly once and reused everywhere, so you never exceed the database's connection limit."
   },
+  "diagram": {
+    "caption": "One class owns its single instance and hands the same one to every caller.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client(s)",
+            "emoji": "🧑‍💻",
+            "sub": "call getInstance()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Singleton",
+            "emoji": "🧿",
+            "sub": "private constructor · static instance"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "The one shared instance",
+            "emoji": "☝️"
+          }
+        ]
+      }
+    ],
+    "note": "Global access point — powerful, but can become a hidden dependency that hurts testability."
+  },
   "quiz": [
     {
       "question": "What is the core guarantee a Singleton provides?",

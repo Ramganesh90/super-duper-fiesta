@@ -109,6 +109,38 @@
     "correct": "inversion-of-control",
     "explanation": "The Conductor lets a framework own the request lifecycle entirely, so your team only writes the business-logic handlers it calls into — no more reinvented plumbing per project."
   },
+  "diagram": {
+    "caption": "The framework calls your code, rather than your code calling the framework.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Framework",
+            "emoji": "🏗️",
+            "sub": "owns the flow"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "calls your hooks",
+            "emoji": "📞"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Your code",
+            "emoji": "🧑‍💻",
+            "sub": "handlers / callbacks"
+          }
+        ]
+      }
+    ],
+    "note": "'Don't call us, we'll call you.' Dependency Injection is one form of IoC."
+  },
   "quiz": [
     {
       "question": "What does Inversion of Control fundamentally change?",

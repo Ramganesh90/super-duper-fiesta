@@ -109,6 +109,38 @@
     "correct": "monitor-object",
     "explanation": "The Sentinel ensures only one thread can execute the stock-decrement method at a time, eliminating the read-then-write race that let the count go negative."
   },
+  "diagram": {
+    "caption": "Ensure only one method runs at a time on an object, with condition waits.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client threads",
+            "emoji": "🧵🧵"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Monitor object",
+            "emoji": "🔐",
+            "sub": "one lock guards all methods"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Synchronized methods",
+            "emoji": "🚦",
+            "sub": "wait() / notify() on conditions"
+          }
+        ]
+      }
+    ],
+    "note": "Combines mutual exclusion with condition variables for safe coordination."
+  },
   "quiz": [
     {
       "question": "What guarantee does a Monitor Object provide?",

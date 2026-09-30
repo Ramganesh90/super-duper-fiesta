@@ -109,6 +109,44 @@
     "correct": "chain-of-responsibility",
     "explanation": "The Relay lets each approval tier be its own handler that either approves the request or passes it up the chain, so adding a new tier means inserting one new link."
   },
+  "diagram": {
+    "caption": "Pass a request along a chain until a handler deals with it.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "sends request"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Handler",
+            "emoji": "🔗",
+            "sub": "handle() · next"
+          }
+        ]
+      },
+      {
+        "group": "The chain",
+        "nodes": [
+          {
+            "label": "HandlerA"
+          },
+          {
+            "label": "HandlerB"
+          },
+          {
+            "label": "HandlerC"
+          }
+        ]
+      }
+    ],
+    "note": "Each handler either handles the request or passes it on — sender and receiver stay decoupled."
+  },
   "quiz": [
     {
       "question": "What is the core behavior of Chain of Responsibility?",

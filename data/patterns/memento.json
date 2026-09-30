@@ -109,6 +109,39 @@
     "correct": "memento",
     "explanation": "The Historian lets the game engine create opaque save-state snapshots that the save/load UI can store and pass back, without ever reading or tampering with the engine's internals."
   },
+  "diagram": {
+    "caption": "Capture and restore an object's state without breaking encapsulation.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Originator",
+            "emoji": "📝",
+            "sub": "save() / restore()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Memento",
+            "emoji": "📸",
+            "sub": "opaque state snapshot"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Caretaker",
+            "emoji": "🗃️",
+            "sub": "keeps the history"
+          }
+        ]
+      }
+    ],
+    "note": "Powers undo/rollback — the caretaker stores mementos but can't read their contents."
+  },
   "quiz": [
     {
       "question": "What does Memento capture, and who can read it?",

@@ -109,6 +109,37 @@
     "correct": "parameterized-constructor",
     "explanation": "The Customizer makes both amount and currency required constructor arguments, so a Money object can never exist with one set and the other forgotten."
   },
+  "diagram": {
+    "caption": "Pass configuration into the constructor to set a valid initial state.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "supplies values"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Constructor(params)",
+            "emoji": "🧱"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Fully-configured object",
+            "emoji": "📦"
+          }
+        ]
+      }
+    ],
+    "note": "Explicit dependencies over hidden defaults or post-construction setters."
+  },
   "quiz": [
     {
       "question": "What problem does Parameterized Constructor solve?",

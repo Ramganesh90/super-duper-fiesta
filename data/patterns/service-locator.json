@@ -109,6 +109,41 @@
     "correct": "service-locator",
     "explanation": "The Directory lets the deeply-nested combat code look up AudioManager only when it's actually needed, without forcing five unrelated layers to thread it through as an unused parameter."
   },
+  "diagram": {
+    "caption": "A central registry returns service instances on request.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "locator.get('X')"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Service Locator",
+            "emoji": "📇",
+            "sub": "registry + cache"
+          }
+        ]
+      },
+      {
+        "group": "Services",
+        "nodes": [
+          {
+            "label": "ServiceA"
+          },
+          {
+            "label": "ServiceB"
+          }
+        ]
+      }
+    ],
+    "note": "Central lookup — convenient, but can hide dependencies; prefer DI where you can."
+  },
   "quiz": [
     {
       "question": "What does Service Locator provide?",

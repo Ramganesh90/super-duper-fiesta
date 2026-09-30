@@ -109,6 +109,35 @@
     "correct": "mediator",
     "explanation": "Switchboard replaces the tangled many-to-many wiring between widgets with a single hub each widget talks to, so adding or changing a widget no longer ripples through the others."
   },
+  "diagram": {
+    "caption": "Centralize how a set of objects communicate, so they don't refer to each other.",
+    "rows": [
+      {
+        "group": "Colleagues",
+        "nodes": [
+          {
+            "label": "ColleagueA"
+          },
+          {
+            "label": "ColleagueB"
+          },
+          {
+            "label": "ColleagueC"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Mediator",
+            "emoji": "🎯",
+            "sub": "notify() routes messages"
+          }
+        ]
+      }
+    ],
+    "note": "Turns a tangled many-to-many web into simple spokes through one hub."
+  },
   "quiz": [
     {
       "question": "What problem does Mediator solve?",

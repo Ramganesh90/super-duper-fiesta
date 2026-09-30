@@ -109,6 +109,50 @@
     "correct": "prototype",
     "explanation": "The Clone copies the fully-built slide (with a correct deep copy of its shape tree) instantly, instead of reconstructing an equivalent slide from scratch."
   },
+  "diagram": {
+    "caption": "Create new objects by cloning an existing, configured instance.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "calls clone()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Prototype",
+            "emoji": "🧬",
+            "sub": "«interface» clone()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete prototypes",
+        "nodes": [
+          {
+            "label": "ShapeA"
+          },
+          {
+            "label": "ShapeB"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Copy",
+            "emoji": "📋",
+            "sub": "independent duplicate"
+          }
+        ]
+      }
+    ],
+    "note": "Avoids costly re-initialization; copy a ready-made instance instead of building anew."
+  },
   "quiz": [
     {
       "question": "What is the core idea behind the Prototype pattern?",

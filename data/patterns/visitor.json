@@ -109,6 +109,40 @@
     "correct": "visitor",
     "explanation": "The Emissary lets each new operation (type-checking, codegen, printing) become its own visitor class, without touching any of the 20 stable node classes."
   },
+  "diagram": {
+    "caption": "Add new operations to an object structure without changing its classes.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Visitor",
+            "emoji": "🧳",
+            "sub": "visitA() · visitB()"
+          }
+        ]
+      },
+      {
+        "group": "Elements (accept a visitor)",
+        "nodes": [
+          {
+            "label": "ElementA"
+          },
+          {
+            "label": "ElementB"
+          }
+        ]
+      }
+    ],
+    "note": "Double dispatch: add operations without touching the element classes."
+  },
   "quiz": [
     {
       "question": "What trade-off does Visitor make?",

@@ -109,6 +109,38 @@
     "correct": "data-mapper",
     "explanation": "The Courier moves all SQL out of the domain objects and into dedicated mapper classes, letting business logic be tested with plain in-memory objects and no database."
   },
+  "diagram": {
+    "caption": "Move data between objects and the database, keeping them ignorant of each other.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Domain object",
+            "emoji": "📦",
+            "sub": "no persistence code"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Data Mapper",
+            "emoji": "🔀",
+            "sub": "maps fields ↔ rows"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Database",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "The domain model stays pure; the mapper knows the database, not vice versa."
+  },
   "quiz": [
     {
       "question": "What does Data Mapper keep the domain model free of?",

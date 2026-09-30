@@ -109,6 +109,44 @@
     "correct": "interpreter",
     "explanation": "The Linguist models AND/OR/comparison as expression classes that nest naturally, correctly handling arbitrarily nested filter expressions without fragile string parsing."
   },
+  "diagram": {
+    "caption": "Represent a grammar and interpret sentences written in it.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          },
+          {
+            "label": "Context",
+            "emoji": "📄"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "AbstractExpression",
+            "emoji": "🔠",
+            "sub": "interpret(context)"
+          }
+        ]
+      },
+      {
+        "group": "Expressions",
+        "nodes": [
+          {
+            "label": "TerminalExpr"
+          },
+          {
+            "label": "NonterminalExpr"
+          }
+        ]
+      }
+    ],
+    "note": "Good for small languages and DSLs; grows unwieldy for complex grammars."
+  },
   "quiz": [
     {
       "question": "What does the Interpreter pattern represent as classes?",

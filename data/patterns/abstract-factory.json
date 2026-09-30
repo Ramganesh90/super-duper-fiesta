@@ -109,6 +109,51 @@
     "correct": "abstract-factory",
     "explanation": "The Matchmaker guarantees every client you get from one cloud's factory belongs to that same cloud, eliminating cross-provider mismatches entirely."
   },
+  "diagram": {
+    "caption": "A factory of factories: create whole families of related products together.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "AbstractFactory",
+            "emoji": "🏭",
+            "sub": "createButton() · createCheckbox()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete factories",
+        "nodes": [
+          {
+            "label": "WinFactory"
+          },
+          {
+            "label": "MacFactory"
+          }
+        ]
+      },
+      {
+        "group": "Product families",
+        "nodes": [
+          {
+            "label": "Button"
+          },
+          {
+            "label": "Checkbox"
+          }
+        ]
+      }
+    ],
+    "note": "Guarantees products from one family (e.g. all 'Mac') are used together."
+  },
   "quiz": [
     {
       "question": "What does Abstract Factory guarantee that a plain Factory Method doesn't?",

@@ -109,6 +109,43 @@
     "correct": "soa",
     "explanation": "The Federation splits the monolith into independently deployable services owned by each team, removing the shared-pipeline bottleneck entirely."
   },
+  "diagram": {
+    "caption": "Expose business capabilities as loosely-coupled, reusable services.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Consumers",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Service bus / registry",
+            "emoji": "🚌",
+            "sub": "discovery + routing"
+          }
+        ]
+      },
+      {
+        "group": "Services",
+        "nodes": [
+          {
+            "label": "OrdersSvc"
+          },
+          {
+            "label": "BillingSvc"
+          },
+          {
+            "label": "ShippingSvc"
+          }
+        ]
+      }
+    ],
+    "note": "Services communicate via contracts; discoverable and independently reusable."
+  },
   "quiz": [
     {
       "question": "What does SOA decompose a system into?",

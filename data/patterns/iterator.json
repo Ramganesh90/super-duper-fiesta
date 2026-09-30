@@ -109,6 +109,38 @@
     "correct": "iterator",
     "explanation": "Wayfinder lets you build two different traversal-order iterators (depth-first, breadth-first) behind the same hasNext()/next() interface, so reports never touch the tree's internal structure."
   },
+  "diagram": {
+    "caption": "Traverse a collection's elements without exposing its internals.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Aggregate",
+            "emoji": "📚",
+            "sub": "createIterator()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Iterator",
+            "emoji": "➡️",
+            "sub": "hasNext() · next()"
+          }
+        ]
+      }
+    ],
+    "note": "Uniform traversal across different collection types; hides the structure."
+  },
   "quiz": [
     {
       "question": "What does Iterator hide from the code that processes a collection's elements?",

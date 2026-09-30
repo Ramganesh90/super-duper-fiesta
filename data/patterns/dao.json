@@ -109,6 +109,45 @@
     "correct": "dao",
     "explanation": "The Custodian centralizes all the raw connection handling, SQL, and result parsing into one class, so the four report functions call clean methods instead of duplicating JDBC boilerplate."
   },
+  "diagram": {
+    "caption": "Hide all access to a data source behind a data-access interface.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Business object",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "DAO",
+            "emoji": "🚪",
+            "sub": "«interface» CRUD"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Data source",
+            "emoji": "🔀"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Database",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "Isolates persistence details so the data source can change without ripples."
+  },
   "quiz": [
     {
       "question": "What does DAO encapsulate?",

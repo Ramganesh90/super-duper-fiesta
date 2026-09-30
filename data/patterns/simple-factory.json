@@ -109,6 +109,40 @@
     "correct": "simple-factory",
     "explanation": "The Dispatcher is exactly right for a small, stable set of known types where you just want one function centralizing construction — no subclass hierarchy needed."
   },
+  "diagram": {
+    "caption": "One factory method returns the right product based on a type argument.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "SimpleFactory",
+            "emoji": "🏭",
+            "sub": "create(type)"
+          }
+        ]
+      },
+      {
+        "group": "Products",
+        "nodes": [
+          {
+            "label": "ProductA"
+          },
+          {
+            "label": "ProductB"
+          }
+        ]
+      }
+    ],
+    "note": "A common idiom (not a formal GoF pattern) that centralizes object creation."
+  },
   "quiz": [
     {
       "question": "Is Simple Factory one of the 23 official Gang of Four patterns?",

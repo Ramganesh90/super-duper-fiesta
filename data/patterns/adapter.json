@@ -109,6 +109,47 @@
     "correct": "adapter",
     "explanation": "The Translator lets each provider's mismatched API be wrapped into one common interface your checkout code already expects, without changing the original implementations."
   },
+  "diagram": {
+    "caption": "Wrap an incompatible class so it fits the interface the client expects.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Target",
+            "emoji": "🔌",
+            "sub": "«interface» request()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Adapter",
+            "emoji": "🔧",
+            "sub": "translates the call"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Adaptee",
+            "emoji": "🧩",
+            "sub": "specificRequest()"
+          }
+        ]
+      }
+    ],
+    "note": "The adapter converts one interface into another without changing either side."
+  },
   "quiz": [
     {
       "question": "What problem does Adapter solve?",

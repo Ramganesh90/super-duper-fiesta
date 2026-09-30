@@ -109,6 +109,50 @@
     "correct": "decorator",
     "explanation": "Enhancer lets each feature (timestamp, filter, format) be its own wrapper, stacked in any order without multiplying subclasses."
   },
+  "diagram": {
+    "caption": "Add responsibilities to an object dynamically by wrapping it.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Component",
+            "emoji": "🎁",
+            "sub": "«interface»"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "ConcreteComponent",
+            "emoji": "📦",
+            "sub": "the core object"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Decorator",
+            "emoji": "🎀",
+            "sub": "has-a Component"
+          }
+        ]
+      },
+      {
+        "group": "Concrete decorators",
+        "nodes": [
+          {
+            "label": "WithLogging"
+          },
+          {
+            "label": "WithCache"
+          }
+        ]
+      }
+    ],
+    "note": "Stack wrappers for flexible behavior — a nimble alternative to subclassing."
+  },
   "quiz": [
     {
       "question": "What does Decorator let you do that plain subclassing struggles with?",

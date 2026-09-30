@@ -109,6 +109,52 @@
     "correct": "bridge",
     "explanation": "Crossover splits Remote (abstraction) from Device (implementation) so new remote styles and new device types can each be added independently, without multiplying subclasses."
   },
+  "diagram": {
+    "caption": "Separate an abstraction from its implementation so both can vary independently.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Abstraction",
+            "emoji": "🎛️",
+            "sub": "has-a Implementor"
+          }
+        ]
+      },
+      {
+        "group": "Refined abstractions",
+        "nodes": [
+          {
+            "label": "AbstractionA"
+          },
+          {
+            "label": "AbstractionB"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Implementor",
+            "emoji": "🔗",
+            "sub": "«interface»"
+          }
+        ]
+      },
+      {
+        "group": "Concrete implementors",
+        "nodes": [
+          {
+            "label": "ImplX"
+          },
+          {
+            "label": "ImplY"
+          }
+        ]
+      }
+    ],
+    "note": "Composition over inheritance — avoids an M×N class explosion."
+  },
   "quiz": [
     {
       "question": "What core problem does Bridge solve?",

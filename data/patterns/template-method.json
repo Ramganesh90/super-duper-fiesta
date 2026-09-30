@@ -109,6 +109,32 @@
     "correct": "template-method",
     "explanation": "The Blueprint locks the fetch/validate/transform/load sequence in one base class, letting each importer override only the transform step that actually differs."
   },
+  "diagram": {
+    "caption": "Define an algorithm's skeleton in a base class; subclasses fill in steps.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "AbstractClass",
+            "emoji": "🧩",
+            "sub": "templateMethod() → step1() · step2()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete classes",
+        "nodes": [
+          {
+            "label": "SubclassA"
+          },
+          {
+            "label": "SubclassB"
+          }
+        ]
+      }
+    ],
+    "note": "Invariant steps stay in the base; variant steps are overridden by subclasses."
+  },
   "quiz": [
     {
       "question": "What does the 'template method' itself typically do?",

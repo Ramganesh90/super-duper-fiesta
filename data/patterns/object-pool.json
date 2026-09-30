@@ -109,6 +109,43 @@
     "correct": "object-pool",
     "explanation": "The Recycler keeps a fixed pool of already-started rendering engines ready to borrow, eliminating the 300ms startup cost from the request path entirely."
   },
+  "diagram": {
+    "caption": "Reuse expensive objects from a pool instead of creating and destroying them.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "acquire() … release()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "ObjectPool",
+            "emoji": "🎱",
+            "sub": "tracks in-use / idle"
+          }
+        ]
+      },
+      {
+        "group": "Reusable objects",
+        "nodes": [
+          {
+            "label": "obj #1",
+            "sub": "in use"
+          },
+          {
+            "label": "obj #2",
+            "sub": "idle"
+          }
+        ]
+      }
+    ],
+    "note": "Great for DB connections and threads — always return the object when done."
+  },
   "quiz": [
     {
       "question": "What problem does Object Pool solve?",

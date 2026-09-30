@@ -109,6 +109,46 @@
     "correct": "business-delegate",
     "explanation": "The Envoy centralizes the EJB lookup, retry, and exception-translation logic behind one simple delegate interface, so the fifteen screens stop duplicating remoting plumbing."
   },
+  "diagram": {
+    "caption": "A client-side facade that hides how business services are found and called.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Presentation / Client",
+            "emoji": "🖼️"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Business Delegate",
+            "emoji": "🕴️",
+            "sub": "hides lookup & remoting"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Lookup service",
+            "emoji": "📇"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Business service",
+            "emoji": "⚙️",
+            "sub": "remote tier"
+          }
+        ]
+      }
+    ],
+    "note": "Decouples the presentation tier from business-tier lookup and access details."
+  },
   "quiz": [
     {
       "question": "What does Business Delegate shield client code from?",

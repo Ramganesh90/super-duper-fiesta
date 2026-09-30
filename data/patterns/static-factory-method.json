@@ -109,6 +109,38 @@
     "correct": "static-factory-method",
     "explanation": "The Herald's Optional.empty() can return one cached shared instance every time, instead of a constructor that would always allocate fresh."
   },
+  "diagram": {
+    "caption": "A named static method creates instances — clearer than a bare constructor.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Class",
+            "emoji": "🏷️",
+            "sub": "static of() / from() / valueOf()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Instance",
+            "emoji": "📦",
+            "sub": "may be cached or a subtype"
+          }
+        ]
+      }
+    ],
+    "note": "Named constructors with intent; can return existing or specialized instances."
+  },
   "quiz": [
     {
       "question": "What can a Static Factory Method do that a plain constructor cannot?",

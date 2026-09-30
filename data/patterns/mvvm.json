@@ -109,6 +109,38 @@
     "correct": "mvvm",
     "explanation": "The Binder replaces manual update calls with declarative bindings to observable ViewModel state, so the UI updates itself automatically whenever the data changes."
   },
+  "diagram": {
+    "caption": "A ViewModel exposes bindable state the View binds to.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "View",
+            "emoji": "🖼️",
+            "sub": "data-binds"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "ViewModel",
+            "emoji": "🔗",
+            "sub": "observable state + commands"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Model",
+            "emoji": "🗄️"
+          }
+        ]
+      }
+    ],
+    "note": "Two-way binding keeps the view in sync; the ViewModel stays UI-framework-agnostic."
+  },
   "quiz": [
     {
       "question": "What does the View do in MVVM, that it doesn't do in MVP?",

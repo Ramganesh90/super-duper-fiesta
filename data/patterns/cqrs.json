@@ -109,6 +109,46 @@
     "correct": "cqrs",
     "explanation": "The Splitter separates strict, transactional writes from fast, denormalized analytics reads, so neither path has to compromise for the other."
   },
+  "diagram": {
+    "caption": "Separate the write model (commands) from the read model (queries).",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Command → Write model",
+            "emoji": "✍️",
+            "sub": "validates & mutates"
+          },
+          {
+            "label": "Query → Read model",
+            "emoji": "🔎",
+            "sub": "optimized for reads"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Write DB",
+            "emoji": "🛢️"
+          },
+          {
+            "label": "Read DB",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "Reads and writes scale and evolve independently; often synced via events."
+  },
   "quiz": [
     {
       "question": "What does CQRS separate?",

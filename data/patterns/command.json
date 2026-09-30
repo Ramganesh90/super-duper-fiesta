@@ -109,6 +109,47 @@
     "correct": "command",
     "explanation": "Invoker turns each job request into a queueable, retryable, loggable object instead of an immediate function call that vanishes once executed."
   },
+  "diagram": {
+    "caption": "Encapsulate a request as an object you can pass around, queue, and undo.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Invoker",
+            "emoji": "🕹️",
+            "sub": "triggers execute()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Command",
+            "emoji": "✉️",
+            "sub": "«interface» execute()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Receiver",
+            "emoji": "⚙️",
+            "sub": "does the actual work"
+          }
+        ]
+      }
+    ],
+    "note": "Enables undo/redo, queues, scheduling, and logging of operations."
+  },
   "quiz": [
     {
       "question": "What does the Command pattern turn a request into?",

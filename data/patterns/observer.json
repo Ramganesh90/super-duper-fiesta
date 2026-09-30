@@ -137,6 +137,35 @@
     "correct": "observer",
     "explanation": "Signal-Man lets the price feed broadcast 'price changed' once, and any widget — current or future — can subscribe without the feed knowing they exist."
   },
+  "diagram": {
+    "caption": "When a subject changes, all its dependents are notified automatically.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Subject",
+            "emoji": "📢",
+            "sub": "attach() · notify()"
+          }
+        ]
+      },
+      {
+        "group": "Observers",
+        "nodes": [
+          {
+            "label": "ObserverA"
+          },
+          {
+            "label": "ObserverB"
+          },
+          {
+            "label": "ObserverC"
+          }
+        ]
+      }
+    ],
+    "note": "One-to-many, loosely coupled — the backbone of pub/sub and event systems."
+  },
   "quiz": [
     {
       "question": "What relationship does the Observer pattern formalize?",

@@ -109,6 +109,49 @@
     "correct": "reactor",
     "explanation": "The Watchtower handles all 50,000 mostly-idle connections on one thread via readiness notification, instead of allocating a thread per connection that would exhaust memory."
   },
+  "diagram": {
+    "caption": "Demultiplex and dispatch many I/O events to handlers (synchronous, non-blocking).",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Event sources",
+            "emoji": "🔌",
+            "sub": "sockets, files"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Synchronous event demultiplexer",
+            "emoji": "🎚️",
+            "sub": "select() / epoll"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Reactor / Dispatcher",
+            "emoji": "🗂️"
+          }
+        ]
+      },
+      {
+        "group": "Event handlers",
+        "nodes": [
+          {
+            "label": "ReadHandler"
+          },
+          {
+            "label": "WriteHandler"
+          }
+        ]
+      }
+    ],
+    "note": "Reacts to readiness ('you can read now'), then dispatches the right handler."
+  },
   "quiz": [
     {
       "question": "What is the core mechanism a Reactor relies on?",

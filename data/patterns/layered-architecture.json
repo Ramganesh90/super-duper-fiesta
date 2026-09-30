@@ -109,6 +109,44 @@
     "correct": "layered-architecture",
     "explanation": "The Foundation establishes strict, one-directional layers so a database change is contained entirely within the Data Access layer, instead of rippling through the whole app."
   },
+  "diagram": {
+    "caption": "Organize the system into stacked layers, each using the one below.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Presentation",
+            "emoji": "🖼️"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Business / Application",
+            "emoji": "🧠"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Persistence",
+            "emoji": "🗄️"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Database",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "Each layer depends only on the layer beneath it, isolating concerns."
+  },
   "quiz": [
     {
       "question": "What is the core rule of Layered Architecture?",

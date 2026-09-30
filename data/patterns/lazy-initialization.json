@@ -109,6 +109,46 @@
     "correct": "lazy-initialization",
     "explanation": "The Procrastinator defers loading the 50MB of diagnostics data until the user actually opens that panel, keeping app launch fast for everyone else."
   },
+  "diagram": {
+    "caption": "Defer creating an object until the moment it's first needed.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "get()"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Holder",
+            "emoji": "💤",
+            "sub": "value == null?"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Create on first access → cache",
+            "emoji": "⚡"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Return cached value",
+            "emoji": "📦"
+          }
+        ]
+      }
+    ],
+    "note": "Saves work if the object is never used; watch thread-safety on first init."
+  },
   "quiz": [
     {
       "question": "What does Lazy Initialization primarily save?",

@@ -109,6 +109,50 @@
     "correct": "dependency-injection",
     "explanation": "The Provider lets EmailService accept its SMTP client from outside, so tests can inject a fake client instead of sending real emails."
   },
+  "diagram": {
+    "caption": "Supply a class's dependencies from the outside instead of it creating them.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Injector / Container",
+            "emoji": "💉",
+            "sub": "wires objects"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "receives dependencies"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Service",
+            "emoji": "🔗",
+            "sub": "«interface»"
+          }
+        ]
+      },
+      {
+        "group": "Concrete services",
+        "nodes": [
+          {
+            "label": "RealService"
+          },
+          {
+            "label": "MockService"
+          }
+        ]
+      }
+    ],
+    "note": "Constructor/setter injection inverts creation, making code testable and swappable."
+  },
   "quiz": [
     {
       "question": "What does Dependency Injection change about how a class gets its dependencies?",

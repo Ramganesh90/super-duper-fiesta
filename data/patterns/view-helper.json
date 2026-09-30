@@ -109,6 +109,38 @@
     "correct": "view-helper",
     "explanation": "The Stagehand centralizes the date/number formatting logic in one shared helper class, so the locale bug fix happens once instead of twelve times."
   },
+  "diagram": {
+    "caption": "Keep presentation logic in helpers, out of the view template.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "View",
+            "emoji": "🖼️",
+            "sub": "markup only"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Helper",
+            "emoji": "🛠️",
+            "sub": "formatting & view logic"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Model data",
+            "emoji": "🗄️"
+          }
+        ]
+      }
+    ],
+    "note": "Separates business/formatting logic from the template, keeping views clean."
+  },
   "quiz": [
     {
       "question": "What does View Helper move out of templates?",

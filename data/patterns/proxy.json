@@ -109,6 +109,46 @@
     "correct": "proxy",
     "explanation": "Gatekeeper can sit in front of the real geocoding client as a caching proxy, serving repeated lookups from cache and only hitting the real API — and the rate limit — when truly necessary."
   },
+  "diagram": {
+    "caption": "A stand-in that controls access to a real object.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Subject",
+            "emoji": "🔗",
+            "sub": "«interface»"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Proxy",
+            "emoji": "🕴️",
+            "sub": "access control / lazy / remote"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "RealSubject",
+            "emoji": "📦"
+          }
+        ]
+      }
+    ],
+    "note": "Virtual, protection, and remote proxies add lazy loading, security, or remoting."
+  },
   "quiz": [
     {
       "question": "What does a Proxy do that distinguishes it from a plain wrapper?",

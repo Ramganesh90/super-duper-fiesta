@@ -109,6 +109,44 @@
     "correct": "state",
     "explanation": "Morph gives each order status its own class that knows exactly which transitions are valid from it, eliminating the duplicated switch logic across every method."
   },
+  "diagram": {
+    "caption": "Let an object change its behavior when its internal state changes.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Context",
+            "emoji": "🎮",
+            "sub": "delegates to current state"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "State",
+            "emoji": "🔄",
+            "sub": "«interface» handle()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete states",
+        "nodes": [
+          {
+            "label": "Idle"
+          },
+          {
+            "label": "Running"
+          },
+          {
+            "label": "Done"
+          }
+        ]
+      }
+    ],
+    "note": "Replaces sprawling conditionals; states handle their own transitions."
+  },
   "quiz": [
     {
       "question": "What triggers a state transition in the State pattern?",

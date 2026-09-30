@@ -109,6 +109,49 @@
     "correct": "builder",
     "explanation": "The Architect turns those 12 positional nulls into named, optional, chainable steps that only assemble the report once .build() is called."
   },
+  "diagram": {
+    "caption": "Construct a complex object step by step, separate from its representation.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Director",
+            "emoji": "🎬",
+            "sub": "orders the steps"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Builder",
+            "emoji": "👷",
+            "sub": "buildPartA() · buildPartB() · getResult()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete builders",
+        "nodes": [
+          {
+            "label": "CarBuilder"
+          },
+          {
+            "label": "HouseBuilder"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Product",
+            "emoji": "📦"
+          }
+        ]
+      }
+    ],
+    "note": "Same construction process yields different representations."
+  },
   "quiz": [
     {
       "question": "What problem does Builder primarily solve?",

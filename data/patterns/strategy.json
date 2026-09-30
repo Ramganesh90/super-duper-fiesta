@@ -109,6 +109,41 @@
     "correct": "strategy",
     "explanation": "Shape-Shifter lets the export feature swap between fully independent compression algorithms at runtime, chosen by the caller, with no shared conditional logic."
   },
+  "diagram": {
+    "caption": "Define a family of interchangeable algorithms and swap them at runtime.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Context",
+            "emoji": "🎮",
+            "sub": "has-a Strategy"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Strategy",
+            "emoji": "🧠",
+            "sub": "«interface» execute()"
+          }
+        ]
+      },
+      {
+        "group": "Concrete strategies",
+        "nodes": [
+          {
+            "label": "QuickSort"
+          },
+          {
+            "label": "MergeSort"
+          }
+        ]
+      }
+    ],
+    "note": "Behavior varies independently of the context that uses it."
+  },
   "quiz": [
     {
       "question": "What is the core problem Strategy solves?",

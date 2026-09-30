@@ -9,6 +9,7 @@ import ConversationReader from "@/components/comic/ConversationReader";
 import CodeBlock from "@/components/code/CodeBlock";
 import CodeBattle from "@/components/learning/CodeBattle";
 import Quiz from "@/components/learning/Quiz";
+import StructureDiagram from "@/components/patterns/StructureDiagram";
 import ProgressIndicator from "@/components/learning/ProgressIndicator";
 import { getAllPatternIds, getAllPatterns, getPatternById } from "@/lib/patterns";
 import { CATEGORY_ICONS, CATEGORY_LABELS, type PatternCategory } from "@/lib/types";
@@ -117,6 +118,15 @@ export default async function PatternPage({ params }: PatternPageProps) {
         </h2>
         <BeforeAfter data={pattern.beforeAfter} />
       </section>
+
+      {pattern.diagram && (
+        <section aria-labelledby="structure-heading" className="flex flex-col gap-4">
+          <h2 id="structure-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
+            🗺️ STRUCTURE AT A GLANCE
+          </h2>
+          <StructureDiagram diagram={pattern.diagram} />
+        </section>
+      )}
 
       <section aria-labelledby="code-example-heading" className="flex flex-col gap-4">
         <h2 id="code-example-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">

@@ -109,6 +109,47 @@
     "correct": "proactor",
     "explanation": "The Delegate lets the OS perform each read entirely via IOCP, notifying the app only on completion, avoiding both thread-per-read overhead and the extra readiness-then-read round-trip."
   },
+  "diagram": {
+    "caption": "Like Reactor, but dispatches on I/O completion, not readiness.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Initiator",
+            "emoji": "🧑‍💻",
+            "sub": "starts async op"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "OS performs I/O",
+            "emoji": "⚙️",
+            "sub": "then signals completion"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Completion dispatcher",
+            "emoji": "🗂️"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Completion handler",
+            "emoji": "✅",
+            "sub": "processes the result"
+          }
+        ]
+      }
+    ],
+    "note": "The OS does the I/O; your handler runs once it's already finished."
+  },
   "quiz": [
     {
       "question": "What is the key difference between Proactor and Reactor?",

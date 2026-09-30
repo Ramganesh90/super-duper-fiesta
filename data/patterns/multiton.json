@@ -109,6 +109,41 @@
     "correct": "multiton",
     "explanation": "The Registrar guarantees exactly one metrics collector per region key, unlike Singleton (only one instance total) or Object Pool (many interchangeable instances)."
   },
+  "diagram": {
+    "caption": "Like Singleton, but one managed instance per key.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻",
+            "sub": "getInstance(key)"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Multiton",
+            "emoji": "🗝️",
+            "sub": "registry: key → instance"
+          }
+        ]
+      },
+      {
+        "group": "Keyed instances",
+        "nodes": [
+          {
+            "label": "instance: 'A'"
+          },
+          {
+            "label": "instance: 'B'"
+          }
+        ]
+      }
+    ],
+    "note": "A map of singletons — the same key always returns the same instance."
+  },
   "quiz": [
     {
       "question": "How does Multiton differ from Singleton?",

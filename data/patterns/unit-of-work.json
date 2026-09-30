@@ -109,6 +109,37 @@
     "correct": "unit-of-work",
     "explanation": "The Ledger tracks the inventory deduction, charge, and shipment creation together, committing all three atomically — a crash mid-operation leaves none of them applied."
   },
+  "diagram": {
+    "caption": "Track changes during a business transaction and commit them together.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Unit of Work",
+            "emoji": "🧾",
+            "sub": "tracks new / dirty / removed"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "commit() → one DB transaction",
+            "emoji": "🛢️"
+          }
+        ]
+      }
+    ],
+    "note": "One coordinated commit keeps data consistent and minimizes round-trips."
+  },
   "quiz": [
     {
       "question": "What guarantee does Unit of Work provide?",

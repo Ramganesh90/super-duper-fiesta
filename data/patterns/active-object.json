@@ -109,6 +109,55 @@
     "correct": "active-object",
     "explanation": "The Scheduler moves the export work onto its own thread and returns a future immediately, keeping the UI thread free to handle clicks and redraws throughout."
   },
+  "diagram": {
+    "caption": "Decouple a method's invocation from its execution on another thread.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Client",
+            "emoji": "🧑‍💻"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Proxy",
+            "emoji": "📮",
+            "sub": "enqueues the call"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Activation queue",
+            "emoji": "📥"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Scheduler → Servant",
+            "emoji": "🧵",
+            "sub": "runs on its own thread"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Future",
+            "emoji": "🔮",
+            "sub": "holds the eventual result"
+          }
+        ]
+      }
+    ],
+    "note": "Callers get a Future immediately; work happens asynchronously."
+  },
   "quiz": [
     {
       "question": "What does Active Object decouple?",

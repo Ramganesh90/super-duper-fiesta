@@ -109,6 +109,35 @@
     "correct": "microkernel",
     "explanation": "The Core keeps the browsing engine minimal and stable, with every extension living as an isolated plugin that can fail without taking down the core."
   },
+  "diagram": {
+    "caption": "A minimal core system plus plug-in modules for features.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "Core system",
+            "emoji": "⚙️",
+            "sub": "minimal, stable"
+          }
+        ]
+      },
+      {
+        "group": "Plug-ins",
+        "nodes": [
+          {
+            "label": "PluginA"
+          },
+          {
+            "label": "PluginB"
+          },
+          {
+            "label": "PluginC"
+          }
+        ]
+      }
+    ],
+    "note": "Add or swap features via plug-ins without changing the core."
+  },
   "quiz": [
     {
       "question": "What is the defining trait of a Microkernel architecture?",

@@ -109,6 +109,38 @@
     "correct": "mvp",
     "explanation": "The Go-Between extracts the logic into a testable Presenter behind a simple View interface, which fits WinForms' non-declarative-binding UI model well."
   },
+  "diagram": {
+    "caption": "A Presenter drives a passive View and talks to the Model.",
+    "rows": [
+      {
+        "nodes": [
+          {
+            "label": "View",
+            "emoji": "🖼️",
+            "sub": "passive — forwards events"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Presenter",
+            "emoji": "🎤",
+            "sub": "all presentation logic"
+          }
+        ]
+      },
+      {
+        "nodes": [
+          {
+            "label": "Model",
+            "emoji": "🗄️"
+          }
+        ]
+      }
+    ],
+    "note": "The view is 'dumb'; the presenter is highly testable in isolation."
+  },
   "quiz": [
     {
       "question": "What is the defining characteristic of the View in MVP?",
