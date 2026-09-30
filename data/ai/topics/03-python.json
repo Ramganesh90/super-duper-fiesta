@@ -24,6 +24,16 @@
     "PyTorch and TensorFlow are the deep-learning frameworks; PyTorch is especially common in research and modern LLM work.",
     "'Vectorized' operations (whole-array math) are far faster than Python for-loops."
   ],
+  "diagram": {
+    "caption": "The AI toolbelt stacks up: Python at the base, specialized libraries on top.",
+    "rows": [
+      { "nodes": [{ "label": "PyTorch / TensorFlow", "emoji": "🔥", "sub": "build & train neural nets" }] },
+      { "nodes": [{ "label": "pandas", "emoji": "🐼", "sub": "tables (DataFrames)" }] },
+      { "nodes": [{ "label": "NumPy", "emoji": "🔢", "sub": "fast array math" }] },
+      { "nodes": [{ "label": "Python", "emoji": "🐍", "sub": "the language everything runs on" }] }
+    ],
+    "note": "You explore all of this in Jupyter/Colab notebooks — run a cell, see the result, iterate."
+  },
   "keyTerms": [
     { "term": "NumPy", "plain": "Fast math on big arrays of numbers, without slow loops." },
     { "term": "pandas DataFrame", "plain": "A spreadsheet you can boss around with code." },

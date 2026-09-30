@@ -24,6 +24,20 @@
     "Regularization (e.g. L1/L2, dropout) penalizes complexity to improve generalization.",
     "More and cleaner data, cross-validation, and early stopping all help models generalize."
   ],
+  "diagram": {
+    "caption": "The Goldilocks zone: not too simple, not too memorized — just right.",
+    "rows": [
+      {
+        "nodes": [
+          { "label": "Underfitting", "emoji": "😴", "sub": "too simple · bad on train + test" },
+          { "label": "Just right", "emoji": "😎", "sub": "learns the real pattern · generalizes" },
+          { "label": "Overfitting", "emoji": "🤯", "sub": "memorized noise · great on train, bad on test" }
+        ]
+      },
+      { "nodes": [{ "label": "Big train-vs-validation gap = overfitting alarm", "emoji": "🚨" }] }
+    ],
+    "note": "Fixes: more/cleaner data, regularization, a simpler model, cross-validation, and early stopping."
+  },
   "keyTerms": [
     { "term": "Overfitting", "plain": "Memorizing the training set, flopping on anything new." },
     { "term": "Underfitting", "plain": "Too lazy/simple to even learn the training set." },

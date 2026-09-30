@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AiQuiz from "@/components/ai/AiQuiz";
 import ScenarioChallenge from "@/components/ai/ScenarioChallenge";
 import CharacterCard from "@/components/ai/CharacterCard";
+import ArchitectureDiagram from "@/components/ai/ArchitectureDiagram";
 import { getAllTopicIds, getAllTopics, getTopicById } from "@/lib/ai/topics";
 import { TRACK_ICONS, TRACK_LABELS } from "@/lib/ai/types";
 
@@ -114,6 +115,15 @@ export default async function TopicPage({ params }: TopicPageProps) {
           ))}
         </ul>
       </section>
+
+      {topic.diagram && (
+        <section aria-labelledby="diagram-heading" className="flex flex-col gap-4">
+          <h2 id="diagram-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
+            🗺️ HOW IT FITS TOGETHER
+          </h2>
+          <ArchitectureDiagram diagram={topic.diagram} />
+        </section>
+      )}
 
       <section aria-labelledby="terms-heading" className="flex flex-col gap-4">
         <h2 id="terms-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">

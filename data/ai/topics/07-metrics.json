@@ -25,6 +25,29 @@
     "For regression, RMSE and MAE measure average prediction error (RMSE punishes big misses more).",
     "The 'best' metric depends on which error is costlier for your use case."
   ],
+  "diagram": {
+    "caption": "From raw predictions to the metric that matches what an error actually costs you.",
+    "rows": [
+      { "nodes": [{ "label": "Predictions vs actuals", "emoji": "🎣" }] },
+      {
+        "group": "Confusion matrix",
+        "nodes": [
+          { "label": "True Positive", "emoji": "✅" },
+          { "label": "False Positive", "emoji": "🥾", "sub": "false alarm" },
+          { "label": "False Negative", "emoji": "🕳️", "sub": "a miss" },
+          { "label": "True Negative", "emoji": "✅" }
+        ]
+      },
+      {
+        "nodes": [
+          { "label": "Precision", "emoji": "🎯", "sub": "of caught, how many right" },
+          { "label": "Recall", "emoji": "🔍", "sub": "of real, how many caught" },
+          { "label": "F1", "emoji": "⚖️", "sub": "balance of both" }
+        ]
+      }
+    ],
+    "note": "Pick the metric by cost: prioritize recall when misses hurt (cancer screening), precision when false alarms hurt."
+  },
   "keyTerms": [
     { "term": "Precision", "plain": "When it says yes, how often is it right?" },
     { "term": "Recall", "plain": "Of all the real yeses, how many did it catch?" },

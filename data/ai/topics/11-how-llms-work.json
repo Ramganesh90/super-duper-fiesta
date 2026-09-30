@@ -24,6 +24,17 @@
     "Temperature and top-p control randomness: low is focused/deterministic, high is more creative/varied.",
     "Hallucinations occur because the model predicts plausible-sounding text, not verified facts — it optimizes for likely, not true."
   ],
+  "diagram": {
+    "caption": "An LLM is autocomplete on steroids: tokenize, predict the next token, repeat.",
+    "rows": [
+      { "nodes": [{ "label": "Your prompt", "emoji": "💬" }] },
+      { "nodes": [{ "label": "Tokenize", "emoji": "🧩", "sub": "text → tokens" }] },
+      { "nodes": [{ "label": "Transformer", "emoji": "🧠", "sub": "reads the whole context window" }] },
+      { "nodes": [{ "label": "Predict next token", "emoji": "🎲", "sub": "temperature = how adventurous" }] },
+      { "nodes": [{ "label": "Append + repeat → reply", "emoji": "🔁" }] }
+    ],
+    "note": "It's stateless between calls and predicts plausible text, not verified facts — which is why it can hallucinate."
+  },
   "keyTerms": [
     { "term": "Token", "plain": "A chunk of text (often a word-piece). The model's Lego brick." },
     { "term": "Next-token prediction", "plain": "Guess the next brick, again and again, to build a sentence." },

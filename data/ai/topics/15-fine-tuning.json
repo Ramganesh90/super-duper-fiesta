@@ -24,6 +24,22 @@
     "Fine-tuning needs quality labeled examples; poor data bakes in bad behavior.",
     "Fine-tuned models require versioning and re-tuning as needs change — an ongoing maintenance cost."
   ],
+  "diagram": {
+    "caption": "Escalate only as needed: prompt first, add RAG for knowledge, fine-tune for consistent behavior.",
+    "rows": [
+      { "nodes": [{ "label": "1. Prompting", "emoji": "💬", "sub": "cheapest · try first" }] },
+      { "nodes": [{ "label": "2. RAG", "emoji": "🗄️", "sub": "for fresh / private facts" }] },
+      { "nodes": [{ "label": "3. Fine-tuning", "emoji": "🗿", "sub": "for consistent style / format" }] },
+      {
+        "group": "Fine-tuning, cheaply",
+        "nodes": [
+          { "label": "Base model (frozen)", "emoji": "❄️" },
+          { "label": "+ LoRA adapter", "emoji": "🔩", "sub": "train tiny add-on weights" }
+        ]
+      }
+    ],
+    "note": "Fine-tuning teaches behavior, not facts — use RAG for knowledge that changes. LoRA/PEFT slashes the cost."
+  },
   "keyTerms": [
     { "term": "Fine-tuning", "plain": "Extra training to specialize a model's behavior/style." },
     { "term": "Base/foundation model", "plain": "The big pretrained generalist you start from." },

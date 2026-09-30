@@ -48,6 +48,27 @@ export interface Scenario {
   explanation: string;
 }
 
+// A single box in a concept/flow diagram.
+export interface DiagramNode {
+  label: string;
+  emoji?: string;
+  sub?: string; // small caption under the label
+}
+
+// A horizontal band of nodes, optionally wrapped in a labeled group. Rows stack
+// top-to-bottom with a downward arrow between them.
+export interface DiagramRow {
+  group?: string;
+  nodes: DiagramNode[];
+}
+
+// A simple, data-driven diagram rendered in the comic style.
+export interface Diagram {
+  caption: string;
+  rows: DiagramRow[];
+  note?: string;
+}
+
 // One topic in the roadmap.
 export interface Topic {
   id: string; // e.g. "01-math"
@@ -59,6 +80,7 @@ export interface Topic {
   analogy: string; // the comical, plain-English story that makes it click
   objectives: string[];
   keyConcepts: string[];
+  diagram?: Diagram;
   keyTerms: KeyTerm[];
   resources: StudyResource[];
   scenarios: Scenario[];

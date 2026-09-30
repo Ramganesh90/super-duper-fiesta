@@ -24,6 +24,17 @@
     "Keyword search matches exact words; semantic search matches meaning — often you combine both (hybrid search).",
     "Chunk size and the embedding model choice significantly affect retrieval quality."
   ],
+  "diagram": {
+    "caption": "Turn meaning into vectors, store them, and find the nearest ones to a query.",
+    "rows": [
+      { "nodes": [{ "label": "Text", "emoji": "📝", "sub": "docs, questions" }] },
+      { "nodes": [{ "label": "Embedding model", "emoji": "🔤➡️🔢" }] },
+      { "nodes": [{ "label": "Vectors", "emoji": "📍", "sub": "points in meaning-space" }] },
+      { "nodes": [{ "label": "Vector database", "emoji": "🗂️", "sub": "fast nearest-neighbor search" }] },
+      { "nodes": [{ "label": "Query → nearest matches", "emoji": "🔍", "sub": "cosine similarity" }] }
+    ],
+    "note": "Semantic search matches meaning, not exact keywords — 'card declined' finds 'payment failure'."
+  },
   "keyTerms": [
     { "term": "Embedding", "plain": "Meaning turned into a list of numbers (a point in concept-space)." },
     { "term": "Vector space", "plain": "A map where similar things sit close together." },

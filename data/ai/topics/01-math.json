@@ -23,6 +23,17 @@
     "Probability describes uncertainty; models often output a probability distribution over possible answers rather than one certain answer.",
     "You optimize a 'loss function' — a single number saying how wrong the model is — by nudging parameters to make it smaller."
   ],
+  "diagram": {
+    "caption": "The learning loop: math turns data into predictions, then nudges the model to be less wrong.",
+    "rows": [
+      { "nodes": [{ "label": "Data", "emoji": "📊", "sub": "turned into vectors" }] },
+      { "nodes": [{ "label": "Model", "emoji": "🧮", "sub": "weights (matrices)" }] },
+      { "nodes": [{ "label": "Prediction", "emoji": "🎯" }] },
+      { "nodes": [{ "label": "Loss", "emoji": "📉", "sub": "how wrong (one number)" }] },
+      { "nodes": [{ "label": "Gradient → update", "emoji": "⬇️", "sub": "nudge weights downhill" }] }
+    ],
+    "note": "That last arrow loops back to the model — repeat many times and the loss shrinks. That's learning."
+  },
   "keyTerms": [
     { "term": "Vector", "plain": "A row of numbers. Think of it as coordinates describing a thing." },
     { "term": "Matrix", "plain": "A spreadsheet of numbers the model multiplies things by." },

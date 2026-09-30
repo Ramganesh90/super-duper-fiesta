@@ -24,6 +24,23 @@
     "The Transformer (from 'Attention Is All You Need', 2017) underlies GPT, Claude, BERT, and virtually all modern LLMs.",
     "Scaling Transformers with more data and parameters produced the leap to today's large language models."
   ],
+  "diagram": {
+    "caption": "The Transformer: tokens become vectors, attention weighs their relationships, all in parallel.",
+    "rows": [
+      { "nodes": [{ "label": "Tokens", "emoji": "🧩", "sub": "text split into pieces" }] },
+      { "nodes": [{ "label": "Embeddings + positional encoding", "emoji": "🔢", "sub": "meaning + word order" }] },
+      {
+        "group": "Multi-head self-attention (× many layers)",
+        "nodes": [
+          { "label": "Head 1", "emoji": "👀" },
+          { "label": "Head 2", "emoji": "👀" },
+          { "label": "Head 3", "emoji": "👀" }
+        ]
+      },
+      { "nodes": [{ "label": "Output", "emoji": "📤", "sub": "context-aware representation" }] }
+    ],
+    "note": "Processing the whole sequence in parallel (not step by step) is why Transformers scale and beat RNNs on long context."
+  },
   "keyTerms": [
     { "term": "Self-attention", "plain": "Each word deciding which other words to focus on." },
     { "term": "Transformer", "plain": "The parallel, attention-based architecture powering modern AI." },

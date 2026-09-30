@@ -24,6 +24,29 @@
     "Training is the learning phase; inference is using the trained model to make predictions.",
     "If a simple deterministic rule solves the problem reliably, you often don't need ML at all."
   ],
+  "diagram": {
+    "caption": "Traditional code follows rules you write; ML learns the rules from examples.",
+    "rows": [
+      {
+        "group": "Traditional programming",
+        "nodes": [
+          { "label": "Rules + Data", "emoji": "📜" },
+          { "label": "→ Program →", "emoji": "⚙️" },
+          { "label": "Output", "emoji": "📤" }
+        ]
+      },
+      {
+        "group": "Machine learning",
+        "nodes": [
+          { "label": "Data + Answers", "emoji": "📊" },
+          { "label": "→ Training →", "emoji": "🏋️" },
+          { "label": "Model (learned rules)", "emoji": "🔮" }
+        ]
+      },
+      { "nodes": [{ "label": "New data → Model → Prediction", "emoji": "✨", "sub": "this is inference" }] }
+    ],
+    "note": "Supervised uses labeled answers; unsupervised finds structure with no labels; reinforcement learns from rewards."
+  },
   "keyTerms": [
     { "term": "Supervised learning", "plain": "Learning from flashcards with the answers on the back." },
     { "term": "Unsupervised learning", "plain": "Sorting a pile of stuff into groups with no labels given." },

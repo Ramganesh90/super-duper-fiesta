@@ -24,6 +24,18 @@
     "Track quality with real metrics (accuracy on evals, pass rates, user feedback) rather than vibes.",
     "'Offline' evals (before release) and 'online' monitoring (in production) are both needed."
   ],
+  "diagram": {
+    "caption": "Fence the model at both ends, and grade it with a repeatable eval suite.",
+    "rows": [
+      { "nodes": [{ "label": "User input", "emoji": "💬" }] },
+      { "nodes": [{ "label": "Input guardrail", "emoji": "🛂", "sub": "block unsafe / off-topic" }] },
+      { "nodes": [{ "label": "LLM", "emoji": "🤖" }] },
+      { "nodes": [{ "label": "Output guardrail", "emoji": "🧯", "sub": "safety, PII, format checks" }] },
+      { "nodes": [{ "label": "Response", "emoji": "📤" }] },
+      { "nodes": [{ "label": "Eval suite / LLM-as-judge", "emoji": "🧪", "sub": "run on every change" }] }
+    ],
+    "note": "Evals are regression tests for AI — a demo isn't proof. Grounding + citations reduce hallucinations."
+  },
   "keyTerms": [
     { "term": "Eval", "plain": "A test suite for your AI — run it every time you change something." },
     { "term": "LLM-as-judge", "plain": "Using another model to grade open-ended answers against a rubric." },

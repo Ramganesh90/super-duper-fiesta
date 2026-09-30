@@ -24,6 +24,30 @@
     "Choose RAG when knowledge changes often or is proprietary; choose fine-tuning to teach style/format or specialized behavior.",
     "Quality depends on chunk size, retrieval relevance, the embedding model, and how well the prompt instructs the model to use (and cite) the context."
   ],
+  "diagram": {
+    "caption": "RAG in two phases: index your docs once, then retrieve-and-answer at query time.",
+    "rows": [
+      {
+        "group": "Index (offline)",
+        "nodes": [
+          { "label": "Docs", "emoji": "📄" },
+          { "label": "Chunk", "emoji": "✂️" },
+          { "label": "Embed", "emoji": "🔢" },
+          { "label": "Vector DB", "emoji": "🗂️" }
+        ]
+      },
+      {
+        "group": "Answer (at query time)",
+        "nodes": [
+          { "label": "Question", "emoji": "❓" },
+          { "label": "Retrieve top chunks", "emoji": "🔍" },
+          { "label": "Augment prompt", "emoji": "➕" },
+          { "label": "LLM → grounded answer", "emoji": "🤖" }
+        ]
+      }
+    ],
+    "note": "Grounding in retrieved sources cuts hallucination and enables citations — without retraining the model."
+  },
   "keyTerms": [
     { "term": "RAG", "plain": "Look it up, then answer using what you found." },
     { "term": "Chunking", "plain": "Cutting documents into bite-sized pieces to embed and retrieve." },

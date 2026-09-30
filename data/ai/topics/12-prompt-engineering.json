@@ -24,6 +24,23 @@
     "Constrain outputs (length, JSON schema, allowed values) to make responses reliable and parseable.",
     "Iterate: prompting is empirical — test, observe failures, and refine."
   ],
+  "diagram": {
+    "caption": "Anatomy of a strong prompt: brief the intern precisely, then get gold back.",
+    "rows": [
+      {
+        "group": "A well-built prompt",
+        "nodes": [
+          { "label": "Role", "emoji": "🎩", "sub": "'You are a...'" },
+          { "label": "Context", "emoji": "📎", "sub": "background + data" },
+          { "label": "Examples", "emoji": "🧾", "sub": "few-shot" },
+          { "label": "Task + format", "emoji": "✅", "sub": "exact output wanted" }
+        ]
+      },
+      { "nodes": [{ "label": "LLM", "emoji": "🤖" }] },
+      { "nodes": [{ "label": "Reliable, on-format output", "emoji": "🎁" }] }
+    ],
+    "note": "For multi-step problems, add 'think step by step' (chain-of-thought). Prompting is iterative: test, inspect, refine."
+  },
   "keyTerms": [
     { "term": "Zero-shot", "plain": "Asking with no examples — just the instruction." },
     { "term": "Few-shot", "plain": "Showing a few examples so the model copies the pattern." },

@@ -24,6 +24,22 @@
     "'Deep' just means many layers; more depth can capture more abstract features but needs more data/compute.",
     "Training loops over the data in batches for many epochs, gradually improving the weights."
   ],
+  "diagram": {
+    "caption": "Layers of neurons pass signals forward; errors flow backward to update the weights.",
+    "rows": [
+      { "nodes": [{ "label": "Input layer", "emoji": "📥", "sub": "features as numbers" }] },
+      {
+        "group": "Hidden layers (with non-linear activations)",
+        "nodes": [
+          { "label": "Layer 1", "emoji": "🔵" },
+          { "label": "Layer 2", "emoji": "🔵" }
+        ]
+      },
+      { "nodes": [{ "label": "Output layer", "emoji": "📤", "sub": "prediction" }] },
+      { "nodes": [{ "label": "Loss → Backprop → update weights", "emoji": "↩️", "sub": "learning rate = step size" }] }
+    ],
+    "note": "Without non-linear activations, stacked layers collapse into one linear layer — the activations unlock the power."
+  },
   "keyTerms": [
     { "term": "Neuron", "plain": "A tiny function: weigh inputs, add them up, decide how loud to shout." },
     { "term": "Activation function", "plain": "The 'should I fire?' switch that adds non-linearity (e.g. ReLU)." },

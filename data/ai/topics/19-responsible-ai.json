@@ -24,6 +24,23 @@
     "Keep a human in the loop for consequential decisions (hiring, lending, medical, legal).",
     "AI safety spans avoiding harmful outputs, misuse, and unintended consequences — and being honest about limitations rather than overclaiming."
   ],
+  "diagram": {
+    "caption": "A model mirrors its data — so check for bias, protect privacy, and keep a human on high-stakes calls.",
+    "rows": [
+      { "nodes": [{ "label": "Training data", "emoji": "📚", "sub": "carries human bias" }] },
+      { "nodes": [{ "label": "Model", "emoji": "🪞", "sub": "can amplify that bias" }] },
+      { "nodes": [{ "label": "Outcomes", "emoji": "⚖️", "sub": "who is helped / harmed?" }] },
+      {
+        "group": "Responsible checks",
+        "nodes": [
+          { "label": "Fairness audit", "emoji": "🔎", "sub": "across groups" },
+          { "label": "Privacy", "emoji": "🔐", "sub": "minimize + protect PII" },
+          { "label": "Human in the loop", "emoji": "🧑‍⚖️", "sub": "high-stakes review" }
+        ]
+      }
+    ],
+    "note": "'The math is objective' is a trap — automation can launder bias. Transparency and oversight keep AI accountable."
+  },
   "keyTerms": [
     { "term": "Bias", "plain": "Systematic unfairness the model soaked up from data or design." },
     { "term": "Fairness", "plain": "Checking the model doesn't quietly harm some groups more than others." },

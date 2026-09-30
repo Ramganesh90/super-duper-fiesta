@@ -24,6 +24,30 @@
     "LSTMs/GRUs are RNN variants that better retain information over longer sequences.",
     "RNNs process sequentially and struggle with very long-range dependencies — a key reason Transformers took over language."
   ],
+  "diagram": {
+    "caption": "Two specialists: CNNs build up image features layer by layer; RNNs read sequences step by step.",
+    "rows": [
+      {
+        "group": "CNN — vision (features regardless of position)",
+        "nodes": [
+          { "label": "Image", "emoji": "🖼️" },
+          { "label": "Conv → edges", "emoji": "📐" },
+          { "label": "Conv → shapes", "emoji": "🔷" },
+          { "label": "Object: 'cat'", "emoji": "🐱" }
+        ]
+      },
+      {
+        "group": "RNN — sequences (carries a memory)",
+        "nodes": [
+          { "label": "word 1 →", "emoji": "🔤" },
+          { "label": "word 2 →", "emoji": "🔤" },
+          { "label": "word 3 →", "emoji": "🔤" },
+          { "label": "output", "emoji": "📤" }
+        ]
+      }
+    ],
+    "note": "RNNs process one step at a time and forget distant context — the itch Transformers came to scratch."
+  },
   "keyTerms": [
     { "term": "Convolution", "plain": "Sliding a small pattern-detector across an image." },
     { "term": "CNN", "plain": "The image specialist — great at seeing." },

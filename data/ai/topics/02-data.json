@@ -23,6 +23,23 @@
     "Class imbalance (e.g. 99% 'not fraud') can make accuracy misleading; you may need resampling or better metrics.",
     "Features are the input columns the model sees; good feature engineering often beats a fancier model."
   ],
+  "diagram": {
+    "caption": "The data pipeline: clean raw data, engineer features, then split before you ever train.",
+    "rows": [
+      { "nodes": [{ "label": "Raw data", "emoji": "🗂️", "sub": "messy, missing, mixed units" }] },
+      { "nodes": [{ "label": "Clean", "emoji": "🧹", "sub": "fix missing / errors" }] },
+      { "nodes": [{ "label": "Features", "emoji": "🏷️", "sub": "the inputs the model sees" }] },
+      {
+        "group": "Split BEFORE training",
+        "nodes": [
+          { "label": "Train", "emoji": "📚", "sub": "learn" },
+          { "label": "Validation", "emoji": "🎚️", "sub": "tune" },
+          { "label": "Test", "emoji": "🔒", "sub": "honest final grade" }
+        ]
+      }
+    ],
+    "note": "Compute cleaning/scaling stats on the training set only — reusing test data leaks the answers (data leakage)."
+  },
   "keyTerms": [
     { "term": "Feature", "plain": "An input column — a measurable property the model learns from." },
     { "term": "Train/val/test split", "plain": "Three data piles: learn, tune, and a locked fridge for honest grading." },

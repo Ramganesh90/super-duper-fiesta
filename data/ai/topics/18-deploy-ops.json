@@ -24,6 +24,22 @@
     "Observability means logging inputs/outputs, latency, cost, and errors, plus tracking quality metrics and user feedback over time.",
     "Right-size the model: use a smaller/cheaper model when it passes your evals, and reserve the biggest model for hard cases."
   ],
+  "diagram": {
+    "caption": "The bakery around the model: serve it via an API, cache, stream, and watch everything.",
+    "rows": [
+      { "nodes": [{ "label": "User", "emoji": "👤" }] },
+      { "nodes": [{ "label": "Your API", "emoji": "🔌", "sub": "retries, rate limits, fallbacks" }] },
+      {
+        "nodes": [
+          { "label": "Cache", "emoji": "⚡", "sub": "reuse repeats · cheaper/faster" },
+          { "label": "Model API", "emoji": "🤖", "sub": "right-sized model" }
+        ]
+      },
+      { "nodes": [{ "label": "Stream response", "emoji": "📤", "sub": "feels faster" }] },
+      { "nodes": [{ "label": "Observability", "emoji": "📹", "sub": "log latency, cost, errors, quality" }] }
+    ],
+    "note": "Tokens = money. Cache repeats, stream for perceived speed, and use the smallest model that passes your evals."
+  },
   "keyTerms": [
     { "term": "Latency", "plain": "How long the user waits for a response." },
     { "term": "Token cost", "plain": "You pay per token in and out — words literally cost money." },

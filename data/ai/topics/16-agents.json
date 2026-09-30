@@ -24,6 +24,17 @@
     "Reliability drops as steps multiply (errors compound); good design adds checks, limits, and clear tool definitions.",
     "Guardrails and permissions are essential — agents that take real actions can cause real harm if unconstrained."
   ],
+  "diagram": {
+    "caption": "An agent loops: reason, use a tool, observe the result, repeat — until the goal is met.",
+    "rows": [
+      { "nodes": [{ "label": "Goal", "emoji": "🎯" }] },
+      { "nodes": [{ "label": "Reason", "emoji": "🤔", "sub": "what next?" }] },
+      { "nodes": [{ "label": "Act — call a tool", "emoji": "🛠️", "sub": "search, DB, API (via MCP)" }] },
+      { "nodes": [{ "label": "Observe result", "emoji": "👁️", "sub": "loops back to Reason" }] },
+      { "nodes": [{ "label": "Final answer", "emoji": "✅", "sub": "when done" }] }
+    ],
+    "note": "Errors compound across steps — add guardrails, permissions, and checks, especially for real/irreversible actions."
+  },
   "keyTerms": [
     { "term": "Tool / function calling", "plain": "The model asking to run a function and getting the result back." },
     { "term": "Agent", "plain": "An LLM that plans and takes actions in a loop, not just chats." },
