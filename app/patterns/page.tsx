@@ -5,6 +5,7 @@ import ProgressIndicator from "@/components/learning/ProgressIndicator";
 import RandomHeroButton from "@/components/homepage/RandomHeroButton";
 import PatternRoster from "@/components/patterns/PatternRoster";
 import GuessThePattern from "@/components/learning/GuessThePattern";
+import ResetProgress from "@/components/patterns/ResetProgress";
 import { getAllPatterns } from "@/lib/patterns";
 import type { ComicPanelData } from "@/lib/types";
 
@@ -88,6 +89,9 @@ export default function PatternsIndexPage() {
 
       <section className="mx-auto w-full max-w-3xl px-4 sm:px-6">
         <ProgressIndicator totalPatterns={patterns.length} />
+        <div className="mt-3 flex justify-end">
+          <ResetProgress />
+        </div>
       </section>
 
       <section

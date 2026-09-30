@@ -5,6 +5,8 @@ import AiQuiz from "@/components/ai/AiQuiz";
 import ScenarioChallenge from "@/components/ai/ScenarioChallenge";
 import CharacterCard from "@/components/ai/CharacterCard";
 import ArchitectureDiagram from "@/components/ai/ArchitectureDiagram";
+import Flashcards from "@/components/learning/Flashcards";
+import { buildTopicFlashcards } from "@/lib/ai/flashcards";
 import { getAllTopicIds, getAllTopics, getTopicById } from "@/lib/ai/topics";
 import { TRACK_ICONS, TRACK_LABELS } from "@/lib/ai/types";
 
@@ -159,6 +161,16 @@ export default async function TopicPage({ params }: TopicPageProps) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="flashcards-heading" className="flex flex-col gap-4">
+        <h2 id="flashcards-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
+          🃏 FLASHCARDS
+        </h2>
+        <p className="text-sm text-ink/70 sm:text-base">
+          Quick recall drills for {topic.title} — flip, shuffle, and mark the ones you know.
+        </p>
+        <Flashcards cards={buildTopicFlashcards(topic)} accent="bg-ai-violet" accentText="text-paper" />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-ai-violet-dark bg-ai-violet/10 p-5 sm:p-8">

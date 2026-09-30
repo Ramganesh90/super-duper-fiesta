@@ -10,6 +10,8 @@ import CodeBlock from "@/components/code/CodeBlock";
 import CodeBattle from "@/components/learning/CodeBattle";
 import Quiz from "@/components/learning/Quiz";
 import StructureDiagram from "@/components/patterns/StructureDiagram";
+import Flashcards from "@/components/learning/Flashcards";
+import { buildPatternFlashcards } from "@/lib/flashcards";
 import ProgressIndicator from "@/components/learning/ProgressIndicator";
 import { getAllPatternIds, getAllPatterns, getPatternById } from "@/lib/patterns";
 import { CATEGORY_ICONS, CATEGORY_LABELS, type PatternCategory } from "@/lib/types";
@@ -156,6 +158,16 @@ export default async function PatternPage({ params }: PatternPageProps) {
           🧠 WHY IT WORKS
         </h2>
         <PatternExplanation pattern={pattern} />
+      </section>
+
+      <section aria-labelledby="flashcards-heading" className="flex flex-col gap-4">
+        <h2 id="flashcards-heading" className="font-comic text-3xl tracking-wide sm:text-4xl">
+          🃏 FLASHCARDS
+        </h2>
+        <p className="text-sm text-ink/70 sm:text-base">
+          Quick recall drills for {pattern.title} — flip, shuffle, and mark the ones you know.
+        </p>
+        <Flashcards cards={buildPatternFlashcards(pattern)} accent="bg-hero-blue" accentText="text-paper" />
       </section>
 
       <div className="comic-border flex flex-col gap-14 border-comic-yellow-dark bg-comic-yellow/10 p-5 sm:p-8">

@@ -5,6 +5,7 @@ import MasteryMeter from "./MasteryMeter";
 import StreakTracker from "./StreakTracker";
 import TrackBadges from "./TrackBadges";
 import TopicGrid, { type TopicSummary } from "./TopicGrid";
+import ResetProgress from "./ResetProgress";
 import { FUTURE_TRACKS } from "@/lib/ai/types";
 
 // Client shell for /ai: live stats, track badges, the topic roadmap, and a
@@ -47,6 +48,10 @@ export default function AiDashboard({ topics }: { topics: TopicSummary[] }) {
           ))}
         </ul>
       </section>
+
+      <div className="flex justify-end border-t-2 border-dashed border-ink/20 pt-4">
+        <ResetProgress />
+      </div>
     </div>
   );
 }

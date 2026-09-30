@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import AwsQuiz from "@/components/aws/AwsQuiz";
 import ScenarioChallenge from "@/components/aws/ScenarioChallenge";
 import ArchitectureDiagram from "@/components/aws/ArchitectureDiagram";
+import Flashcards from "@/components/learning/Flashcards";
+import { buildSegmentFlashcards } from "@/lib/aws/flashcards";
 import { getAllSegmentIds, getAllSegments, getSegmentById } from "@/lib/aws/segments";
 import { DOMAIN_ICONS, DOMAIN_LABELS } from "@/lib/aws/types";
 
@@ -159,6 +161,16 @@ export default async function SegmentPage({ params }: SegmentPageProps) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="flashcards-heading" className="flex flex-col gap-4">
+        <h2 id="flashcards-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
+          🃏 FLASHCARDS
+        </h2>
+        <p className="text-sm text-ink/70 sm:text-base">
+          Quick recall drills for Week {segment.week} — flip, shuffle, and mark the ones you know.
+        </p>
+        <Flashcards cards={buildSegmentFlashcards(segment)} accent="bg-aws-orange" accentText="text-ink" />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-aws-orange-dark bg-aws-orange/10 p-5 sm:p-8">
