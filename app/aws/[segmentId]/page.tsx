@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AwsQuiz from "@/components/aws/AwsQuiz";
 import ScenarioChallenge from "@/components/aws/ScenarioChallenge";
+import ArchitectureDiagram from "@/components/aws/ArchitectureDiagram";
 import { getAllSegmentIds, getAllSegments, getSegmentById } from "@/lib/aws/segments";
 import { DOMAIN_ICONS, DOMAIN_LABELS } from "@/lib/aws/types";
 
@@ -128,6 +129,15 @@ export default async function SegmentPage({ params }: SegmentPageProps) {
           ))}
         </ul>
       </section>
+
+      {segment.diagram && (
+        <section aria-labelledby="diagram-heading" className="flex flex-col gap-4">
+          <h2 id="diagram-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">
+            🗺️ ARCHITECTURE AT A GLANCE
+          </h2>
+          <ArchitectureDiagram diagram={segment.diagram} />
+        </section>
+      )}
 
       <section aria-labelledby="resources-heading" className="flex flex-col gap-4">
         <h2 id="resources-heading" className="font-comic text-2xl tracking-wide sm:text-3xl">

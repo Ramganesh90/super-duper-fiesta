@@ -25,6 +25,29 @@
     "gp3 lets you provision IOPS/throughput independently of size; io2 Block Express is for the highest-performance, latency-sensitive databases.",
     "Add ElastiCache or CloudFront to cache hot data — this lowers latency and reduces load on databases and origins."
   ],
+  "diagram": {
+    "caption": "Match the workload to the right compute, then to the right storage.",
+    "rows": [
+      { "nodes": [{ "label": "Incoming workload", "emoji": "👤" }] },
+      {
+        "group": "Compute — pick by pattern",
+        "nodes": [
+          { "label": "AWS Lambda", "emoji": "λ", "sub": "spiky, event-driven" },
+          { "label": "Amazon EC2", "emoji": "🖥️", "sub": "steady / specialized" },
+          { "label": "AWS Fargate", "emoji": "📦", "sub": "serverless containers" }
+        ]
+      },
+      {
+        "group": "Storage — pick by access",
+        "nodes": [
+          { "label": "Amazon S3", "emoji": "🪣", "sub": "objects" },
+          { "label": "Amazon EBS", "emoji": "💽", "sub": "block, single instance" },
+          { "label": "Amazon EFS", "emoji": "🗂️", "sub": "shared file, multi-AZ" }
+        ]
+      }
+    ],
+    "note": "Add ElastiCache or CloudFront to cache hot data, cutting latency and offloading the backend."
+  },
   "resources": [
     { "label": "EC2 instance types", "url": "https://aws.amazon.com/ec2/instance-types/", "type": "docs" },
     { "label": "EBS volume types", "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html", "type": "docs" },

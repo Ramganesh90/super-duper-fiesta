@@ -25,6 +25,29 @@
     "Avoid paying for idle: right-size instances, use Auto Scaling to match demand, and prefer serverless (Lambda, Fargate) for spiky workloads.",
     "Set AWS Budgets alerts and review Cost Explorer / Cost and Usage Report and Trusted Advisor recommendations regularly."
   ],
+  "diagram": {
+    "caption": "Cost-optimized choices: match the pricing model to the workload, and tier storage over time.",
+    "rows": [
+      {
+        "group": "Compute pricing — match to usage",
+        "nodes": [
+          { "label": "On-Demand", "emoji": "🏷️", "sub": "spiky / short-term" },
+          { "label": "Savings Plans / RIs", "emoji": "💵", "sub": "steady, committed" },
+          { "label": "Spot", "emoji": "♻️", "sub": "interruptible, up to ~90% off" }
+        ]
+      },
+      {
+        "group": "S3 lifecycle — cheaper as data cools",
+        "nodes": [
+          { "label": "S3 Standard", "emoji": "🗄️", "sub": "frequent access" },
+          { "label": "Standard-IA", "emoji": "📉", "sub": "infrequent" },
+          { "label": "Glacier", "emoji": "🧊", "sub": "archive" },
+          { "label": "Glacier Deep Archive", "emoji": "🧊", "sub": "lowest cost" }
+        ]
+      }
+    ],
+    "note": "Right-size with Compute Optimizer, avoid idle with Auto Scaling/serverless, and watch spend with Budgets & Cost Explorer."
+  },
   "resources": [
     { "label": "EC2 purchasing options", "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html", "type": "docs" },
     { "label": "S3 storage classes", "url": "https://aws.amazon.com/s3/storage-classes/", "type": "docs" },

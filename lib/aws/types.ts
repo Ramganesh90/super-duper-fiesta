@@ -43,6 +43,27 @@ export interface Scenario {
   explanation: string;
 }
 
+// A single box in an architecture diagram.
+export interface DiagramNode {
+  label: string;
+  emoji?: string;
+  sub?: string; // small caption under the label
+}
+
+// A horizontal band of nodes, optionally wrapped in a labeled group (e.g. a VPC
+// or an Availability Zone). Rows stack top-to-bottom with a downward arrow between.
+export interface DiagramRow {
+  group?: string; // optional boundary label around this row's nodes
+  nodes: DiagramNode[];
+}
+
+// A simple, data-driven architecture/flow diagram rendered in the comic style.
+export interface Diagram {
+  caption: string;
+  rows: DiagramRow[];
+  note?: string;
+}
+
 // One week of the study plan.
 export interface Segment {
   id: string; // e.g. "week-1"
@@ -54,6 +75,7 @@ export interface Segment {
   objectives: string[];
   services: AwsService[];
   keyConcepts: string[];
+  diagram?: Diagram;
   resources: StudyResource[];
   scenarios: Scenario[];
   quiz: QuizQuestion[];

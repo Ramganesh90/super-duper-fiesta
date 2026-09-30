@@ -25,6 +25,27 @@
     "Choose DynamoDB for massive scale, predictable low-latency key-value access, and serverless operations; add DAX for microsecond cached reads.",
     "Match the database to the pattern: relational/ACID → RDS/Aurora; key-value at scale → DynamoDB; analytics → Redshift; in-memory cache → ElastiCache."
   ],
+  "diagram": {
+    "caption": "Global delivery plus a scaled data tier for high performance.",
+    "rows": [
+      { "nodes": [{ "label": "Global users", "emoji": "👤" }] },
+      { "nodes": [{ "label": "Amazon CloudFront", "emoji": "📡", "sub": "edge cache, low latency" }] },
+      { "nodes": [{ "label": "Application Load Balancer", "emoji": "⚖️" }] },
+      {
+        "group": "Compute",
+        "nodes": [{ "label": "App servers", "emoji": "🖥️" }]
+      },
+      {
+        "group": "Data tier",
+        "nodes": [
+          { "label": "RDS / Aurora primary", "emoji": "🗄️", "sub": "writes" },
+          { "label": "Read replicas", "emoji": "📖", "sub": "scale reads" },
+          { "label": "ElastiCache", "emoji": "⚡", "sub": "in-memory cache" }
+        ]
+      }
+    ],
+    "note": "For key-value at scale use DynamoDB (+ DAX for microsecond reads); Aurora Global Database serves low-latency cross-Region reads."
+  },
   "resources": [
     { "label": "CloudFront developer guide", "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html", "type": "docs" },
     { "label": "Global Accelerator", "url": "https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html", "type": "docs" },

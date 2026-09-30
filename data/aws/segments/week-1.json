@@ -24,6 +24,21 @@
     "The six Well-Architected pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability.",
     "Some services are global (IAM, Route 53, CloudFront, WAF), most are regional (EC2, S3 buckets live in a Region), and a few are zonal (EC2 instances, EBS volumes)."
   ],
+  "diagram": {
+    "caption": "AWS global infrastructure: a Region is made of multiple isolated Availability Zones.",
+    "rows": [
+      { "nodes": [{ "label": "AWS Global Infrastructure", "emoji": "🌍", "sub": "many Regions worldwide" }] },
+      {
+        "group": "Region (e.g. us-east-1)",
+        "nodes": [
+          { "label": "Availability Zone A", "emoji": "🏢", "sub": "1+ data centers" },
+          { "label": "Availability Zone B", "emoji": "🏢", "sub": "1+ data centers" },
+          { "label": "Availability Zone C", "emoji": "🏢", "sub": "1+ data centers" }
+        ]
+      }
+    ],
+    "note": "Design across AZs for high availability; across Regions for disaster recovery. Edge locations (CloudFront) cache content closer to users."
+  },
   "resources": [
     { "label": "AWS Global Infrastructure", "url": "https://aws.amazon.com/about-aws/global-infrastructure/", "type": "docs" },
     { "label": "Shared Responsibility Model", "url": "https://aws.amazon.com/compliance/shared-responsibility-model/", "type": "docs" },

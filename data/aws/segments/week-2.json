@@ -25,6 +25,16 @@
     "Grant least privilege: start minimal and add permissions; use conditions (e.g. source IP, MFA) to tighten access.",
     "Never embed access keys in code or AMIs — attach an instance profile/role instead."
   ],
+  "diagram": {
+    "caption": "How an EC2 app gets temporary AWS credentials via an IAM role — no stored keys.",
+    "rows": [
+      { "nodes": [{ "label": "EC2 instance", "emoji": "🖥️", "sub": "app needs S3 access" }] },
+      { "nodes": [{ "label": "IAM Role / Instance Profile", "emoji": "🎭", "sub": "trust + permissions policy" }] },
+      { "nodes": [{ "label": "AWS STS", "emoji": "⏳", "sub": "issues temporary, auto-expiring credentials" }] },
+      { "nodes": [{ "label": "Amazon S3", "emoji": "🪣", "sub": "access granted per policy" }] }
+    ],
+    "note": "An explicit Deny always overrides any Allow. In multi-account setups, SCPs cap the maximum permissions."
+  },
   "resources": [
     { "label": "IAM User Guide", "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html", "type": "docs" },
     { "label": "IAM Roles", "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html", "type": "docs" },

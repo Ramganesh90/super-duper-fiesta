@@ -25,6 +25,23 @@
     "Use an ALB for HTTP/HTTPS (path/host routing), an NLB for extreme performance / TCP-UDP / static IP, and a Gateway Load Balancer for third-party virtual appliances.",
     "Keep application tiers stateless (store session/state in DynamoDB or ElastiCache) so any instance can handle any request and scaling is painless."
   ],
+  "diagram": {
+    "caption": "A resilient web tier: multi-AZ Auto Scaling behind an ALB, decoupled from workers with a queue.",
+    "rows": [
+      { "nodes": [{ "label": "Users", "emoji": "👤" }] },
+      { "nodes": [{ "label": "Application Load Balancer", "emoji": "⚖️", "sub": "spans AZs, health checks" }] },
+      {
+        "group": "Auto Scaling group (Multi-AZ)",
+        "nodes": [
+          { "label": "EC2 — AZ-a", "emoji": "🖥️" },
+          { "label": "EC2 — AZ-b", "emoji": "🖥️" }
+        ]
+      },
+      { "nodes": [{ "label": "Amazon SQS", "emoji": "📬", "sub": "buffers work (load leveling)" }] },
+      { "nodes": [{ "label": "Worker fleet", "emoji": "⚙️", "sub": "processes at its own pace" }] }
+    ],
+    "note": "SQS decouples producers from consumers so spikes don't drop work. SNS fans one message out to many subscribers."
+  },
   "resources": [
     { "label": "EC2 Auto Scaling", "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html", "type": "docs" },
     { "label": "Elastic Load Balancing types", "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html", "type": "docs" },

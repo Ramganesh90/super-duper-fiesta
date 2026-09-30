@@ -25,6 +25,28 @@
     "Place resources that shouldn't be internet-reachable in private subnets; use a NAT gateway for outbound-only internet access.",
     "Attach AWS WAF to CloudFront, ALB, or API Gateway; AWS Shield Standard is automatic and free, Shield Advanced adds enhanced DDoS protection and cost protection."
   ],
+  "diagram": {
+    "caption": "A secure VPC: public subnet for the load balancer, private subnets for app and data, NAT for outbound.",
+    "rows": [
+      { "nodes": [{ "label": "Internet", "emoji": "🌐" }] },
+      {
+        "group": "Public subnet",
+        "nodes": [
+          { "label": "Application Load Balancer", "emoji": "⚖️", "sub": "internet-facing" },
+          { "label": "NAT Gateway", "emoji": "🔀", "sub": "outbound only" }
+        ]
+      },
+      {
+        "group": "Private subnet — app",
+        "nodes": [{ "label": "EC2 instances", "emoji": "🖥️", "sub": "SG allows traffic from ALB" }]
+      },
+      {
+        "group": "Private subnet — data",
+        "nodes": [{ "label": "Amazon RDS", "emoji": "🗄️", "sub": "no public route" }]
+      }
+    ],
+    "note": "Security groups are stateful (instance level); NACLs are stateless (subnet level). Use a gateway VPC endpoint to reach S3 privately."
+  },
   "resources": [
     { "label": "Encrypting data with KMS", "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html", "type": "docs" },
     { "label": "Security groups vs NACLs", "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-comparison.html", "type": "docs" },

@@ -25,6 +25,21 @@
     "Route 53 failover routing + health checks can automatically redirect traffic to a standby Region/endpoint when the primary is unhealthy.",
     "RDS Multi-AZ is for availability (synchronous standby, auto-failover), not for scaling reads — read replicas handle read scaling."
   ],
+  "diagram": {
+    "caption": "Multi-Region failover with Route 53 health checks (warm standby).",
+    "rows": [
+      { "nodes": [{ "label": "Users", "emoji": "👤" }] },
+      { "nodes": [{ "label": "Amazon Route 53", "emoji": "🌐", "sub": "failover routing + health checks" }] },
+      {
+        "nodes": [
+          { "label": "Primary Region", "emoji": "🟢", "sub": "active — serves traffic" },
+          { "label": "Secondary Region", "emoji": "🟡", "sub": "warm standby — scaled down" }
+        ]
+      },
+      { "nodes": [{ "label": "Cross-Region replication", "emoji": "🔁", "sub": "keeps standby data current" }] }
+    ],
+    "note": "RTO/RPO drive the DR strategy, cheapest→fastest: Backup & Restore → Pilot Light → Warm Standby → Multi-Site Active/Active."
+  },
   "resources": [
     { "label": "Disaster recovery options in the cloud", "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html", "type": "whitepaper" },
     { "label": "Route 53 routing policies", "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html", "type": "docs" },
