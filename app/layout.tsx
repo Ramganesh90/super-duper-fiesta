@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bangers, Geist_Mono, Inter } from "next/font/google";
 import Link from "next/link";
+import ThemeToggle, { themeInitScript } from "@/components/ThemeToggle";
 import "./globals.css";
 
 const bangers = Bangers({
@@ -49,9 +50,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${bangers.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
@@ -63,29 +66,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <nav aria-label="Apps" className="flex items-center gap-2">
               <Link
                 href="/patterns"
-                className="comic-border-sm font-comic bg-comic-yellow px-3 py-1.5 text-sm text-ink transition-transform hover:-translate-y-0.5 sm:text-base"
+                className="comic-border-sm font-comic bg-comic-yellow px-3 py-1.5 text-sm text-ink-fixed transition-transform hover:-translate-y-0.5 sm:text-base"
               >
                 Patterns
               </Link>
               <Link
                 href="/aws"
-                className="comic-border-sm font-comic bg-aws-orange px-3 py-1.5 text-sm text-ink transition-transform hover:-translate-y-0.5 sm:text-base"
+                className="comic-border-sm font-comic bg-aws-orange px-3 py-1.5 text-sm text-ink-fixed transition-transform hover:-translate-y-0.5 sm:text-base"
               >
                 AWS SA
               </Link>
               <Link
                 href="/ai"
-                className="comic-border-sm font-comic bg-ai-violet px-3 py-1.5 text-sm text-paper transition-transform hover:-translate-y-0.5 sm:text-base"
+                className="comic-border-sm font-comic bg-ai-violet px-3 py-1.5 text-sm text-paper-fixed transition-transform hover:-translate-y-0.5 sm:text-base"
               >
                 AI
               </Link>
+              <ThemeToggle />
             </nav>
           </div>
         </header>
         <main id="main-content" className="flex-1">
           {children}
         </main>
-        <footer className="border-t-4 border-ink bg-ink text-paper">
+        <footer className="border-t-4 border-ink bg-ink-fixed text-paper-fixed">
           <div className="mx-auto max-w-6xl px-4 py-8 text-center text-sm sm:px-6">
             <p className="font-comic text-lg text-comic-yellow">STUDY COMPANION</p>
             <p className="mt-2 opacity-80">

@@ -41,7 +41,7 @@ export default function HeroCard({ pattern, showCategory = false }: HeroCardProp
           {pattern.hero.emoji}
         </span>
         {mastered && (
-          <span className="comic-border-sm font-comic bg-comic-yellow px-2 py-1 text-xs text-ink">
+          <span className="comic-border-sm font-comic bg-comic-yellow px-2 py-1 text-xs text-ink-fixed">
             ✅ MASTERED
           </span>
         )}
@@ -69,7 +69,7 @@ export default function HeroCard({ pattern, showCategory = false }: HeroCardProp
 
       <Link
         href={`/patterns/${pattern.id}`}
-        className="comic-border-sm font-comic mt-2 block bg-hero-blue px-4 py-2 text-center text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+        className="comic-border-sm font-comic mt-2 block bg-hero-blue px-4 py-2 text-center text-paper-fixed tracking-wide transition-transform hover:-translate-y-0.5"
       >
         Learn Pattern
       </Link>

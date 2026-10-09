@@ -42,7 +42,7 @@ export default function StreakTracker() {
         onClick={handleCheckIn}
         disabled={checkedInToday}
         aria-live="polite"
-        className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 sm:text-base"
+        className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink-fixed transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 sm:text-base"
       >
         {checkedInToday
           ? justChecked

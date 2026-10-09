@@ -170,7 +170,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         <p className="text-sm text-ink/70 sm:text-base">
           Quick recall drills for {topic.title} — flip, shuffle, and mark the ones you know.
         </p>
-        <Flashcards cards={buildTopicFlashcards(topic)} accent="bg-ai-violet" accentText="text-paper" deckId={`ai:${topic.id}`} />
+        <Flashcards cards={buildTopicFlashcards(topic)} accent="bg-ai-violet" accentText="text-paper-fixed" deckId={`ai:${topic.id}`} />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-ai-violet-dark bg-ai-violet/10 p-5 sm:p-8">
@@ -210,7 +210,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         {nextTopic && (
           <Link
             href={`/ai/${nextTopic.id}`}
-            className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-sm tracking-wide text-paper transition-transform hover:-translate-y-0.5"
+            className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-sm tracking-wide text-paper-fixed transition-transform hover:-translate-y-0.5"
           >
             Next: {nextTopic.title} →
           </Link>

@@ -40,7 +40,7 @@ export default function ConversationReader({ conversation, heroName, accent }: C
         <button
           type="button"
           onClick={() => setRevealed((r) => Math.min(r + 1, conversation.length))}
-          className="comic-border-sm font-comic self-center bg-hero-blue px-5 py-2.5 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+          className="comic-border-sm font-comic self-center bg-hero-blue px-5 py-2.5 text-paper-fixed tracking-wide transition-transform hover:-translate-y-0.5"
         >
           Continue ↓ ({revealed}/{conversation.length})
         </button>

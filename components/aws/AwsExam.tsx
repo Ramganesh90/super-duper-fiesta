@@ -94,7 +94,7 @@ export default function AwsExam() {
               key={cfg.count}
               type="button"
               onClick={() => start(cfg)}
-              className="comic-border-sm font-comic bg-aws-orange px-4 py-3 text-sm tracking-wide text-ink transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic bg-aws-orange px-4 py-3 text-sm tracking-wide text-ink-fixed transition-transform hover:-translate-y-0.5"
             >
               {cfg.label}
             </button>
@@ -152,7 +152,7 @@ export default function AwsExam() {
             <button
               type="button"
               onClick={() => setPhase("done")}
-              className="comic-border-sm font-comic bg-action-red px-4 py-2 text-sm text-paper transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic bg-action-red px-4 py-2 text-sm text-paper-fixed transition-transform hover:-translate-y-0.5"
             >
               Submit exam
             </button>
@@ -160,7 +160,7 @@ export default function AwsExam() {
             <button
               type="button"
               onClick={() => setPos((p) => Math.min(questions.length - 1, p + 1))}
-              className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm text-paper transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm text-paper-fixed transition-transform hover:-translate-y-0.5"
             >
               Next →
             </button>
@@ -230,7 +230,7 @@ export default function AwsExam() {
         <button
           type="button"
           onClick={() => setPhase("config")}
-          className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink transition-transform hover:-translate-y-0.5"
+          className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink-fixed transition-transform hover:-translate-y-0.5"
         >
           Take another
         </button>

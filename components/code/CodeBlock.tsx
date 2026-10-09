@@ -22,7 +22,7 @@ export default function CodeBlock({ code, language = "typescript", label }: Code
   };
 
   return (
-    <div className="comic-border-sm overflow-hidden bg-ink text-paper">
+    <div className="comic-border-sm overflow-hidden bg-ink-fixed text-paper-fixed">
       <div className="flex items-center justify-between border-b-2 border-paper/20 px-4 py-2">
         <span className="font-code text-xs uppercase tracking-widest text-paper/70">
           {label ?? language}

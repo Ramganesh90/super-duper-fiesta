@@ -41,7 +41,7 @@ export default function ResetProgress() {
       <button
         type="button"
         onClick={handleReset}
-        className="comic-border-sm font-comic bg-action-red px-3 py-1 text-paper transition-transform hover:-translate-y-0.5"
+        className="comic-border-sm font-comic bg-action-red px-3 py-1 text-paper-fixed transition-transform hover:-translate-y-0.5"
       >
         Yes, reset
       </button>

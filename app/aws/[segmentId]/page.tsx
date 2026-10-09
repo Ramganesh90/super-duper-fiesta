@@ -170,7 +170,7 @@ export default async function SegmentPage({ params }: SegmentPageProps) {
         <p className="text-sm text-ink/70 sm:text-base">
           Quick recall drills for Week {segment.week} — flip, shuffle, and mark the ones you know.
         </p>
-        <Flashcards cards={buildSegmentFlashcards(segment)} accent="bg-aws-orange" accentText="text-ink" deckId={`aws:${segment.id}`} />
+        <Flashcards cards={buildSegmentFlashcards(segment)} accent="bg-aws-orange" accentText="text-ink-fixed" deckId={`aws:${segment.id}`} />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-aws-orange-dark bg-aws-orange/10 p-5 sm:p-8">
@@ -210,7 +210,7 @@ export default async function SegmentPage({ params }: SegmentPageProps) {
         {nextSegment && (
           <Link
             href={`/aws/${nextSegment.id}`}
-            className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink transition-transform hover:-translate-y-0.5"
+            className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink-fixed transition-transform hover:-translate-y-0.5"
           >
             Next: Week {nextSegment.week} — {nextSegment.title} →
           </Link>

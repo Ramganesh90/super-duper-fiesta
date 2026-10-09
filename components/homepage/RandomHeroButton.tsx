@@ -80,7 +80,7 @@ export default function RandomHeroButton({ patterns }: RandomHeroButtonProps) {
         disabled={isBusy}
         whileHover={!isBusy && !reduceMotion ? { scale: 1.05, rotate: -1 } : undefined}
         whileTap={!isBusy && !reduceMotion ? { scale: 0.95 } : undefined}
-        className="comic-border font-comic relative bg-comic-yellow px-8 py-5 text-xl tracking-wide text-ink transition-opacity disabled:opacity-90 sm:text-2xl"
+        className="comic-border font-comic relative bg-comic-yellow px-8 py-5 text-xl tracking-wide text-ink-fixed transition-opacity disabled:opacity-90 sm:text-2xl"
       >
         <motion.span
           aria-hidden="true"

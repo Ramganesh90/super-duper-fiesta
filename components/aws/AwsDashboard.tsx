@@ -33,7 +33,7 @@ export default function AwsDashboard({ segments }: { segments: SegmentSummary[] 
             Assemble a real architecture and get live Well-Architected feedback on every miss.
           </p>
         </div>
-        <span className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink">
+        <span className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink-fixed">
           Open the sandbox →
         </span>
       </Link>
@@ -50,7 +50,7 @@ export default function AwsDashboard({ segments }: { segments: SegmentSummary[] 
             Timed, mixed-domain practice with a score and a weak-area breakdown.
           </p>
         </div>
-        <span className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm tracking-wide text-paper">
+        <span className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm tracking-wide text-paper-fixed">
           Start exam →
         </span>
       </Link>

@@ -55,7 +55,7 @@ export default function Home() {
             <PatternHubSnapshot total={patternCount} />
             <Link
               href="/patterns"
-              className="comic-border-sm font-comic mt-6 self-start bg-hero-blue px-5 py-2.5 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic mt-6 self-start bg-hero-blue px-5 py-2.5 text-paper-fixed tracking-wide transition-transform hover:-translate-y-0.5"
             >
               Enter Pattern-Verse →
             </Link>
@@ -77,7 +77,7 @@ export default function Home() {
             <AwsHubSnapshot />
             <Link
               href="/aws"
-              className="comic-border-sm font-comic mt-6 self-start bg-aws-orange px-5 py-2.5 text-ink tracking-wide transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic mt-6 self-start bg-aws-orange px-5 py-2.5 text-ink-fixed tracking-wide transition-transform hover:-translate-y-0.5"
             >
               Start Studying →
             </Link>
@@ -99,7 +99,7 @@ export default function Home() {
             <AiHubSnapshot />
             <Link
               href="/ai"
-              className="comic-border-sm font-comic mt-6 self-start bg-ai-violet px-5 py-2.5 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic mt-6 self-start bg-ai-violet px-5 py-2.5 text-paper-fixed tracking-wide transition-transform hover:-translate-y-0.5"
             >
               Enter AI Academy →
             </Link>

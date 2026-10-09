@@ -101,7 +101,7 @@ export default function PatternRoster({ patterns }: PatternRosterProps) {
                   onClick={() => handleCategoryClick(category)}
                   aria-pressed={isActive}
                   className={`comic-border-sm inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${
-                    isActive ? "bg-hero-blue text-paper" : "bg-paper"
+                    isActive ? "bg-hero-blue text-paper-fixed" : "bg-paper"
                   }`}
                 >
                   {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}

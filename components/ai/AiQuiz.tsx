@@ -67,7 +67,7 @@ export default function AiQuiz({ topicId, topicTitle, questions }: AiQuizProps) 
         {passed ? (
           <div
             role="status"
-            className="comic-border animate-pop-in flex flex-col items-center gap-2 bg-comic-yellow p-6 text-center text-ink"
+            className="comic-border animate-pop-in flex flex-col items-center gap-2 bg-comic-yellow p-6 text-center text-ink-fixed"
           >
             <span className="text-5xl" aria-hidden="true">🏆</span>
             <p className="font-comic text-2xl tracking-wide sm:text-3xl">TOPIC MASTERED</p>
@@ -83,7 +83,7 @@ export default function AiQuiz({ topicId, topicTitle, questions }: AiQuizProps) 
         <button
           type="button"
           onClick={handleRetry}
-          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5"
+          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5"
         >
           Retry Quiz
         </button>
@@ -149,7 +149,7 @@ export default function AiQuiz({ topicId, topicTitle, questions }: AiQuizProps) 
             type="button"
             onClick={handleCheck}
             disabled={!selected}
-            className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+            className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
           >
             Check Answer
           </button>
@@ -157,7 +157,7 @@ export default function AiQuiz({ topicId, topicTitle, questions }: AiQuizProps) 
           <button
             type="button"
             onClick={handleNext}
-            className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-paper transition-transform hover:-translate-y-0.5"
+            className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5"
           >
             {isLast ? "See Results" : "Next Question"}
           </button>

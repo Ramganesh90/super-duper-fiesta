@@ -141,10 +141,10 @@ export default function VpcBuilder() {
       <Celebrate runId={score.tone === "pass" ? 1 : 0} />
       {/* Toolbar */}
       <div className="comic-border-sm flex flex-wrap items-center gap-2 bg-paper p-4">
-        <button type="button" onClick={() => addSubnet("public")} className={btn("bg-aws-orange text-ink")}>
+        <button type="button" onClick={() => addSubnet("public")} className={btn("bg-aws-orange text-ink-fixed")}>
           + Public subnet
         </button>
-        <button type="button" onClick={() => addSubnet("private")} className={btn("bg-hero-blue text-paper")}>
+        <button type="button" onClick={() => addSubnet("private")} className={btn("bg-hero-blue text-paper-fixed")}>
           + Private subnet
         </button>
         <label className="comic-border-sm ml-1 inline-flex items-center gap-2 bg-paper-dim px-3 py-2 text-sm font-semibold">

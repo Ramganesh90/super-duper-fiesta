@@ -12,7 +12,7 @@ export default function SegmentNotFound() {
       </p>
       <Link
         href="/aws"
-        className="comic-border-sm font-comic bg-aws-orange px-5 py-3 text-ink tracking-wide transition-transform hover:-translate-y-0.5"
+        className="comic-border-sm font-comic bg-aws-orange px-5 py-3 text-ink-fixed tracking-wide transition-transform hover:-translate-y-0.5"
       >
         Back to the AWS Dashboard
       </Link>

@@ -68,7 +68,7 @@ export default function ComicReader({ panels, accent }: ComicReaderProps) {
           type="button"
           onClick={() => goTo(index + 1)}
           disabled={isLast}
-          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm tracking-wide text-paper transition-transform hover:-translate-y-0.5 disabled:opacity-30 disabled:hover:translate-y-0 sm:text-base"
+          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm tracking-wide text-paper-fixed transition-transform hover:-translate-y-0.5 disabled:opacity-30 disabled:hover:translate-y-0 sm:text-base"
         >
           Next Panel →
         </button>

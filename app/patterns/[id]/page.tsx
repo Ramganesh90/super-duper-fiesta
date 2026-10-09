@@ -167,7 +167,7 @@ export default async function PatternPage({ params }: PatternPageProps) {
         <p className="text-sm text-ink/70 sm:text-base">
           Quick recall drills for {pattern.title} — flip, shuffle, and mark the ones you know.
         </p>
-        <Flashcards cards={buildPatternFlashcards(pattern)} accent="bg-hero-blue" accentText="text-paper" deckId={`patterns:${pattern.id}`} />
+        <Flashcards cards={buildPatternFlashcards(pattern)} accent="bg-hero-blue" accentText="text-paper-fixed" deckId={`patterns:${pattern.id}`} />
       </section>
 
       <div className="comic-border flex flex-col gap-14 border-comic-yellow-dark bg-comic-yellow/10 p-5 sm:p-8">

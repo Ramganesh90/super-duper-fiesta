@@ -12,7 +12,7 @@ export default function TopicNotFound() {
       </p>
       <Link
         href="/ai"
-        className="comic-border-sm font-comic bg-ai-violet px-5 py-3 text-paper tracking-wide transition-transform hover:-translate-y-0.5"
+        className="comic-border-sm font-comic bg-ai-violet px-5 py-3 text-paper-fixed tracking-wide transition-transform hover:-translate-y-0.5"
       >
         Back to the AI Roadmap
       </Link>

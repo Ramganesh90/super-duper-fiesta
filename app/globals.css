@@ -16,6 +16,14 @@
   --color-ai-violet: #7c3aed;
   --color-ai-violet-dark: #5b21b6;
 
+  /* Fixed on-accent text colors — these never flip with the theme, so text on
+     bright accent buttons (yellow/orange/blue/red/violet fills) stays readable. */
+  --color-ink-fixed: #14121a;
+  --color-paper-fixed: #faf5e9;
+
+  /* Halftone dot tint (flips in dark). */
+  --halftone: rgba(20, 18, 26, 0.12);
+
   --font-comic: var(--font-bangers), "Impact", "Arial Narrow Bold", sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-code: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
@@ -29,6 +37,47 @@
   --background: var(--color-paper);
   --foreground: var(--color-ink);
   color-scheme: light;
+}
+
+/* ---- Bold "arcade" dark theme ----
+   Applied when the OS prefers dark (unless the user forced light), or when the
+   user explicitly chose dark. Only surface/text/accent-text tokens flip; the
+   vivid accent fills stay bright so they pop (neon) against the dark ground. */
+:root[data-theme="dark"],
+:root[data-theme="dark"] body {
+  --color-ink: #ece9fb;
+  --color-paper: #0e0b16;
+  --color-paper-dim: #1b1626;
+  --color-comic-yellow-dark: #ffe08a;
+  --color-aws-orange-dark: #ffb347;
+  --color-ai-violet-dark: #c4a6ff;
+  --color-hero-blue-dark: #8fb3ff;
+  --color-action-red-dark: #ff8a9a;
+  --halftone: rgba(236, 233, 251, 0.05);
+  --shadow-comic: 0 0 0 1px rgba(236, 233, 251, 0.1), 6px 6px 16px rgba(0, 0, 0, 0.55);
+  --shadow-comic-sm: 0 0 0 1px rgba(236, 233, 251, 0.1), 3px 3px 10px rgba(0, 0, 0, 0.5);
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-ink: #ece9fb;
+    --color-paper: #0e0b16;
+    --color-paper-dim: #1b1626;
+    --color-comic-yellow-dark: #ffe08a;
+    --color-aws-orange-dark: #ffb347;
+    --color-ai-violet-dark: #c4a6ff;
+    --color-hero-blue-dark: #8fb3ff;
+    --color-action-red-dark: #ff8a9a;
+    --halftone: rgba(236, 233, 251, 0.05);
+    --shadow-comic: 0 0 0 1px rgba(236, 233, 251, 0.1), 6px 6px 16px rgba(0, 0, 0, 0.55);
+    --shadow-comic-sm: 0 0 0 1px rgba(236, 233, 251, 0.1), 3px 3px 10px rgba(0, 0, 0, 0.5);
+    --background: var(--color-paper);
+    --foreground: var(--color-ink);
+    color-scheme: dark;
+  }
 }
 
 body {
@@ -48,7 +97,7 @@ body {
 
 /* Halftone dot backdrop used behind comic panels — kept faint so body text stays legible */
 .bg-halftone {
-  background-image: radial-gradient(rgba(20, 18, 26, 0.12) 1px, transparent 1.3px);
+  background-image: radial-gradient(var(--halftone) 1px, transparent 1.3px);
   background-size: 20px 20px;
   background-position: 0 0;
 }

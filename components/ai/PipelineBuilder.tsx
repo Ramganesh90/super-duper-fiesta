@@ -108,7 +108,7 @@ export default function PipelineBuilder() {
             aria-pressed={state.useCase === u.key}
             title={u.blurb}
             className={`comic-border-sm px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5 ${
-              state.useCase === u.key ? "bg-ai-violet text-paper" : "bg-paper"
+              state.useCase === u.key ? "bg-ai-violet text-paper-fixed" : "bg-paper"
             }`}
           >
             {u.emoji} {u.label}

@@ -21,7 +21,7 @@ export default function DomainBadges() {
             <li
               key={domain}
               className={`comic-border-sm flex flex-col items-center gap-1 px-3 py-4 text-center transition-colors ${
-                earned ? "bg-comic-yellow text-ink" : "bg-paper-dim text-ink/70"
+                earned ? "bg-comic-yellow text-ink-fixed" : "bg-paper-dim text-ink/70"
               }`}
             >
               <span className={`text-3xl ${earned ? "" : "opacity-40 grayscale"}`} aria-hidden="true">

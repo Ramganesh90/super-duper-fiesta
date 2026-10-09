@@ -37,7 +37,7 @@ export default function ReviewMisses() {
           Take a mock exam or a weekly quiz — any questions you get wrong will collect here for focused review.
         </p>
         <div className="mt-2 flex flex-wrap justify-center gap-3">
-          <Link href="/aws/exam" className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink hover:-translate-y-0.5">
+          <Link href="/aws/exam" className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-sm tracking-wide text-ink-fixed hover:-translate-y-0.5">
             Take a mock exam
           </Link>
           <Link href="/aws" className="comic-border-sm font-comic bg-paper px-4 py-2 text-sm tracking-wide hover:-translate-y-0.5">
@@ -110,11 +110,11 @@ export default function ReviewMisses() {
 
       <div className="flex justify-end gap-3">
         {!revealed ? (
-          <button type="button" onClick={check} disabled={!selected} className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5 disabled:opacity-40">
+          <button type="button" onClick={check} disabled={!selected} className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5 disabled:opacity-40">
             Check
           </button>
         ) : (
-          <button type="button" onClick={next} className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-ink transition-transform hover:-translate-y-0.5">
+          <button type="button" onClick={next} className="comic-border-sm font-comic bg-aws-orange px-4 py-2 text-ink-fixed transition-transform hover:-translate-y-0.5">
             Next →
           </button>
         )}

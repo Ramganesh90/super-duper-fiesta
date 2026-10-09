@@ -75,7 +75,7 @@ export default function Quiz({ patternId, heroName, questions }: QuizProps) {
         <button
           type="button"
           onClick={handleRetry}
-          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5"
+          className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5"
         >
           Retry Quiz
         </button>
@@ -141,7 +141,7 @@ export default function Quiz({ patternId, heroName, questions }: QuizProps) {
             type="button"
             onClick={handleCheck}
             disabled={!selected}
-            className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
+            className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5 disabled:opacity-40 disabled:hover:translate-y-0"
           >
             Check Answer
           </button>
@@ -149,7 +149,7 @@ export default function Quiz({ patternId, heroName, questions }: QuizProps) {
           <button
             type="button"
             onClick={handleNext}
-            className="comic-border-sm font-comic bg-action-red px-4 py-2 text-paper transition-transform hover:-translate-y-0.5"
+            className="comic-border-sm font-comic bg-action-red px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5"
           >
             {isLast ? "See Results" : "Next Question"}
           </button>

@@ -32,7 +32,7 @@ export default function AiDashboard({ topics }: { topics: TopicSummary[] }) {
             Assemble an LLM app and get live best-practice feedback on grounding, guardrails, and evals.
           </p>
         </div>
-        <span className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-sm tracking-wide text-paper">
+        <span className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-sm tracking-wide text-paper-fixed">
           Open the sandbox →
         </span>
       </Link>

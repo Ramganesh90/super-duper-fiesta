@@ -92,14 +92,14 @@ export default function GuessThePattern({ patterns }: GuessThePatternProps) {
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <Link
               href={`/patterns/${current.id}`}
-              className="comic-border-sm font-comic inline-block bg-hero-blue px-4 py-2 text-paper transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic inline-block bg-hero-blue px-4 py-2 text-paper-fixed transition-transform hover:-translate-y-0.5"
             >
               Learn {current.hero.name} →
             </Link>
             <button
               type="button"
               onClick={handleNext}
-              className="comic-border-sm font-comic bg-comic-yellow px-4 py-2 text-ink transition-transform hover:-translate-y-0.5"
+              className="comic-border-sm font-comic bg-comic-yellow px-4 py-2 text-ink-fixed transition-transform hover:-translate-y-0.5"
             >
               Next Challenge ⚡
             </button>
