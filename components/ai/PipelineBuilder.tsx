@@ -16,6 +16,7 @@ import {
   type UseCase,
 } from "@/lib/ai/pipeline";
 import { awardAchievement } from "@/lib/ai/progress";
+import Celebrate from "@/components/learning/Celebrate";
 
 const STORAGE_KEY = "ai-eng:pipeline";
 const PILLAR_ORDER: Pillar[] = ["quality", "safety", "evaluation", "ops"];
@@ -95,6 +96,7 @@ export default function PipelineBuilder() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Celebrate runId={score.tone === "pass" ? 1 : 0} />
       {/* Toolbar */}
       <div className="comic-border-sm flex flex-wrap items-center gap-2 bg-paper p-4">
         <span className="font-comic text-sm tracking-wide">Use case:</span>

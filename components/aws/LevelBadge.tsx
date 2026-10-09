@@ -2,6 +2,7 @@
 
 import { getLevel } from "@/lib/aws/progress";
 import { useAwsProgress } from "./useAwsProgress";
+import CountUp from "@/components/learning/CountUp";
 
 // Shows the current level title, XP, and progress toward the next level.
 export default function LevelBadge() {
@@ -14,7 +15,7 @@ export default function LevelBadge() {
         <p className="font-comic text-lg tracking-wide">
           LVL {level.level} · {level.title.toUpperCase()}
         </p>
-        <p className="font-comic text-xl tracking-wide text-aws-orange-dark">🏆 {xp} XP</p>
+        <p className="font-comic text-xl tracking-wide text-aws-orange-dark">🏆 <CountUp value={xp} /> XP</p>
       </div>
       <div
         className="h-3 overflow-hidden rounded-full border-2 border-ink bg-paper-dim"

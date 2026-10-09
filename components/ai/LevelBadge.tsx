@@ -2,6 +2,7 @@
 
 import { getLevel } from "@/lib/ai/progress";
 import { useAiProgress } from "./useAiProgress";
+import CountUp from "@/components/learning/CountUp";
 
 // Current level title, XP, and progress toward the next level.
 export default function LevelBadge() {
@@ -14,7 +15,7 @@ export default function LevelBadge() {
         <p className="font-comic text-lg tracking-wide">
           LVL {level.level} · {level.title.toUpperCase()}
         </p>
-        <p className="font-comic text-xl tracking-wide text-ai-violet-dark">🏆 {xp} XP</p>
+        <p className="font-comic text-xl tracking-wide text-ai-violet-dark">🏆 <CountUp value={xp} /> XP</p>
       </div>
       <div
         className="h-3 overflow-hidden rounded-full border-2 border-ink bg-paper-dim"

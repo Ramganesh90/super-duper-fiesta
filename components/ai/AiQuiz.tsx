@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/ai/types";
 import { recordQuizResult } from "@/lib/ai/progress";
+import Celebrate from "@/components/learning/Celebrate";
 
 interface AiQuizProps {
   topicId: string;
@@ -59,13 +60,14 @@ export default function AiQuiz({ topicId, topicTitle, questions }: AiQuizProps) 
     const passed = score / questions.length >= 0.6;
     return (
       <div className="flex flex-col items-center gap-4 text-center">
+        <Celebrate runId={passed ? 1 : 0} />
         <p className="font-comic text-3xl tracking-wide">
           {score} / {questions.length} CORRECT
         </p>
         {passed ? (
           <div
             role="status"
-            className="comic-border flex flex-col items-center gap-2 bg-comic-yellow p-6 text-center text-ink"
+            className="comic-border animate-pop-in flex flex-col items-center gap-2 bg-comic-yellow p-6 text-center text-ink"
           >
             <span className="text-5xl" aria-hidden="true">🏆</span>
             <p className="font-comic text-2xl tracking-wide sm:text-3xl">TOPIC MASTERED</p>

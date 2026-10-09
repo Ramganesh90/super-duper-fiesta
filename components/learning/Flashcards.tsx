@@ -122,17 +122,21 @@ export default function Flashcards({
         type="button"
         onClick={() => setFlipped((f) => !f)}
         aria-live="polite"
-        className="comic-border flex min-h-[11rem] w-full flex-col items-center justify-center gap-3 bg-paper p-6 text-center transition-transform hover:-translate-y-0.5 sm:min-h-[13rem]"
+        className="flip-card block w-full text-center"
       >
-        <span className="font-comic text-xs uppercase tracking-widest text-ink/50">
-          {flipped ? "Answer" : "Prompt"} · tap to flip
+        <span className={`flip-inner block ${flipped ? "is-flipped" : ""}`}>
+          <span className="flip-face comic-border flex min-h-[11rem] w-full flex-col items-center justify-center gap-3 bg-paper p-6 sm:min-h-[13rem]">
+            <span className="font-comic text-xs uppercase tracking-widest text-ink/50">Prompt · tap to flip</span>
+            <span className="text-base leading-relaxed sm:text-lg">{current.front}</span>
+          </span>
+          <span className="flip-face flip-face-back comic-border flex min-h-[11rem] w-full flex-col items-center justify-center gap-3 bg-paper p-6 sm:min-h-[13rem]">
+            <span className="font-comic text-xs uppercase tracking-widest text-ink/50">Answer · tap to flip</span>
+            <span className="text-base leading-relaxed sm:text-lg">{current.back}</span>
+            {known.has(order[pos]) && (
+              <span className="text-xs font-semibold text-emerald-700">marked known</span>
+            )}
+          </span>
         </span>
-        <span className="text-base leading-relaxed sm:text-lg">
-          {flipped ? current.back : current.front}
-        </span>
-        {known.has(order[pos]) && (
-          <span className="text-xs font-semibold text-emerald-700">marked known</span>
-        )}
       </button>
 
       <div className="flex flex-wrap items-center justify-center gap-2">

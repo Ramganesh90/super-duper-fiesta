@@ -19,6 +19,7 @@ import {
   type Pillar,
 } from "@/lib/aws/builder";
 import { awardAchievement } from "@/lib/aws/progress";
+import Celebrate from "@/components/learning/Celebrate";
 
 const STORAGE_KEY = "aws-sa:builder";
 const AZS: AZ[] = ["a", "b", "c"];
@@ -137,6 +138,7 @@ export default function VpcBuilder() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Celebrate runId={score.tone === "pass" ? 1 : 0} />
       {/* Toolbar */}
       <div className="comic-border-sm flex flex-wrap items-center gap-2 bg-paper p-4">
         <button type="button" onClick={() => addSubnet("public")} className={btn("bg-aws-orange text-ink")}>

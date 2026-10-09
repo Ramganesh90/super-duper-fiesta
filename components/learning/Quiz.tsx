@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { QuizQuestion } from "@/lib/types";
 import { recordQuizResult } from "@/lib/progress";
 import CompletionBadge from "./CompletionBadge";
+import Celebrate from "./Celebrate";
 
 interface QuizProps {
   patternId: string;
@@ -58,11 +59,14 @@ export default function Quiz({ patternId, heroName, questions }: QuizProps) {
     const passed = score / questions.length >= 0.6;
     return (
       <div className="flex flex-col items-center gap-4 text-center">
+        <Celebrate runId={passed ? 1 : 0} />
         <p className="font-comic text-3xl tracking-wide">
           {score} / {questions.length} CORRECT
         </p>
         {passed ? (
-          <CompletionBadge heroName={heroName} />
+          <div className="animate-pop-in">
+            <CompletionBadge heroName={heroName} />
+          </div>
         ) : (
           <p className="max-w-md text-sm sm:text-base">
             Not quite mastered yet — you need at least 60% correct. Review the panels above and try again!
