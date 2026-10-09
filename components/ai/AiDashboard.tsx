@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import LevelBadge from "./LevelBadge";
 import MasteryMeter from "./MasteryMeter";
 import StreakTracker from "./StreakTracker";
@@ -18,6 +19,23 @@ export default function AiDashboard({ topics }: { topics: TopicSummary[] }) {
         <MasteryMeter />
         <StreakTracker />
       </div>
+
+      <Link
+        href="/ai/builder"
+        className="comic-border bg-halftone flex flex-col items-start gap-1 bg-ai-violet/10 p-5 transition-transform hover:-translate-y-1 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="font-comic text-xl tracking-wide text-ai-violet-dark sm:text-2xl">
+            🏗️ Build your own AI pipeline
+          </p>
+          <p className="text-sm text-ink/80 sm:text-base">
+            Assemble an LLM app and get live best-practice feedback on grounding, guardrails, and evals.
+          </p>
+        </div>
+        <span className="comic-border-sm font-comic bg-ai-violet px-4 py-2 text-sm tracking-wide text-paper">
+          Open the sandbox →
+        </span>
+      </Link>
 
       <TrackBadges />
 
