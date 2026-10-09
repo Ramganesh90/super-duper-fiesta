@@ -26,6 +26,7 @@ export interface AiProgressState {
   scenariosWon: string[]; // keyed "<topicId>#<index>"
   xp: number;
   streak: AiStreak;
+  achievements: string[]; // one-time bonuses (e.g. "ai-production-ready")
 }
 
 const EMPTY_STATE: AiProgressState = {
@@ -34,6 +35,7 @@ const EMPTY_STATE: AiProgressState = {
   scenariosWon: [],
   xp: 0,
   streak: { current: 0, longest: 0, lastStudyDate: null },
+  achievements: [],
 };
 
 // --- Levels (AI-flavored) --------------------------------------------------
@@ -258,6 +260,22 @@ export function getMastery(state: AiProgressState): number {
 
   if (totalWeight === 0) return 0;
   return Math.round((weightedSum / totalWeight) * 100);
+}
+
+// One-time bonus: adds XP the first time an achievement id is awarded.
+export function awardAchievement(id: string, xp: number): AiProgressState {
+  const state = loadProgress();
+  if (!state.achievements.includes(id)) {
+    state.achievements.push(id);
+    state.xp += xp;
+    applyStreak(state);
+    saveProgress(state);
+  }
+  return state;
+}
+
+export function hasAchievement(id: string): boolean {
+  return loadProgress().achievements.includes(id);
 }
 
 export function getXP(): number {

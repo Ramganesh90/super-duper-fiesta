@@ -18,6 +18,7 @@ import {
   type Severity,
   type Pillar,
 } from "@/lib/aws/builder";
+import { awardAchievement } from "@/lib/aws/progress";
 
 const STORAGE_KEY = "aws-sa:builder";
 const AZS: AZ[] = ["a", "b", "c"];
@@ -72,6 +73,11 @@ export default function VpcBuilder() {
 
   const findings = useMemo(() => evaluate(state), [state]);
   const score = useMemo(() => scoreOf(findings), [findings]);
+
+  // Reward a flawless design once with bonus XP in the AWS app.
+  useEffect(() => {
+    if (score.tone === "pass") awardAchievement("vpc-well-architected", 150);
+  }, [score.tone]);
 
   // Worst severity per target id, for canvas highlighting.
   const sevByTarget = useMemo(() => {
@@ -267,6 +273,12 @@ export default function VpcBuilder() {
             </div>
             <p className="font-comic text-4xl tracking-wide">{score.pct}%</p>
           </div>
+
+          {score.tone === "pass" && (
+            <div role="status" className="comic-border-sm bg-emerald-500/15 p-3 text-center text-sm font-semibold text-emerald-800">
+              🎉 Well-Architected! You earned <strong>+150 XP</strong> in the AWS app.
+            </div>
+          )}
 
           {PILLAR_ORDER.map((pillar) => {
             const group = findings.filter((f) => f.pillar === pillar);

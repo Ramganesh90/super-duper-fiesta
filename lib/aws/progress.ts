@@ -31,6 +31,7 @@ export interface AwsProgressState {
   scenariosWon: string[]; // keyed "<segmentId>#<index>"
   xp: number;
   streak: AwsStreak;
+  achievements: string[]; // one-time bonuses (e.g. "vpc-well-architected")
 }
 
 const EMPTY_STATE: AwsProgressState = {
@@ -39,6 +40,7 @@ const EMPTY_STATE: AwsProgressState = {
   scenariosWon: [],
   xp: 0,
   streak: { current: 0, longest: 0, lastStudyDate: null },
+  achievements: [],
 };
 
 // --- Levels ----------------------------------------------------------------
@@ -273,6 +275,22 @@ export function getReadiness(state: AwsProgressState): number {
 
   if (totalWeight === 0) return 0;
   return Math.round((weightedSum / totalWeight) * 100);
+}
+
+// One-time bonus: adds XP the first time an achievement id is awarded.
+export function awardAchievement(id: string, xp: number): AwsProgressState {
+  const state = loadProgress();
+  if (!state.achievements.includes(id)) {
+    state.achievements.push(id);
+    state.xp += xp;
+    applyStreak(state);
+    saveProgress(state);
+  }
+  return state;
+}
+
+export function hasAchievement(id: string): boolean {
+  return loadProgress().achievements.includes(id);
 }
 
 export function getXP(): number {

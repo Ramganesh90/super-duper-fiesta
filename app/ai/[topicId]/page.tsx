@@ -170,7 +170,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         <p className="text-sm text-ink/70 sm:text-base">
           Quick recall drills for {topic.title} — flip, shuffle, and mark the ones you know.
         </p>
-        <Flashcards cards={buildTopicFlashcards(topic)} accent="bg-ai-violet" accentText="text-paper" />
+        <Flashcards cards={buildTopicFlashcards(topic)} accent="bg-ai-violet" accentText="text-paper" deckId={`ai:${topic.id}`} />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-ai-violet-dark bg-ai-violet/10 p-5 sm:p-8">

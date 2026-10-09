@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export interface Flashcard {
   front: string;
@@ -13,6 +13,8 @@ interface FlashcardsProps {
   accent?: string;
   // Text color that pairs with the accent bg.
   accentText?: string;
+  // Stable id for this deck; when set, "known" cards persist in localStorage.
+  deckId?: string;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -30,11 +32,40 @@ export default function Flashcards({
   cards,
   accent = "bg-hero-blue",
   accentText = "text-paper",
+  deckId,
 }: FlashcardsProps) {
   const [order, setOrder] = useState<number[]>(() => cards.map((_, i) => i));
   const [pos, setPos] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(() => new Set());
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load persisted "known" cards for this deck (starts empty so SSR matches).
+  useEffect(() => {
+    const load = () => {
+      let next = new Set<number>();
+      try {
+        if (deckId) {
+          const raw = window.localStorage.getItem(`flashcards:known:${deckId}`);
+          if (raw) next = new Set(JSON.parse(raw) as number[]);
+        }
+      } catch {
+        /* ignore */
+      }
+      setKnown(next);
+      setHydrated(true);
+    };
+    load();
+  }, [deckId]);
+
+  useEffect(() => {
+    if (!hydrated || !deckId) return;
+    try {
+      window.localStorage.setItem(`flashcards:known:${deckId}`, JSON.stringify([...known]));
+    } catch {
+      /* ignore */
+    }
+  }, [known, hydrated, deckId]);
 
   const current = cards[order[pos]];
   const total = cards.length;

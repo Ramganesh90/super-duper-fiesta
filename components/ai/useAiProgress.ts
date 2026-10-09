@@ -16,6 +16,7 @@ export function useAiProgress(): AiProgressState {
     scenariosWon: [],
     xp: 0,
     streak: { current: 0, longest: 0, lastStudyDate: null },
+    achievements: [],
   }));
 
   useEffect(() => {

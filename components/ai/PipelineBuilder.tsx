@@ -15,6 +15,7 @@ import {
   type Pillar,
   type UseCase,
 } from "@/lib/ai/pipeline";
+import { awardAchievement } from "@/lib/ai/progress";
 
 const STORAGE_KEY = "ai-eng:pipeline";
 const PILLAR_ORDER: Pillar[] = ["quality", "safety", "evaluation", "ops"];
@@ -70,6 +71,11 @@ export default function PipelineBuilder() {
 
   const findings = useMemo(() => evaluate(state), [state]);
   const score = useMemo(() => scoreOf(findings), [findings]);
+
+  // Reward a production-ready pipeline once with bonus XP in the AI app.
+  useEffect(() => {
+    if (score.tone === "pass") awardAchievement("ai-production-ready", 150);
+  }, [score.tone]);
 
   const sevByTarget = useMemo(() => {
     const m = new Map<CapabilityKey, "warn" | "fail">();
@@ -195,6 +201,12 @@ export default function PipelineBuilder() {
             </div>
             <p className="font-comic text-4xl tracking-wide">{score.pct}%</p>
           </div>
+
+          {score.tone === "pass" && (
+            <div role="status" className="comic-border-sm bg-emerald-500/15 p-3 text-center text-sm font-semibold text-emerald-800">
+              🎉 Production-ready! You earned <strong>+150 XP</strong> in the AI app.
+            </div>
+          )}
 
           {PILLAR_ORDER.map((pillar) => {
             const group = findings.filter((f) => f.pillar === pillar);

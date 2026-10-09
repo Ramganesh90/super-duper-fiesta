@@ -170,7 +170,7 @@ export default async function SegmentPage({ params }: SegmentPageProps) {
         <p className="text-sm text-ink/70 sm:text-base">
           Quick recall drills for Week {segment.week} — flip, shuffle, and mark the ones you know.
         </p>
-        <Flashcards cards={buildSegmentFlashcards(segment)} accent="bg-aws-orange" accentText="text-ink" />
+        <Flashcards cards={buildSegmentFlashcards(segment)} accent="bg-aws-orange" accentText="text-ink" deckId={`aws:${segment.id}`} />
       </section>
 
       <div className="comic-border flex flex-col gap-12 border-aws-orange-dark bg-aws-orange/10 p-5 sm:p-8">
