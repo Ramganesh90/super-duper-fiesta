@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { QuizQuestion } from "@/lib/aws/types";
-import { recordQuizResult } from "@/lib/aws/progress";
+import { recordQuizResult, recordMisses } from "@/lib/aws/progress";
 
 interface AwsQuizProps {
   segmentId: string;
@@ -18,6 +18,8 @@ export default function AwsQuiz({ segmentId, segmentTitle, questions }: AwsQuizP
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  // Per-attempt record of which question indices were right/wrong, for miss review.
+  const resultsRef = useRef<Record<number, boolean>>({});
 
   const question = questions[index];
   const isCorrect = selected === question?.answer;
@@ -31,7 +33,9 @@ export default function AwsQuiz({ segmentId, segmentTitle, questions }: AwsQuizP
   const handleCheck = () => {
     if (!selected) return;
     setRevealed(true);
-    if (selected === question.answer) {
+    const correct = selected === question.answer;
+    resultsRef.current[index] = correct;
+    if (correct) {
       setScore((s) => s + 1);
     }
   };
@@ -39,6 +43,13 @@ export default function AwsQuiz({ segmentId, segmentTitle, questions }: AwsQuizP
   const handleNext = () => {
     if (isLast) {
       recordQuizResult(segmentId, score, questions.length);
+      const wrong: string[] = [];
+      const right: string[] = [];
+      questions.forEach((_, i) => {
+        if (resultsRef.current[i] === false) wrong.push(`${segmentId}#q${i}`);
+        else if (resultsRef.current[i] === true) right.push(`${segmentId}#q${i}`);
+      });
+      recordMisses(wrong, right);
       setFinished(true);
       return;
     }
@@ -53,6 +64,7 @@ export default function AwsQuiz({ segmentId, segmentTitle, questions }: AwsQuizP
     setRevealed(false);
     setScore(0);
     setFinished(false);
+    resultsRef.current = {};
   };
 
   if (finished) {

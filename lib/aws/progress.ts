@@ -32,6 +32,7 @@ export interface AwsProgressState {
   xp: number;
   streak: AwsStreak;
   achievements: string[]; // one-time bonuses (e.g. "vpc-well-architected")
+  missedQuestions: string[]; // exam/quiz question ids answered wrong, for review
 }
 
 const EMPTY_STATE: AwsProgressState = {
@@ -41,6 +42,7 @@ const EMPTY_STATE: AwsProgressState = {
   xp: 0,
   streak: { current: 0, longest: 0, lastStudyDate: null },
   achievements: [],
+  missedQuestions: [],
 };
 
 // --- Levels ----------------------------------------------------------------
@@ -291,6 +293,21 @@ export function awardAchievement(id: string, xp: number): AwsProgressState {
 
 export function hasAchievement(id: string): boolean {
   return loadProgress().achievements.includes(id);
+}
+
+// Track wrong-answered question ids for later review; correct answers clear them.
+export function recordMisses(wrongIds: string[], correctIds: string[] = []): AwsProgressState {
+  const state = loadProgress();
+  const set = new Set(state.missedQuestions);
+  for (const id of wrongIds) set.add(id);
+  for (const id of correctIds) set.delete(id);
+  state.missedQuestions = [...set];
+  saveProgress(state);
+  return state;
+}
+
+export function getMissedQuestions(): string[] {
+  return loadProgress().missedQuestions;
 }
 
 export function getXP(): number {

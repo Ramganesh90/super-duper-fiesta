@@ -7,10 +7,12 @@ import StreakTracker from "./StreakTracker";
 import DomainBadges from "./DomainBadges";
 import WeekGrid, { type SegmentSummary } from "./WeekGrid";
 import ResetProgress from "./ResetProgress";
+import { useAwsProgress } from "./useAwsProgress";
 
 // Client shell for the /aws home: live stats (level, readiness, streak),
 // domain badges, and the week grid. All read from lib/aws/progress.
 export default function AwsDashboard({ segments }: { segments: SegmentSummary[] }) {
+  const { missedQuestions } = useAwsProgress();
   return (
     <div className="flex flex-col gap-10">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -35,6 +37,33 @@ export default function AwsDashboard({ segments }: { segments: SegmentSummary[] 
           Open the sandbox →
         </span>
       </Link>
+
+      <Link
+        href="/aws/exam"
+        className="comic-border bg-halftone flex flex-col items-start gap-1 bg-hero-blue/10 p-5 transition-transform hover:-translate-y-1 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <p className="font-comic text-xl tracking-wide text-hero-blue sm:text-2xl">
+            📝 Take a mock exam
+          </p>
+          <p className="text-sm text-ink/80 sm:text-base">
+            Timed, mixed-domain practice with a score and a weak-area breakdown.
+          </p>
+        </div>
+        <span className="comic-border-sm font-comic bg-hero-blue px-4 py-2 text-sm tracking-wide text-paper">
+          Start exam →
+        </span>
+      </Link>
+
+      {missedQuestions.length > 0 && (
+        <Link
+          href="/aws/review"
+          className="comic-border-sm flex items-center justify-between gap-3 bg-action-red/10 px-4 py-3 text-sm font-semibold transition-transform hover:-translate-y-0.5"
+        >
+          <span>🔁 Review your {missedQuestions.length} missed question{missedQuestions.length === 1 ? "" : "s"}</span>
+          <span aria-hidden="true">→</span>
+        </Link>
+      )}
 
       <DomainBadges />
 
