@@ -1,0 +1,137 @@
+{
+  "id": "week-12",
+  "week": 12,
+  "title": "Monitoring, Governance & Secrets",
+  "domain": "security",
+  "oneLiner": "See what's happening and keep it compliant: CloudWatch, CloudTrail, AWS Config, Secrets Manager, and SSM.",
+  "examWeightNote": "Rounds out Design Secure Architectures — observability, auditing, compliance, and secret handling.",
+  "objectives": [
+    "Tell apart CloudWatch (metrics/logs/alarms), CloudTrail (API audit), and AWS Config (resource compliance).",
+    "Use CloudWatch alarms and dashboards to react to metrics and drive Auto Scaling.",
+    "Store and rotate secrets with Secrets Manager; use SSM Parameter Store for config.",
+    "Apply Trusted Advisor checks for security, cost, and best practices."
+  ],
+  "services": [
+    { "name": "Amazon CloudWatch", "purpose": "Metrics, logs, alarms, and dashboards for AWS resources and applications.", "emoji": "📈" },
+    { "name": "AWS CloudTrail", "purpose": "Records every API call for auditing, security analysis, and troubleshooting.", "emoji": "🧾" },
+    { "name": "AWS Config", "purpose": "Tracks resource configuration over time and evaluates it against compliance rules.", "emoji": "✅" },
+    { "name": "AWS Secrets Manager", "purpose": "Stores, encrypts, and automatically rotates secrets like DB credentials and API keys.", "emoji": "🔑" },
+    { "name": "SSM Parameter Store", "purpose": "Hierarchical storage for configuration and secrets (free standard tier; integrates with KMS).", "emoji": "🗂️" },
+    { "name": "AWS Trusted Advisor", "purpose": "Automated checks and recommendations across cost, security, performance, and resilience.", "emoji": "🧮" }
+  ],
+  "keyConcepts": [
+    "CloudWatch = 'how is it performing?' — metrics, logs, dashboards, and alarms (alarms can trigger Auto Scaling or notifications).",
+    "CloudTrail = 'who did what?' — an audit log of API calls across the account; essential for security forensics and compliance.",
+    "AWS Config = 'is it compliant and how did it change?' — records configuration history and evaluates resources against rules.",
+    "Secrets Manager stores and automatically rotates secrets (e.g. RDS credentials); prefer it over hard-coding or env files.",
+    "SSM Parameter Store holds configuration and secrets hierarchically; the standard tier is free and can encrypt values with KMS (SecureString).",
+    "Trusted Advisor surfaces best-practice recommendations; the full set of checks requires Business/Enterprise Support."
+  ],
+  "diagram": {
+    "caption": "Three complementary lenses on your account, plus managed secrets for apps.",
+    "rows": [
+      { "nodes": [{ "label": "AWS resources & apps", "emoji": "☁️" }] },
+      {
+        "group": "Observe & govern",
+        "nodes": [
+          { "label": "CloudWatch", "emoji": "📈", "sub": "metrics/logs/alarms" },
+          { "label": "CloudTrail", "emoji": "🧾", "sub": "API audit" },
+          { "label": "AWS Config", "emoji": "✅", "sub": "compliance" }
+        ]
+      },
+      { "nodes": [{ "label": "Alarms → Auto Scaling / SNS alerts", "emoji": "🚨" }] },
+      { "nodes": [{ "label": "Secrets Manager / Parameter Store → apps", "emoji": "🔑", "sub": "rotated, encrypted" }] }
+    ],
+    "note": "Remember the one-liners: CloudWatch = performance, CloudTrail = who-did-what, Config = compliance/history."
+  },
+  "resources": [
+    { "label": "Amazon CloudWatch", "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html", "type": "docs" },
+    { "label": "AWS CloudTrail", "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html", "type": "docs" },
+    { "label": "Secrets Manager vs Parameter Store", "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A security team needs to know exactly who deleted a security group and when, across the whole account.",
+      "question": "Which service provides this audit trail?",
+      "options": [
+        { "id": "a", "label": "AWS CloudTrail" },
+        { "id": "b", "label": "Amazon CloudWatch metrics" },
+        { "id": "c", "label": "AWS Trusted Advisor" },
+        { "id": "d", "label": "Amazon QuickSight" }
+      ],
+      "correct": "a",
+      "explanation": "CloudTrail records API calls (who, what, when, from where) — the go-to for auditing and security forensics. CloudWatch is about performance metrics/logs, not an API audit trail."
+    },
+    {
+      "scenario": "An application hard-codes database credentials in its config, and the team wants them encrypted and rotated automatically.",
+      "question": "What should they use?",
+      "options": [
+        { "id": "a", "label": "AWS Secrets Manager with automatic rotation" },
+        { "id": "b", "label": "Store them in a public S3 bucket" },
+        { "id": "c", "label": "CloudTrail" },
+        { "id": "d", "label": "Leave them in the code but add a comment" }
+      ],
+      "correct": "a",
+      "explanation": "Secrets Manager stores and encrypts secrets and can rotate them automatically (e.g. RDS credentials), removing hard-coded secrets from code/config."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which service records API calls for auditing 'who did what' in your account?",
+      "options": ["AWS CloudTrail", "Amazon CloudWatch", "AWS Config", "AWS Glue"],
+      "answer": "AWS CloudTrail",
+      "explanation": "CloudTrail is the account-wide API audit log — essential for security analysis and compliance."
+    },
+    {
+      "question": "Amazon CloudWatch is primarily for:",
+      "options": [
+        "Auditing API calls",
+        "Metrics, logs, dashboards, and alarms (performance/operational monitoring)",
+        "Converting database schemas",
+        "Storing secrets"
+      ],
+      "answer": "Metrics, logs, dashboards, and alarms (performance/operational monitoring)",
+      "explanation": "CloudWatch answers 'how is it performing?' and its alarms can trigger scaling or notifications."
+    },
+    {
+      "question": "AWS Config is used to:",
+      "options": [
+        "Track resource configuration history and evaluate compliance against rules",
+        "Record API calls",
+        "Deliver streaming data",
+        "Run SQL on S3"
+      ],
+      "answer": "Track resource configuration history and evaluate compliance against rules",
+      "explanation": "Config records how resources are configured over time and flags non-compliant settings."
+    },
+    {
+      "question": "The best way to store and automatically rotate database credentials is:",
+      "options": ["AWS Secrets Manager", "A plaintext file on the instance", "Environment variables in the AMI", "CloudTrail"],
+      "answer": "AWS Secrets Manager",
+      "explanation": "Secrets Manager encrypts secrets and supports automatic rotation, integrating with services like RDS."
+    },
+    {
+      "question": "Which statement about SSM Parameter Store is correct?",
+      "options": [
+        "It is only for EC2 user data",
+        "It stores config/secrets hierarchically, with a free standard tier and KMS-encrypted SecureString values",
+        "It is a data warehouse",
+        "It replaces CloudTrail"
+      ],
+      "answer": "It stores config/secrets hierarchically, with a free standard tier and KMS-encrypted SecureString values",
+      "explanation": "Parameter Store holds configuration and secrets; SecureString values are encrypted with KMS. It's a lighter-weight option than Secrets Manager (which adds managed rotation)."
+    },
+    {
+      "question": "A CloudWatch alarm on high CPU can automatically:",
+      "options": [
+        "Trigger an Auto Scaling action or send an SNS notification",
+        "Rotate secrets",
+        "Audit API calls",
+        "Convert schemas"
+      ],
+      "answer": "Trigger an Auto Scaling action or send an SNS notification",
+      "explanation": "Alarms react to metric thresholds — e.g. scaling out an Auto Scaling group or notifying via SNS."
+    }
+  ],
+  "xpReward": 130
+}

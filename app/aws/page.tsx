@@ -7,7 +7,7 @@ import { getAllSegments } from "@/lib/aws/segments";
 export const metadata: Metadata = {
   title: "AWS Solutions Architect — Learn by Playing",
   description:
-    "A gamified 8-week study plan for the AWS Solutions Architect – Associate (SAA-C03) exam. Earn XP, keep a daily streak, unlock domain badges, and track your exam readiness.",
+    "A gamified, multi-week study plan for the AWS Solutions Architect – Associate (SAA-C03) exam. Earn XP, keep a daily streak, unlock domain badges, and track your exam readiness.",
   alternates: { canonical: "/aws" },
 };
 
@@ -45,7 +45,7 @@ export default function AwsHomePage() {
           Learn by Playing · SAA-C03
         </p>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-ink/80 sm:text-lg">
-          One week, one segment. Work through the 8-week plan, pass each quiz and scenario to earn XP and
+          One week, one segment. Work through the {segments.length}-week plan, pass each quiz and scenario to earn XP and
           level up, keep your daily streak alive, and watch your exam-readiness climb.
         </p>
       </header>

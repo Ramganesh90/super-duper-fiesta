@@ -1,0 +1,131 @@
+{
+  "id": "week-11",
+  "week": 11,
+  "title": "Analytics & Streaming",
+  "domain": "performance",
+  "oneLiner": "Ingest, store, and analyze data at scale: Kinesis, Firehose, Glue, Athena, Redshift, and QuickSight.",
+  "examWeightNote": "Analytics/streaming pipelines appear in High-Performing and decoupling scenarios.",
+  "objectives": [
+    "Differentiate Kinesis Data Streams (real-time, custom consumers) from Firehose (managed delivery to stores).",
+    "Build a serverless analytics flow: Firehose → S3 → Glue catalog → Athena → QuickSight.",
+    "Choose Athena (ad-hoc SQL on S3) vs Redshift (data warehouse) vs OpenSearch (search/logs).",
+    "Recognize EMR for big-data frameworks (Spark/Hadoop)."
+  ],
+  "services": [
+    { "name": "Kinesis Data Streams", "purpose": "Real-time, ordered, replayable data streams you build custom consumers on.", "emoji": "🌊" },
+    { "name": "Kinesis Data Firehose", "purpose": "Fully managed delivery of streaming data to S3, Redshift, or OpenSearch (near real-time, no servers).", "emoji": "🚰" },
+    { "name": "AWS Glue", "purpose": "Serverless ETL and a data catalog that makes S3 data queryable.", "emoji": "🧪" },
+    { "name": "Amazon Athena", "purpose": "Serverless, pay-per-query SQL directly over data in S3 — no cluster to manage.", "emoji": "🔎" },
+    { "name": "Amazon Redshift", "purpose": "Managed petabyte-scale data warehouse for complex analytical (OLAP) queries.", "emoji": "📊" },
+    { "name": "Amazon QuickSight", "purpose": "Serverless BI dashboards and visualizations over your data sources.", "emoji": "📈" }
+  ],
+  "keyConcepts": [
+    "Kinesis Data Streams is for real-time processing with custom consumers and replay (data retained for a window); you manage shards/throughput.",
+    "Kinesis Data Firehose is the easy button: fully managed, auto-scaling delivery of streaming data into S3/Redshift/OpenSearch with optional transformation — near real-time, not sub-second.",
+    "A classic serverless analytics pipeline: sources → Firehose → S3 (data lake) → Glue (catalog/ETL) → Athena (SQL) → QuickSight (dashboards).",
+    "Athena runs ad-hoc SQL on S3 and bills per data scanned — great for occasional queries; Redshift suits heavy, repeated warehouse workloads.",
+    "Amazon OpenSearch Service is for full-text search, log analytics, and observability dashboards.",
+    "EMR runs managed Spark/Hadoop/Presto clusters for large-scale custom big-data processing."
+  ],
+  "diagram": {
+    "caption": "A serverless analytics pipeline from streaming ingest to dashboards.",
+    "rows": [
+      { "nodes": [{ "label": "Producers", "emoji": "📡", "sub": "apps, IoT, logs" }] },
+      { "nodes": [{ "label": "Kinesis Data Streams / Firehose", "emoji": "🌊", "sub": "ingest" }] },
+      { "nodes": [{ "label": "Amazon S3", "emoji": "🪣", "sub": "data lake" }] },
+      { "nodes": [{ "label": "Glue (catalog/ETL)", "emoji": "🧪" }, { "label": "Athena (SQL)", "emoji": "🔎" }] },
+      { "nodes": [{ "label": "QuickSight dashboards", "emoji": "📈" }] }
+    ],
+    "note": "Firehose = managed delivery (near real-time, no code); Data Streams = real-time with custom consumers and replay."
+  },
+  "resources": [
+    { "label": "Amazon Kinesis", "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html", "type": "docs" },
+    { "label": "Amazon Athena", "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html", "type": "docs" },
+    { "label": "Analytics on AWS", "url": "https://aws.amazon.com/big-data/datalakes-and-analytics/", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A team wants to land streaming clickstream data into S3 with zero servers to manage and near-real-time delivery, then query it with SQL occasionally.",
+      "question": "Which services fit best?",
+      "options": [
+        { "id": "a", "label": "Kinesis Data Firehose to deliver to S3, then Athena for ad-hoc SQL" },
+        { "id": "b", "label": "Kinesis Data Streams with a custom app plus a Redshift cluster running 24/7" },
+        { "id": "c", "label": "EMR with a permanent Hadoop cluster" },
+        { "id": "d", "label": "RDS with triggers" }
+      ],
+      "correct": "a",
+      "explanation": "Firehose is the fully managed, no-server path to S3; Athena runs serverless pay-per-query SQL on that S3 data — ideal for occasional analysis without a warehouse."
+    },
+    {
+      "scenario": "An application needs sub-second, ordered processing of events by multiple custom consumers, with the ability to replay recent data.",
+      "question": "Which Kinesis option is appropriate?",
+      "options": [
+        { "id": "a", "label": "Kinesis Data Streams" },
+        { "id": "b", "label": "Kinesis Data Firehose" },
+        { "id": "c", "label": "Amazon Athena" },
+        { "id": "d", "label": "Amazon QuickSight" }
+      ],
+      "correct": "a",
+      "explanation": "Data Streams gives real-time, ordered, replayable streams with custom consumers. Firehose is managed delivery to stores and is near-real-time, not sub-second with replay."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What is the key difference between Kinesis Data Streams and Firehose?",
+      "options": [
+        "Streams is for real-time custom processing/replay; Firehose is managed delivery to S3/Redshift/OpenSearch",
+        "They are identical",
+        "Firehose is real-time with replay; Streams only delivers to S3",
+        "Streams is a data warehouse"
+      ],
+      "answer": "Streams is for real-time custom processing/replay; Firehose is managed delivery to S3/Redshift/OpenSearch",
+      "explanation": "Data Streams = build custom real-time consumers with replay; Firehose = fully managed, near-real-time delivery into stores."
+    },
+    {
+      "question": "Amazon Athena is best described as:",
+      "options": [
+        "A managed Hadoop cluster",
+        "Serverless, pay-per-query SQL over data in S3",
+        "A real-time streaming service",
+        "A BI dashboard tool"
+      ],
+      "answer": "Serverless, pay-per-query SQL over data in S3",
+      "explanation": "Athena queries S3 data with standard SQL and bills per data scanned — no infrastructure to manage."
+    },
+    {
+      "question": "Which service is the managed data warehouse for heavy, repeated analytical (OLAP) queries?",
+      "options": ["Amazon Redshift", "Amazon Athena", "Amazon Kinesis", "Amazon QuickSight"],
+      "answer": "Amazon Redshift",
+      "explanation": "Redshift is a columnar, petabyte-scale warehouse optimized for complex analytical queries at scale."
+    },
+    {
+      "question": "What does AWS Glue provide?",
+      "options": [
+        "Serverless ETL and a data catalog that makes S3 data queryable",
+        "A relational database engine",
+        "A CDN",
+        "A VPN service"
+      ],
+      "answer": "Serverless ETL and a data catalog that makes S3 data queryable",
+      "explanation": "Glue crawls/catalogs data and runs serverless ETL jobs, feeding engines like Athena and Redshift Spectrum."
+    },
+    {
+      "question": "For full-text search and log analytics dashboards, which service fits?",
+      "options": ["Amazon OpenSearch Service", "Amazon Redshift", "AWS Glue", "Kinesis Firehose"],
+      "answer": "Amazon OpenSearch Service",
+      "explanation": "OpenSearch Service handles search, log analytics, and observability dashboards."
+    },
+    {
+      "question": "Amazon QuickSight is used for:",
+      "options": [
+        "Serverless BI dashboards and visualizations",
+        "Streaming ingestion",
+        "Database migration",
+        "Object storage"
+      ],
+      "answer": "Serverless BI dashboards and visualizations",
+      "explanation": "QuickSight is AWS's serverless business-intelligence service for dashboards over your data."
+    }
+  ],
+  "xpReward": 130
+}

@@ -1,0 +1,136 @@
+{
+  "id": "week-10",
+  "week": 10,
+  "title": "Migration & Data Transfer",
+  "domain": "resilience",
+  "oneLiner": "Get data and workloads into AWS: Snow Family, DataSync, Storage Gateway, DMS, and Transfer Family.",
+  "examWeightNote": "Migration and data-transfer scenarios are a recurring SAA theme — pick the right tool for the constraint.",
+  "objectives": [
+    "Choose an offline (Snow Family) vs online (DataSync) transfer based on data size and bandwidth.",
+    "Use Storage Gateway to bridge on-prem apps to AWS storage.",
+    "Migrate databases with DMS, including heterogeneous engines via SCT.",
+    "Know Transfer Family for SFTP/FTPS into S3 and the AWS migration strategies (the 7 R's)."
+  ],
+  "services": [
+    { "name": "AWS Snow Family", "purpose": "Physical devices (Snowball Edge, Snowmobile) to ship large datasets offline when networks are too slow.", "emoji": "❄️" },
+    { "name": "AWS DataSync", "purpose": "Fast, managed online transfer and ongoing sync from on-prem to S3/EFS/FSx over the network.", "emoji": "🔄" },
+    { "name": "AWS Storage Gateway", "purpose": "Hybrid storage: on-prem apps use local file/volume/tape interfaces backed by AWS storage.", "emoji": "🚪" },
+    { "name": "AWS DMS", "purpose": "Database Migration Service — migrate/replicate databases with minimal downtime; SCT converts between engines.", "emoji": "🗄️" },
+    { "name": "AWS Transfer Family", "purpose": "Managed SFTP/FTPS/FTP endpoints that land files directly in S3 or EFS.", "emoji": "📨" }
+  ],
+  "keyConcepts": [
+    "If transferring the data online would take too long for your bandwidth/deadline, ship it offline with the Snow Family (Snowball Edge for TB–PB; Snowmobile for exabyte scale).",
+    "DataSync is for online bulk transfer and recurring sync to S3, EFS, or FSx — far faster than scripting your own copies.",
+    "Storage Gateway keeps on-prem applications working with familiar NFS/SMB (File), iSCSI (Volume), or VTL (Tape) while data lives in AWS.",
+    "DMS keeps the source database usable during migration; for a different target engine, the Schema Conversion Tool (SCT) converts schema/code first.",
+    "AWS Transfer Family exposes managed SFTP/FTPS endpoints so partners can drop files straight into S3 without you running servers.",
+    "Migration strategies (the 7 R's): Rehost, Replatform, Repurchase, Refactor, Relocate, Retain, Retire."
+  ],
+  "diagram": {
+    "caption": "Pick the transfer tool by constraint; data lands in AWS storage or databases.",
+    "rows": [
+      { "nodes": [{ "label": "On-prem data & databases", "emoji": "🏢" }] },
+      {
+        "group": "Choose by size / bandwidth / type",
+        "nodes": [
+          { "label": "Snow Family", "emoji": "❄️", "sub": "offline, huge" },
+          { "label": "DataSync", "emoji": "🔄", "sub": "online bulk/sync" },
+          { "label": "Storage Gateway", "emoji": "🚪", "sub": "hybrid access" },
+          { "label": "DMS", "emoji": "🗄️", "sub": "databases" }
+        ]
+      },
+      { "nodes": [{ "label": "Amazon S3 / EFS / FSx / RDS", "emoji": "☁️" }] }
+    ],
+    "note": "Rule of thumb: too big to send over the wire in time → Snowball; ongoing network sync → DataSync; database → DMS (+ SCT for a different engine)."
+  },
+  "resources": [
+    { "label": "AWS Snow Family", "url": "https://docs.aws.amazon.com/snowball/latest/developer-guide/whatissnowball.html", "type": "docs" },
+    { "label": "AWS DataSync", "url": "https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html", "type": "docs" },
+    { "label": "Database Migration Service", "url": "https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A company must move 80 TB to S3 within two weeks, but their internet link would take over two months to upload that much data.",
+      "question": "What's the most appropriate transfer method?",
+      "options": [
+        { "id": "a", "label": "AWS Snowball Edge — ship the data offline on a physical device" },
+        { "id": "b", "label": "DataSync over the existing internet link" },
+        { "id": "c", "label": "Upload manually with the CLI" },
+        { "id": "d", "label": "Email the files" }
+      ],
+      "correct": "a",
+      "explanation": "When online transfer can't meet the deadline given the bandwidth, the Snow Family moves data offline on a physical device. DataSync is great online but is bottlenecked by the link here."
+    },
+    {
+      "scenario": "A team is migrating an on-prem Oracle database to Amazon Aurora PostgreSQL with minimal downtime.",
+      "question": "Which combination of services fits?",
+      "options": [
+        { "id": "a", "label": "AWS DMS for the migration, plus the Schema Conversion Tool (SCT) to convert Oracle to PostgreSQL" },
+        { "id": "b", "label": "Snowball only" },
+        { "id": "c", "label": "Storage Gateway" },
+        { "id": "d", "label": "Transfer Family" }
+      ],
+      "correct": "a",
+      "explanation": "DMS migrates and can continuously replicate with minimal downtime; for a different engine (Oracle → PostgreSQL), SCT converts the schema and code first."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "When should you choose the Snow Family over an online transfer?",
+      "options": [
+        "When you have a tiny amount of data",
+        "When the data is too large to transfer over your network within the required time",
+        "Always, for any transfer",
+        "Only for streaming data"
+      ],
+      "answer": "When the data is too large to transfer over your network within the required time",
+      "explanation": "Snow Family (offline, physical shipping) wins when bandwidth/time make online transfer impractical for large datasets."
+    },
+    {
+      "question": "AWS DataSync is primarily used for:",
+      "options": [
+        "Shipping physical devices",
+        "Fast online bulk transfer and ongoing sync to S3, EFS, or FSx",
+        "Migrating relational databases",
+        "Hosting SFTP endpoints"
+      ],
+      "answer": "Fast online bulk transfer and ongoing sync to S3, EFS, or FSx",
+      "explanation": "DataSync accelerates and automates online data movement/sync between on-prem and AWS file/object storage."
+    },
+    {
+      "question": "AWS Storage Gateway lets on-prem applications:",
+      "options": [
+        "Run Lambda functions",
+        "Use local file/volume/tape interfaces backed by AWS storage",
+        "Replace the need for S3",
+        "Migrate databases"
+      ],
+      "answer": "Use local file/volume/tape interfaces backed by AWS storage",
+      "explanation": "Storage Gateway (File/Volume/Tape) bridges on-prem apps to AWS storage using familiar protocols."
+    },
+    {
+      "question": "To migrate a database to a DIFFERENT engine (e.g. Oracle to PostgreSQL), you pair DMS with:",
+      "options": ["The Schema Conversion Tool (SCT)", "Snowmobile", "DataSync", "CloudFront"],
+      "answer": "The Schema Conversion Tool (SCT)",
+      "explanation": "SCT converts schema and code between heterogeneous engines; DMS then moves the data."
+    },
+    {
+      "question": "Which service provides managed SFTP/FTPS endpoints that store files directly in S3?",
+      "options": ["AWS Transfer Family", "AWS DMS", "AWS Snowball", "Amazon Kinesis"],
+      "answer": "AWS Transfer Family",
+      "explanation": "Transfer Family offers fully managed SFTP/FTPS/FTP access that lands files in S3 or EFS without running servers."
+    },
+    {
+      "question": "In the AWS migration strategies, 'Rehost' means:",
+      "options": [
+        "Rewrite the app to be cloud-native",
+        "Lift-and-shift the app to AWS with minimal changes",
+        "Replace it with a SaaS product",
+        "Retire the application"
+      ],
+      "answer": "Lift-and-shift the app to AWS with minimal changes",
+      "explanation": "Rehost = lift-and-shift. The 7 R's also include Replatform, Repurchase, Refactor, Relocate, Retain, and Retire."
+    }
+  ],
+  "xpReward": 130
+}

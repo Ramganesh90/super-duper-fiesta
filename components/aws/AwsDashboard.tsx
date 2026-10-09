@@ -9,7 +9,7 @@ import WeekGrid, { type SegmentSummary } from "./WeekGrid";
 import ResetProgress from "./ResetProgress";
 
 // Client shell for the /aws home: live stats (level, readiness, streak),
-// domain badges, and the 8-week grid. All read from lib/aws/progress.
+// domain badges, and the week grid. All read from lib/aws/progress.
 export default function AwsDashboard({ segments }: { segments: SegmentSummary[] }) {
   return (
     <div className="flex flex-col gap-10">

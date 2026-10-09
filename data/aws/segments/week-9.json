@@ -1,0 +1,140 @@
+{
+  "id": "week-9",
+  "week": 9,
+  "title": "Hybrid & Advanced Networking",
+  "domain": "performance",
+  "oneLiner": "Connect on-premises to AWS and wire many VPCs together: Direct Connect, VPN, Transit Gateway, and peering.",
+  "examWeightNote": "Hybrid connectivity shows up across Resilient and High-Performing architecture questions.",
+  "objectives": [
+    "Contrast Site-to-Site VPN with AWS Direct Connect on cost, speed, and consistency.",
+    "Use Transit Gateway to connect many VPCs and on-prem networks at scale.",
+    "Know when to use VPC peering vs Transit Gateway, and that peering is non-transitive.",
+    "Reach AWS services privately with VPC endpoints and PrivateLink."
+  ],
+  "services": [
+    { "name": "AWS Direct Connect", "purpose": "A dedicated private physical link from your data center to AWS — consistent low latency and bandwidth.", "emoji": "🔌" },
+    { "name": "Site-to-Site VPN", "purpose": "Encrypted IPsec tunnels over the public internet between on-prem and a VPC — quick to set up.", "emoji": "🔐" },
+    { "name": "AWS Transit Gateway", "purpose": "A cloud router hub connecting thousands of VPCs and on-prem networks through one attachment each.", "emoji": "🚦" },
+    { "name": "VPC Peering", "purpose": "A one-to-one private connection between two VPCs; simple but non-transitive.", "emoji": "🔗" },
+    { "name": "PrivateLink / VPC Endpoints", "purpose": "Reach AWS or third-party services privately without traversing the internet.", "emoji": "🚪" }
+  ],
+  "keyConcepts": [
+    "Site-to-Site VPN is fast to deploy and cheap but rides the public internet (variable latency); Direct Connect is a dedicated private link with consistent performance but takes weeks to provision and costs more.",
+    "For resilience, pair Direct Connect with a backup VPN, or use two Direct Connect connections.",
+    "Transit Gateway is a hub-and-spoke router: attach many VPCs and VPN/Direct Connect once, instead of a mesh of peerings.",
+    "VPC peering is non-transitive — if A peers with B and B peers with C, A still can't reach C. Transit Gateway solves this at scale.",
+    "A Direct Connect Gateway lets one Direct Connect reach VPCs in multiple Regions.",
+    "Use interface endpoints (PrivateLink) for most services and free gateway endpoints for S3/DynamoDB to keep traffic off the internet."
+  ],
+  "diagram": {
+    "caption": "On-prem connects to AWS via Direct Connect and/or VPN, then a Transit Gateway fans out to many VPCs.",
+    "rows": [
+      { "nodes": [{ "label": "On-premises data center", "emoji": "🏢" }] },
+      { "nodes": [{ "label": "Direct Connect", "emoji": "🔌", "sub": "private, consistent" }, { "label": "Site-to-Site VPN", "emoji": "🔐", "sub": "encrypted backup" }] },
+      { "nodes": [{ "label": "Transit Gateway", "emoji": "🚦", "sub": "cloud router hub" }] },
+      { "group": "Attached VPCs", "nodes": [{ "label": "VPC A", "emoji": "☁️" }, { "label": "VPC B", "emoji": "☁️" }, { "label": "VPC C", "emoji": "☁️" }] }
+    ],
+    "note": "VPC peering would need a connection between every pair (and isn't transitive); Transit Gateway needs just one attachment per network."
+  },
+  "resources": [
+    { "label": "Direct Connect vs VPN", "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/introduction.html", "type": "whitepaper" },
+    { "label": "AWS Transit Gateway", "url": "https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html", "type": "docs" },
+    { "label": "VPC Peering", "url": "https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A company has 25 VPCs that all need to communicate, plus connectivity to their on-prem network. A full mesh of VPC peering is becoming unmanageable.",
+      "question": "What should they use to simplify connectivity at scale?",
+      "options": [
+        { "id": "a", "label": "AWS Transit Gateway as a central hub for all VPCs and the on-prem link" },
+        { "id": "b", "label": "More VPC peering connections" },
+        { "id": "c", "label": "A NAT gateway in each VPC" },
+        { "id": "d", "label": "Public internet routing between VPCs" }
+      ],
+      "correct": "a",
+      "explanation": "Transit Gateway replaces an N×N peering mesh with a hub: each VPC and the on-prem connection attach once. Peering is non-transitive and doesn't scale to many VPCs."
+    },
+    {
+      "scenario": "A workload needs consistent, low-latency, high-bandwidth connectivity between on-prem and AWS for a latency-sensitive application, not best-effort internet.",
+      "question": "Which connectivity option best fits?",
+      "options": [
+        { "id": "a", "label": "Site-to-Site VPN over the internet" },
+        { "id": "b", "label": "AWS Direct Connect (optionally with a VPN backup)" },
+        { "id": "c", "label": "A public NAT gateway" },
+        { "id": "d", "label": "VPC peering" }
+      ],
+      "correct": "b",
+      "explanation": "Direct Connect provides a dedicated private link with consistent latency and bandwidth. A VPN rides the public internet with variable performance; add a VPN as a cheaper backup path for resilience."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "A key difference between Site-to-Site VPN and Direct Connect is that Direct Connect:",
+      "options": [
+        "Is always free",
+        "Is a dedicated private link with consistent latency/bandwidth (but slower to provision)",
+        "Runs over the public internet",
+        "Requires no on-prem hardware"
+      ],
+      "answer": "Is a dedicated private link with consistent latency/bandwidth (but slower to provision)",
+      "explanation": "Direct Connect is a private physical connection with predictable performance; VPN is quick and cheap but uses the public internet with variable latency."
+    },
+    {
+      "question": "Why does VPC peering not scale well to many VPCs?",
+      "options": [
+        "It is encrypted",
+        "It is non-transitive and needs a connection between every pair of VPCs",
+        "It only works within one subnet",
+        "It requires Direct Connect"
+      ],
+      "answer": "It is non-transitive and needs a connection between every pair of VPCs",
+      "explanation": "Peering is one-to-one and non-transitive, so connecting N VPCs needs an N×N mesh. Transit Gateway centralizes this."
+    },
+    {
+      "question": "What is AWS Transit Gateway best described as?",
+      "options": [
+        "A managed NAT device",
+        "A central cloud router that connects many VPCs and on-prem networks via single attachments",
+        "A CDN",
+        "A database proxy"
+      ],
+      "answer": "A central cloud router that connects many VPCs and on-prem networks via single attachments",
+      "explanation": "Transit Gateway is hub-and-spoke routing — attach each VPC/VPN/Direct Connect once instead of meshing peerings."
+    },
+    {
+      "question": "To make a Direct Connect connection resilient at lower cost, a common pattern is to:",
+      "options": [
+        "Add a Site-to-Site VPN as a backup path",
+        "Disable encryption",
+        "Use a single connection and hope",
+        "Route everything over the internet"
+      ],
+      "answer": "Add a Site-to-Site VPN as a backup path",
+      "explanation": "A VPN backup provides a failover path if the Direct Connect link goes down; for higher resilience use redundant Direct Connect connections."
+    },
+    {
+      "question": "Which lets a single Direct Connect connection reach VPCs in multiple AWS Regions?",
+      "options": ["A NAT gateway", "A Direct Connect Gateway", "An internet gateway", "A VPC endpoint"],
+      "answer": "A Direct Connect Gateway",
+      "explanation": "A Direct Connect Gateway associates a Direct Connect with VPCs (via gateways) across multiple Regions."
+    },
+    {
+      "question": "To privately access Amazon S3 from a VPC without any internet path, you would use:",
+      "options": ["A gateway VPC endpoint", "A Site-to-Site VPN", "VPC peering", "A public IP"],
+      "answer": "A gateway VPC endpoint",
+      "explanation": "S3 and DynamoDB use free gateway VPC endpoints; most other services use interface endpoints (PrivateLink)."
+    },
+    {
+      "question": "A Site-to-Site VPN connection provides:",
+      "options": [
+        "A plaintext link over a private line",
+        "Encrypted IPsec tunnels over the public internet",
+        "A dedicated 10 Gbps fiber",
+        "Object storage"
+      ],
+      "answer": "Encrypted IPsec tunnels over the public internet",
+      "explanation": "Site-to-Site VPN establishes encrypted IPsec tunnels between your on-prem gateway and AWS over the internet."
+    }
+  ],
+  "xpReward": 130
+}

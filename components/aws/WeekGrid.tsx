@@ -65,7 +65,7 @@ export default function WeekGrid({ segments }: { segments: SegmentSummary[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="font-comic text-xl tracking-wide sm:text-2xl">🗓️ YOUR 8-WEEK PLAN</h3>
+      <h3 className="font-comic text-xl tracking-wide sm:text-2xl">🗓️ YOUR {segments.length}-WEEK PLAN</h3>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {segments.map((segment) => (
           <SegmentCard
