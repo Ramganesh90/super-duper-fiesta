@@ -1,0 +1,157 @@
+{
+  "id": "week-13",
+  "week": 13,
+  "title": "Serverless & Containers",
+  "domain": "performance",
+  "oneLiner": "Run code without servers and ship containers without clusters: Lambda, API Gateway, Step Functions, ECS, EKS, and Fargate.",
+  "examWeightNote": "Serverless and container patterns span High-Performing, Resilient, and Cost-Optimized designs.",
+  "objectives": [
+    "Build serverless APIs with Lambda behind API Gateway, and know Lambda's limits.",
+    "Orchestrate multi-step workflows with Step Functions (Standard vs Express).",
+    "Contrast ECS and EKS, and the EC2 vs Fargate launch types.",
+    "Know when serverless beats containers beats EC2 for a given workload."
+  ],
+  "services": [
+    { "name": "AWS Lambda", "purpose": "Run event-driven functions with no servers; pay per request and duration (up to a 15-minute timeout).", "emoji": "λ" },
+    { "name": "Amazon API Gateway", "purpose": "Managed REST/HTTP/WebSocket API front door — auth, throttling, and routing to Lambda or other backends.", "emoji": "🚪" },
+    { "name": "AWS Step Functions", "purpose": "Serverless workflow orchestration (state machine) with retries, branching, and parallelism.", "emoji": "🔀" },
+    { "name": "Amazon ECS", "purpose": "AWS-native container orchestration; runs tasks on EC2 or on serverless Fargate.", "emoji": "📦" },
+    { "name": "Amazon EKS", "purpose": "Managed Kubernetes for teams that want the Kubernetes ecosystem/portability.", "emoji": "☸️" },
+    { "name": "AWS Fargate", "purpose": "Serverless compute for ECS/EKS — run containers without managing EC2 hosts.", "emoji": "🚀" }
+  ],
+  "keyConcepts": [
+    "Lambda suits short (≤15 min), event-driven, spiky work with zero idle cost; it scales automatically. Long-running or specialized workloads belong on containers or EC2.",
+    "A classic serverless API: API Gateway (routing, auth, throttling) → Lambda (logic) → DynamoDB/RDS. Add Cognito for user auth.",
+    "Step Functions coordinates multiple Lambdas/services into a reliable workflow with built-in retries and error handling — Standard for long-running/durable, Express for high-volume short flows.",
+    "ECS is AWS-native and simpler; EKS gives you managed Kubernetes and portability. Both can run on EC2 (you manage hosts) or Fargate (serverless).",
+    "Fargate removes server management and right-sizes per task, but EC2 launch type can be cheaper at steady high scale (and allows GPUs/special instances).",
+    "Store images in Amazon ECR; for very simple containerized web apps, AWS App Runner offers an even more hands-off option."
+  ],
+  "diagram": {
+    "caption": "A serverless API on the left; containers (EC2 vs Fargate) on the right.",
+    "rows": [
+      { "nodes": [{ "label": "Clients", "emoji": "👤" }] },
+      {
+        "nodes": [
+          { "label": "API Gateway → Lambda", "emoji": "🚪", "sub": "serverless API" },
+          { "label": "ALB → ECS / EKS", "emoji": "📦", "sub": "containers" }
+        ]
+      },
+      {
+        "group": "Container launch type",
+        "nodes": [
+          { "label": "Fargate", "emoji": "🚀", "sub": "serverless, no hosts" },
+          { "label": "EC2", "emoji": "🖥️", "sub": "you manage hosts" }
+        ]
+      },
+      { "nodes": [{ "label": "Step Functions orchestrates multi-step work", "emoji": "🔀" }] }
+    ],
+    "note": "Pick by workload: spiky/short/event-driven → Lambda; long-running or portable → containers; steady heavy scale → maybe EC2 launch type."
+  },
+  "resources": [
+    { "label": "AWS Lambda", "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html", "type": "docs" },
+    { "label": "ECS vs EKS (containers on AWS)", "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/compute-services.html", "type": "whitepaper" },
+    { "label": "AWS Step Functions", "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html", "type": "docs" }
+  ],
+  "scenarios": [
+    {
+      "scenario": "A team needs a REST API for a mobile app with unpredictable, spiky traffic. They want zero idle cost and no servers to manage.",
+      "question": "Which architecture fits best?",
+      "options": [
+        { "id": "a", "label": "Amazon API Gateway in front of AWS Lambda (with DynamoDB)" },
+        { "id": "b", "label": "A fleet of always-on EC2 instances" },
+        { "id": "c", "label": "An EKS cluster running 24/7" },
+        { "id": "d", "label": "A single large EC2 with a public IP" }
+      ],
+      "correct": "a",
+      "explanation": "API Gateway + Lambda is the serverless API pattern: it scales automatically with spiky traffic, costs nothing when idle, and needs no servers. Always-on EC2/EKS incur idle cost and management overhead."
+    },
+    {
+      "scenario": "A company has containerized microservices and wants to run them without provisioning, patching, or scaling EC2 hosts.",
+      "question": "Which option meets this?",
+      "options": [
+        { "id": "a", "label": "Run ECS or EKS on AWS Fargate" },
+        { "id": "b", "label": "Run ECS on the EC2 launch type and manage the instances" },
+        { "id": "c", "label": "Deploy each container to its own Lambda layer" },
+        { "id": "d", "label": "Use a Snowball device" }
+      ],
+      "correct": "a",
+      "explanation": "Fargate is the serverless launch type for ECS/EKS — you run containers without managing the underlying hosts. The EC2 launch type would require you to manage the instances."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Which workload is the best fit for AWS Lambda?",
+      "options": [
+        "A process that must run continuously for hours",
+        "Short, event-driven, spiky tasks that should cost nothing when idle",
+        "A workload needing a specific GPU for days",
+        "A monolith that can't be changed"
+      ],
+      "answer": "Short, event-driven, spiky tasks that should cost nothing when idle",
+      "explanation": "Lambda is ideal for short (≤15 min), event-driven, bursty work with no idle cost and automatic scaling."
+    },
+    {
+      "question": "What does Amazon API Gateway provide in a serverless API?",
+      "options": [
+        "A managed API front door with routing, auth, and throttling (often to Lambda)",
+        "A relational database",
+        "Container orchestration",
+        "A CDN cache only"
+      ],
+      "answer": "A managed API front door with routing, auth, and throttling (often to Lambda)",
+      "explanation": "API Gateway handles REST/HTTP/WebSocket APIs — routing, authorization, and throttling — commonly in front of Lambda."
+    },
+    {
+      "question": "AWS Step Functions is used to:",
+      "options": [
+        "Store container images",
+        "Orchestrate multi-step workflows with retries and branching across services",
+        "Serve static web content",
+        "Encrypt data at rest"
+      ],
+      "answer": "Orchestrate multi-step workflows with retries and branching across services",
+      "explanation": "Step Functions coordinates Lambdas/services into durable state-machine workflows with built-in error handling (Standard vs Express)."
+    },
+    {
+      "question": "What is the difference between the ECS EC2 and Fargate launch types?",
+      "options": [
+        "EC2 launch type means you manage the host instances; Fargate is serverless (no hosts to manage)",
+        "Fargate requires you to patch servers; EC2 does not",
+        "They are identical",
+        "Fargate only runs on-premises"
+      ],
+      "answer": "EC2 launch type means you manage the host instances; Fargate is serverless (no hosts to manage)",
+      "explanation": "With the EC2 launch type you provision/patch/scale the cluster instances; Fargate removes that by running tasks serverlessly."
+    },
+    {
+      "question": "When would you choose Amazon EKS over Amazon ECS?",
+      "options": [
+        "When you want the Kubernetes ecosystem and portability",
+        "When you never want to use containers",
+        "When you need a relational database",
+        "When you want to avoid all orchestration"
+      ],
+      "answer": "When you want the Kubernetes ecosystem and portability",
+      "explanation": "EKS is managed Kubernetes — pick it for Kubernetes tooling/portability; ECS is simpler and AWS-native."
+    },
+    {
+      "question": "Where are container images stored for ECS/EKS on AWS?",
+      "options": ["Amazon ECR (Elastic Container Registry)", "Amazon S3 Glacier", "AWS Secrets Manager", "Amazon Athena"],
+      "answer": "Amazon ECR (Elastic Container Registry)",
+      "explanation": "ECR is AWS's managed container image registry, integrated with ECS, EKS, and IAM."
+    },
+    {
+      "question": "A key limit of AWS Lambda to remember is:",
+      "options": [
+        "It can run for a maximum of 15 minutes per invocation",
+        "It can only run once per day",
+        "It cannot be triggered by events",
+        "It requires you to manage servers"
+      ],
+      "answer": "It can run for a maximum of 15 minutes per invocation",
+      "explanation": "Lambda functions have a 15-minute maximum execution time; longer jobs should use containers, Batch, or EC2."
+    }
+  ],
+  "xpReward": 130
+}

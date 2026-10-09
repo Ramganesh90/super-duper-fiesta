@@ -11,6 +11,7 @@ import week9 from "@/data/aws/segments/week-9.json";
 import week10 from "@/data/aws/segments/week-10.json";
 import week11 from "@/data/aws/segments/week-11.json";
 import week12 from "@/data/aws/segments/week-12.json";
+import week13 from "@/data/aws/segments/week-13.json";
 
 // Ordered by week — the study plan is meant to be worked through in sequence.
 const segments = [
@@ -26,6 +27,7 @@ const segments = [
   week10,
   week11,
   week12,
+  week13,
 ] as unknown as Segment[];
 
 export function getAllSegments(): Segment[] {
