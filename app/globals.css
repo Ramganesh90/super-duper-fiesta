@@ -15,6 +15,8 @@
   --color-aws-navy: #232f3e;
   --color-ai-violet: #7c3aed;
   --color-ai-violet-dark: #5b21b6;
+  --color-design-teal: #2dd4bf;
+  --color-design-teal-dark: #0f766e;
 
   /* Fixed on-accent text colors — these never flip with the theme, so text on
      bright accent buttons (yellow/orange/blue/red/violet fills) stays readable. */
@@ -53,6 +55,7 @@
   --color-ai-violet-dark: #c4a6ff;
   --color-hero-blue-dark: #8fb3ff;
   --color-action-red-dark: #ff8a9a;
+  --color-design-teal-dark: #5eead4;
   --halftone: rgba(236, 233, 251, 0.05);
   --shadow-comic: 0 0 0 1px rgba(236, 233, 251, 0.1), 6px 6px 16px rgba(0, 0, 0, 0.55);
   --shadow-comic-sm: 0 0 0 1px rgba(236, 233, 251, 0.1), 3px 3px 10px rgba(0, 0, 0, 0.5);
@@ -71,6 +74,7 @@
     --color-ai-violet-dark: #c4a6ff;
     --color-hero-blue-dark: #8fb3ff;
     --color-action-red-dark: #ff8a9a;
+    --color-design-teal-dark: #5eead4;
     --halftone: rgba(236, 233, 251, 0.05);
     --shadow-comic: 0 0 0 1px rgba(236, 233, 251, 0.1), 6px 6px 16px rgba(0, 0, 0, 0.55);
     --shadow-comic-sm: 0 0 0 1px rgba(236, 233, 251, 0.1), 3px 3px 10px rgba(0, 0, 0, 0.5);

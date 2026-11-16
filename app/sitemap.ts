@@ -54,6 +54,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/ai/builder`,
       lastModified: new Date(),
     },
+    {
+      url: `${SITE_URL}/design`,
+      lastModified: new Date(),
+    },
     ...patternRoutes,
     ...awsRoutes,
     ...aiRoutes,

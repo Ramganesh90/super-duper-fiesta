@@ -104,6 +104,28 @@ export default function Home() {
               Enter AI Academy →
             </Link>
           </div>
+
+          {/* System Design Studio */}
+          <div className="comic-border flex flex-col bg-paper p-6 transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl" aria-hidden="true">🧊</span>
+              <div>
+                <h3 className="font-comic text-2xl tracking-wide text-design-teal-dark">System Design Studio</h3>
+                <p className="text-sm text-ink/70">architecture · build in 3D</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed sm:text-base">
+              Build any system architecture on a 3D canvas. Add components, connect them, and get live
+              feedback — single points of failure, missing pieces, and bottlenecks light up, with
+              one-click fixes.
+            </p>
+            <Link
+              href="/design"
+              className="comic-border-sm font-comic mt-auto self-start bg-design-teal px-5 py-2.5 text-ink-fixed tracking-wide transition-transform hover:-translate-y-0.5"
+            >
+              Open the Studio →
+            </Link>
+          </div>
         </div>
       </section>
 

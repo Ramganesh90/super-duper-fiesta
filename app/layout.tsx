@@ -82,6 +82,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 AI
               </Link>
+              <Link
+                href="/design"
+                className="comic-border-sm font-comic bg-design-teal px-3 py-1.5 text-sm text-ink-fixed transition-transform hover:-translate-y-0.5 sm:text-base"
+              >
+                Design
+              </Link>
               <ThemeToggle />
             </nav>
           </div>
