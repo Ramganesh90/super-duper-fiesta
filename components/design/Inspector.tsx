@@ -1,6 +1,6 @@
 "use client";
 
-import { CATALOG } from "@/lib/design/catalog";
+import { CATALOG, AWS_SERVICE, iconUrl } from "@/lib/design/catalog";
 import type { DesignNode, Finding, NodeLoad, OptionKey } from "@/lib/design/types";
 
 const OPTION_LABELS: Record<OptionKey, string> = {
@@ -41,11 +41,16 @@ export default function Inspector({
   return (
     <div className="comic-border-sm flex flex-col gap-3 bg-paper p-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-comic text-lg tracking-wide">{entry.emoji} {entry.label}</span>
+        <span className="flex items-center gap-2 font-comic text-lg tracking-wide">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={iconUrl(node.type)} alt="" width={24} height={24} className="shrink-0 rounded bg-white" />
+          {entry.label}
+        </span>
         <button type="button" onClick={() => onDelete(node.id)} className="text-xs font-semibold text-action-red hover:underline">
           delete
         </button>
       </div>
+      <p className="-mt-1 text-xs text-ink/50">{AWS_SERVICE[node.type]}</p>
 
       <label className="flex flex-col gap-1 text-xs font-semibold">
         Label

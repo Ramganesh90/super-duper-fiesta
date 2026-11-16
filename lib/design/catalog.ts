@@ -84,6 +84,31 @@ export const CATALOG: Record<ComponentType, CatalogEntry> = {
   },
 };
 
+/** Nearest AWS service for each generic component — shown in tooltips and used for the icon. */
+export const AWS_SERVICE: Record<ComponentType, string> = {
+  client: "Client",
+  dns: "Amazon Route 53",
+  cdn: "Amazon CloudFront",
+  waf: "AWS WAF",
+  "load-balancer": "Elastic Load Balancing",
+  "api-gateway": "Amazon API Gateway",
+  service: "Amazon EC2",
+  worker: "AWS Lambda",
+  cache: "Amazon ElastiCache",
+  "sql-db": "Amazon RDS",
+  "nosql-db": "Amazon DynamoDB",
+  queue: "Amazon SQS",
+  "object-storage": "Amazon S3",
+  search: "Amazon OpenSearch",
+  auth: "Amazon Cognito",
+  monitoring: "Amazon CloudWatch",
+};
+
+/** Path to the AWS architecture icon (static asset) for a component type. */
+export function iconUrl(t: ComponentType): string {
+  return `/aws-icons/${t}.svg`;
+}
+
 export const CATEGORY_ORDER: Category[] = ["Entry", "Traffic", "Compute", "Data", "Messaging", "Platform"];
 
 export const ALL_TYPES = Object.keys(CATALOG) as ComponentType[];

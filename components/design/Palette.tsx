@@ -1,6 +1,6 @@
 "use client";
 
-import { CATALOG, CATEGORY_ORDER, ALL_TYPES } from "@/lib/design/catalog";
+import { CATALOG, CATEGORY_ORDER, ALL_TYPES, AWS_SERVICE, iconUrl } from "@/lib/design/catalog";
 import type { Category, ComponentType } from "@/lib/design/types";
 
 export default function Palette({ onAdd }: { onAdd: (t: ComponentType) => void }) {
@@ -19,10 +19,11 @@ export default function Palette({ onAdd }: { onAdd: (t: ComponentType) => void }
                   key={t}
                   type="button"
                   onClick={() => onAdd(t as ComponentType)}
-                  title={CATALOG[t].blurb}
-                  className="comic-border-sm flex items-center gap-1 bg-paper px-2 py-1 text-xs font-semibold transition-transform hover:-translate-y-0.5"
+                  title={`${AWS_SERVICE[t]} — ${CATALOG[t].blurb}`}
+                  className="comic-border-sm flex items-center gap-1.5 bg-paper px-2 py-1 text-xs font-semibold transition-transform hover:-translate-y-0.5"
                 >
-                  <span aria-hidden="true">{CATALOG[t].emoji}</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={iconUrl(t)} alt="" width={18} height={18} className="shrink-0 rounded-[3px] bg-white" />
                   {CATALOG[t].label}
                 </button>
               ))}

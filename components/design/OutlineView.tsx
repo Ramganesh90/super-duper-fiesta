@@ -1,6 +1,6 @@
 "use client";
 
-import { CATALOG } from "@/lib/design/catalog";
+import { iconUrl } from "@/lib/design/catalog";
 import type { Design } from "@/lib/design/types";
 
 // A plain-DOM view of the same graph — keyboard & screen-reader friendly, and the
@@ -36,8 +36,10 @@ export default function OutlineView({
                     selectedId === n.id ? "ring-2 ring-hero-blue" : ""
                   } ${hl === "fail" ? "ring-2 ring-action-red" : hl === "warn" ? "ring-2 ring-amber-500" : ""}`}
                 >
-                  <button type="button" onClick={() => onNodeActivate(n.id)} className="flex-1 text-left font-semibold">
-                    {CATALOG[n.type].emoji} {n.label}
+                  <button type="button" onClick={() => onNodeActivate(n.id)} className="flex flex-1 items-center gap-2 text-left font-semibold">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={iconUrl(n.type)} alt="" width={18} height={18} className="shrink-0 rounded-[3px] bg-white" />
+                    {n.label}
                     {n.replicas > 1 ? <span className="text-ink/50"> ×{n.replicas}</span> : null}
                     {connectSource === n.id ? <span className="text-emerald-700"> (connecting…)</span> : null}
                     {hl ? <span aria-hidden="true"> {hl === "fail" ? "❌" : "⚠️"}</span> : null}

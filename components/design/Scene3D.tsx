@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { CATALOG } from "@/lib/design/catalog";
+import { CATALOG, iconUrl } from "@/lib/design/catalog";
 import type { Design, DesignNode, NodeLoad, Shape } from "@/lib/design/types";
 
 const SPACING = 2.4;
@@ -113,7 +113,8 @@ function NodeMesh({
       )}
 
       <Label
-        text={`${entry.emoji} ${node.label}${node.replicas > 1 ? ` ×${node.replicas}` : ""}`}
+        text={`${node.label}${node.replicas > 1 ? ` ×${node.replicas}` : ""}`}
+        icon={iconUrl(node.type)}
         color={entry.color}
         dark={dark}
         y={1.25}
@@ -133,44 +134,72 @@ function roundRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
 }
 
 // In-canvas text label as a camera-facing sprite (no DOM portal → no reconciler teardown errors).
-function Label({ text, color, dark, y }: { text: string; color: string; dark: boolean; y: number }) {
+// Draws the AWS architecture icon onto the texture next to the component name.
+function Label({ text, icon, color, dark, y }: { text: string; icon: string; color: string; dark: boolean; y: number }) {
   const [data, setData] = useState<{ tex: THREE.CanvasTexture; w: number; h: number } | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    let done = false;
+    const img = new Image();
+
     const build = () => {
       const fontSize = 46;
-      const padX = 22;
+      const padX = 20;
       const padY = 16;
+      const iconSize = 54;
+      const gap = 14;
       const font = `700 ${fontSize}px system-ui, -apple-system, "Segoe UI", sans-serif`;
-      const measureCanvas = document.createElement("canvas");
-      const m = measureCanvas.getContext("2d");
-      if (!m) return;
-      m.font = font;
-      const textW = Math.ceil(m.measureText(text).width);
+      const hasIcon = img.naturalWidth > 0;
+
+      const measure = document.createElement("canvas").getContext("2d");
+      if (!measure) return;
+      measure.font = font;
+      const textW = Math.ceil(measure.measureText(text).width);
+      const iconSpace = hasIcon ? iconSize + gap : 0;
 
       const canvas = document.createElement("canvas");
-      canvas.width = textW + padX * 2;
-      canvas.height = fontSize + padY * 2;
+      canvas.width = padX * 2 + iconSpace + textW;
+      canvas.height = Math.max(fontSize, iconSize) + padY * 2;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      ctx.font = font;
-      ctx.textBaseline = "middle";
+
+      // card background + accent border
       roundRectPath(ctx, 1.5, 1.5, canvas.width - 3, canvas.height - 3, 16);
       ctx.fillStyle = dark ? "rgba(14,11,22,0.88)" : "rgba(255,255,255,0.92)";
       ctx.fill();
       ctx.lineWidth = 3;
       ctx.strokeStyle = color;
       ctx.stroke();
+
+      // AWS icon on a white tile (keeps the dark client glyph visible in dark mode)
+      if (hasIcon) {
+        const iy = (canvas.height - iconSize) / 2;
+        roundRectPath(ctx, padX, iy, iconSize, iconSize, 8);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.drawImage(img, padX, iy, iconSize, iconSize);
+      }
+
+      ctx.font = font;
+      ctx.textBaseline = "middle";
       ctx.fillStyle = dark ? "#ece9fb" : "#14121a";
-      ctx.fillText(text, padX, canvas.height / 2 + 1);
+      ctx.fillText(text, padX + iconSpace, canvas.height / 2 + 1);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.anisotropy = 4;
       tex.needsUpdate = true;
       setData({ tex, w: canvas.width, h: canvas.height });
     };
-    build();
-  }, [text, color, dark]);
+
+    const finish = () => { if (done || cancelled) return; done = true; build(); };
+    img.onload = finish;
+    img.onerror = finish; // fall back to a text-only card
+    img.src = icon;
+    if (img.complete) finish();
+
+    return () => { cancelled = true; };
+  }, [text, icon, color, dark]);
 
   useEffect(() => () => { data?.tex.dispose(); }, [data]);
 
