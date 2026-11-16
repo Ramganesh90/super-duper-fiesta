@@ -205,7 +205,7 @@ export default function DesignStudio() {
           </label>
           {webglOk && (
             <button type="button" onClick={() => setView(view === "3d" ? "outline" : "3d")} className="comic-border-sm bg-paper px-2 py-1 text-xs font-semibold">
-              {view === "3d" ? "📋 Outline" : "🧊 3D"}
+              {view === "3d" ? "Outline view" : "3D view"}
             </button>
           )}
         </div>
